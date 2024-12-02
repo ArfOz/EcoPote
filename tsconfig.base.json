@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@database": ["libs/src/index.ts"]
+      "@database": ["libs/database/src/index.ts"],
+      "@user": ["libs/database/user/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
