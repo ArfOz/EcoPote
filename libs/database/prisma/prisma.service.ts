@@ -6,16 +6,6 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-  constructor() {
-    super({
-      datasources: {
-        db: {
-          url: 'file:./configs/prisma/my-schema.prisma',
-        },
-      },
-    });
-  }
-
   async onModuleInit() {
     await this.$connect();
   }
