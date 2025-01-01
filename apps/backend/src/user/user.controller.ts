@@ -6,17 +6,19 @@ import {
   Delete,
   Param,
   Body,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
+import { CreateUserDto } from './dto/user.dtos';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
-  async findAll() {
-    return this.userService.findAll();
-  }
+  // @Get()
+  // async findAll() {
+  //   return this.userService.findAll();
+  // }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
@@ -24,8 +26,12 @@ export class UserController {
   }
 
   @Post()
-  async create(@Body() data: { email: string; subscripton: true }) {
-    return this.userService.create(data);
+  async create(@Body() data: CreateUserDto) {
+    console.log(data);
+    return await this.userService.create({
+      ...data,
+      subscripton: data.subscripton ?? true,
+    });
   }
 
   @Put(':id')
