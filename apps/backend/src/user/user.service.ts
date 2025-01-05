@@ -1,36 +1,39 @@
-import { UserDatabaseService } from '@database';
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { UserDatabaseService } from '@database';
 
 @Injectable()
 export class UserService {
   constructor(private userDatabaseService: UserDatabaseService) {}
 
-  // async findAll(): Promise<User[]> {
-  //   return this.userDatabaseService.findAll();
-  // }
-
-  async findOne(id: number): Promise<User | null> {
-    return this.userDatabaseService.findOne(id);
-  }
-
-  async findByEmail(email: string): Promise<User | null> {
-    const users = await this.userDatabaseService.findAll({
-      where: { email },
-    });
-    return users[0] || null;
-  }
-
-  async create(data: {
+  async register(data: {
     email: string;
-    subscripton: boolean;
+    subscription: boolean;
   }): Promise<User | { error: string }> {
-    const user = await this.findByEmail(data.email);
-    console.log(user);
+    const user = await this.userDatabaseService.findAll({
+      where: { email: data.email },
+    });
     if (user) {
       return { error: 'User already exists' };
     }
     return this.userDatabaseService.create(data);
+  }
+
+  async unregister(data: { email: string }): Promise<User | { error: string }> {
+    console.log('userunregister', data.email);
+
+    const user = await this.userDatabaseService.findAll({
+      where: { email: data.email },
+    });
+
+    console.log('userunregister', user);
+    if (!user) {
+      return { error: 'User not found' };
+    }
+    // return this.userDatabaseService.update({
+
+    // });
+    return { error: 'Not implemented' };
   }
 
   async update(id: number, data: Partial<User>): Promise<User> {

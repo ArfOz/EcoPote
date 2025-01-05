@@ -1,14 +1,33 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
-export class CreateUserDto {
+export class RegisterUserDto {
+  @IsNotEmpty()
   @IsEmail(
     {},
     { message: 'The email field must contain a valid email address.' }
   )
-  @IsNotEmpty()
   email: string;
 
-  @IsString()
+  @IsBoolean()
   @IsOptional()
-  subscripton?: boolean;
+  subscription: boolean;
+}
+
+export class UnregisterUserDto {
+  @IsNotEmpty()
+  @IsEmail(
+    {},
+    { message: 'The email field must contain a valid email address.' }
+  )
+  email: string;
+
+  @IsBoolean()
+  @IsOptional()
+  subscription: boolean;
 }

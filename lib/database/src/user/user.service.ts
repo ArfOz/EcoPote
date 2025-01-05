@@ -7,7 +7,10 @@ export class UserDatabaseService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(params: { where: Prisma.UserWhereInput }): Promise<User[]> {
-    return this.prisma.user.findMany();
+    console.log('params', params.where.email);
+    return await this.prisma.user.findMany({
+      where: params.where,
+    });
   }
 
   async findOne(id: number): Promise<User | null> {
@@ -16,7 +19,7 @@ export class UserDatabaseService {
     });
   }
 
-  async create(data: { email: string; subscripton: boolean }): Promise<User> {
+  async create(data: { email: string; subscription: boolean }): Promise<User> {
     return this.prisma.user.create({
       data,
     });
