@@ -6,16 +6,19 @@ import { Prisma, User } from '@prisma/client';
 export class UserDatabaseService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(params: { where: Prisma.UserWhereInput }): Promise<User[]> {
-    console.log('params', params.where.email);
+  async findAll(params: { where?: Prisma.UserWhereInput }): Promise<User[]> {
     return await this.prisma.user.findMany({
       where: params.where,
     });
   }
-
-  async findOne(id: number): Promise<User | null> {
+  async findByEmail(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
     return this.prisma.user.findUnique({
-      where: { id },
+      where,
+    });
+  }
+  async findOne(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where,
     });
   }
 

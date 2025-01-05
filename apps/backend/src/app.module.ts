@@ -4,6 +4,7 @@ import generalConfig from '@shared/config/general.config';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from '@database';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { DatabaseModule } from '@database';
       load: [generalConfig],
     }),
     UserModule,
+    AdminModule,
     DatabaseModule,
   ],
   controllers: [],
