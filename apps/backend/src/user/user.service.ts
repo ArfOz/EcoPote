@@ -10,43 +10,37 @@ export class UserService {
     email: string;
     subscription: boolean;
   }): Promise<User | { error: string }> {
-    const user = await this.userDatabaseService.findByEmail({
-      email: data.email,
+    const user = await this.userDatabaseService.findAll({
+      where: { email: data.email },
     });
     if (user) {
-      switch (user.subscription) {
-        case true:
-          return { error: 'User already subscribed' };
-        case false:
-          return this.userDatabaseService.update(user.id, {
-            subscription: true,
-          });
-      }
+      return { error: 'User already exists' };
     }
-
     return this.userDatabaseService.create(data);
   }
 
   async unregister(data: { email: string }): Promise<User | { error: string }> {
-    const user = await this.userDatabaseService.findByEmail({
-      email: data.email,
+    console.log('userunregister', data.email);
+
+    const user = await this.userDatabaseService.findAll({
+      where: { email: data.email },
     });
 
+    console.log('userunregister', user);
     if (!user) {
       return { error: 'User not found' };
     }
-    return this.userDatabaseService.update(user.id, { subscription: false });
+    // return this.userDatabaseService.update({
+
+    // });
+    return { error: 'Not implemented' };
+  }
+
+  async update(id: number, data: Partial<User>): Promise<User> {
+    return this.userDatabaseService.update(id, data);
   }
 
   async delete(id: number): Promise<void> {
     await this.userDatabaseService.delete(id);
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userDatabaseService.findAll({});
-  }
-
-  async update(data: Partial<User>): Promise<User | { error: string }> {
-    return this.userDatabaseService.update(data.id, data);
   }
 }

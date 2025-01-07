@@ -9,15 +9,16 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import {
-  RegisterUserDto,
-  UnregisterUserDto,
-  UpdateUserDto,
-} from './dto/user.dtos';
+import { RegisterUserDto, UnregisterUserDto } from './dto/user.dtos';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  // @Get()
+  // async findAll() {
+  //   return this.userService.findAll();
+  // }
 
   @Post('register')
   async register(@Body() data: RegisterUserDto) {
@@ -34,18 +35,16 @@ export class UserController {
     });
   }
 
+  // @Put(':id')
+  // async update(
+  //   @Param('id') id: string,
+  //   @Body() data: { name?: string; email?: string; password?: string }
+  // ) {
+  //   return this.userService.update(Number(id), data);
+  // }
+
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.userService.delete(Number(id));
-  }
-
-  @Get('showall')
-  async findAll() {
-    return this.userService.findAll();
-  }
-
-  @Post('update')
-  async update(@Body() data: UpdateUserDto) {
-    return await this.userService.update(data);
   }
 }

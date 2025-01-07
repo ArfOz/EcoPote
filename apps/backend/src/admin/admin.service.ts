@@ -6,6 +6,20 @@ import { UserDatabaseService } from '@database';
 export class AdminService {
   constructor(private readonly userDatabaseService: UserDatabaseService) {}
 
+  async login(credentials: {
+    email: string;
+    password: string;
+  }): Promise<{ token: string }> {
+    // Implement login logic here
+    const token = 'your_generated_token'; // Replace with actual token generation logic
+    return { token };
+  }
+  async logout(userId: number): Promise<void> {
+    // Implement logout logic here
+    // For example, you can invalidate the user's token or remove the session
+    console.log(`User with ID ${userId} has been logged out.`);
+  }
+
   async addUser(userData: {
     email: string;
     subscription: boolean;
