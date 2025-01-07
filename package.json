@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "migrate:database": "npx prisma migrate dev --name init --schema=./libs/database/prisma/schema.prisma",
-    "database:generate": "npx generate --schema=./libs/database/prisma/schema.prisma",
-    "database:push": "npx prisma db push --schema=./libs/database/prisma/schema.prisma",
+    "migrate:database": "npx prisma migrate dev --name init --schema=./libs/database/src/prisma/schema.prisma",
+    "database:generate": "npx generate --schema=./libs/database/src/prisma/schema.prisma",
+    "database:push": "npx prisma db push --schema=./libs/database/src/prisma/schema.prisma",
     "backend": "npx nx run backend:serve "
   },
   "private": true,
