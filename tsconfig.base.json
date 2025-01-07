@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@database": ["libs/database/src/index.ts"],
+      "@auth": ["libs/auth/src/index.ts"],
       "@shared/*": ["libs/shared/*"]
     }
   },

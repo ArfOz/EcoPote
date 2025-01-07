@@ -1,10 +1,47 @@
-import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { UserDatabaseService } from '@database';
+import { KeypairService } from '@shared/keypair/keypair.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { Admin, User } from '@prisma/client';
+import { AdminDatabaseService, UserDatabaseService } from '@database';
+import generalConfig from '@shared/config/general.config';
+import authConfig from '@shared/config/auth.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AdminService {
-  constructor(private readonly userDatabaseService: UserDatabaseService) {}
+  constructor(
+    private readonly userDatabaseService: UserDatabaseService,
+    private readonly adminDatabaseService: AdminDatabaseService,
+    @Inject(generalConfig.KEY)
+    private readonly generalCfg: ConfigType<typeof generalConfig>,
+    @Inject(authConfig.KEY)
+    private readonly authCfg: ConfigType<typeof authConfig>,
+    private readonly keypairService: KeypairService
+  ) {}
+
+  async addAdmin(adminData: {
+    email: string;
+    password: string;
+  }): Promise<Admin> {
+    const keys = this.keypairService.generateKey();
+
+    // Encrypt the public and private keys
+    const pubKey = this.keypairService.encryptData(
+      this.generalCfg.publicKey,
+      this.generalCfg.privateKey,
+      keys.publicKey
+    );
+    const privKey = this.keypairService.encryptData(
+      this.generalCfg.publicKey,
+      this.generalCfg.privateKey,
+      keys.secretKey
+    );
+
+    return this.adminDatabaseService.create({
+      ...adminData,
+      publicKey: pubKey,
+      privateKey: privKey,
+    });
+  }
 
   async login(credentials: {
     email: string;

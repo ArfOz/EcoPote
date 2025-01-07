@@ -7,4 +7,7 @@ export default registerAs('general', () => ({
   database_password: process.env.DATABASE_PASSWORD,
   database_name: process.env.DATABASE_NAME,
   database_url: process.env.DATABASE_URL,
+  publicKey: process.env.PUBLIC_KEY,
+  privateKey: process.env.PRIVATE_KEY,
+  nonce: process.env.NONCE,
 }));

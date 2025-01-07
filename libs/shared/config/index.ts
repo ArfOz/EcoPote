@@ -1,1 +1,2 @@
-export * from './general.config';
+export * as authConfig from './auth.config';
+export * as generalConfig from './general.config';
