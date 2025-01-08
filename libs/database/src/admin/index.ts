@@ -1,2 +1,2 @@
-export * from './admin.module';
-export * from './admin.service';
+export * from './admin-database.module';
+export * from './admin-database.service';

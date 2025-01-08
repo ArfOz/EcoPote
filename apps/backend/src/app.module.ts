@@ -1,3 +1,4 @@
+import { Admin } from '@prisma/client';
 import { Module } from '@nestjs/common';
 
 import generalConfig from '@shared/config/general.config';
@@ -13,9 +14,9 @@ import { AdminModule } from './admin/admin.module';
       isGlobal: true,
       load: [generalConfig],
     }),
+    DatabaseModule,
     UserModule,
     AdminModule,
-    DatabaseModule,
   ],
   controllers: [],
   providers: [],
