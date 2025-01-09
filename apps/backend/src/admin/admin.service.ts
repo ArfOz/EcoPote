@@ -5,52 +5,55 @@ import generalConfig from '@shared/config/general.config';
 import authConfig from '@shared/config/auth.config';
 import { ConfigType } from '@nestjs/config';
 import { sign } from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
+import { AuthService } from '@auth';
 
 @Injectable()
 export class AdminService {
   constructor(
-    // private readonly adminDatabaseService: AdminDatabaseService,
+    private readonly adminDatabaseService: AdminDatabaseService,
     @Inject(generalConfig.KEY)
     private readonly generalCfg: ConfigType<typeof generalConfig>,
     @Inject(authConfig.KEY)
     private readonly authCfg: ConfigType<typeof authConfig>,
-    private readonly userDatabaseService: UserDatabaseService
+    private readonly userDatabaseService: UserDatabaseService,
+    private readonly authService: AuthService
   ) {}
 
-  // async addAdmin(adminData: {
-  //   email: string;
-  //   password: string;
-  // }): Promise<Admin> {
-  //   const keys = this.keypairService.generateKey();
-
-  //   // Encrypt the public and private keys
-  //   const pubKey = this.keypairService.encryptData(
-  //     this.generalCfg.publicKey,
-  //     this.generalCfg.privateKey,
-  //     keys.publicKey
-  //   );
-  //   const privKey = this.keypairService.encryptData(
-  //     this.generalCfg.publicKey,
-  //     this.generalCfg.privateKey,
-  //     keys.secretKey
-  //   );
-
-  //   return this.adminDatabaseService.create({
-  //     ...adminData,
-  //     publicKey: pubKey,
-  //     privateKey: privKey,
-  //   });
-  // }
+  async addAdmin(adminData: {
+    email: string;
+    password: string;
+  }): Promise<Admin> {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(adminData.password, saltRounds);
+    adminData.password = hashedPassword;
+    return this.adminDatabaseService.create(adminData);
+  }
 
   async login(credentials: {
     email: string;
     password: string;
-  }): Promise<{ token: string }> {
-    // Implement login logic here
-    const payload = { email: credentials.email };
+  }): Promise<{ access_token: string }> {
+    const admin = await this.adminDatabaseService.findByEmail({
+      email: credentials.email,
+    });
 
-    const token = sign(payload, this.authCfg.jwt_secret, { expiresIn: '1h' });
-    return { token };
+    const isPasswordValid = await bcrypt.compare(
+      credentials.password,
+      admin.password
+    );
+
+    if (!isPasswordValid) {
+      throw new Error('Invalid password');
+    }
+
+    return this.authService.login(credentials);
+
+    // // Implement login logic here
+    // const payload = { email: credentials.email };
+
+    // const token = sign(payload, this.authCfg.jwt_secret, { expiresIn: '1h' });
+    // return { token };
   }
   async logout(userId: number): Promise<void> {
     // Implement logout logic here

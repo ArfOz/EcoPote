@@ -8,23 +8,29 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { User } from '@prisma/client';
+import { Admin, User } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
-import generalConfig from '@shared/config/general.config';
-import { ConfigType } from '@nestjs/config';
 
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  // @UseGuards(AuthGuard('jwt'))
+  @Post('create')
+  async createAdmin(
+    @Body() adminData: { email: string; password: string }
+  ): Promise<Admin> {
+    return this.adminService.addAdmin(adminData);
+  }
+
   @Post('login')
   async login(
     @Body() credentials: { email: string; password: string }
-  ): Promise<{ token: string }> {
+  ): Promise<{ access_token: string }> {
     return this.adminService.login(credentials);
   }
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Post('logout')
   async logout(@Body() { id }: { id: number }): Promise<void> {
     return this.adminService.logout(id);
@@ -42,6 +48,7 @@ export class AdminController {
     return this.adminService.removeUser(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('users')
   async getAllUsers(): Promise<User[]> {
     return this.adminService.listUsers();

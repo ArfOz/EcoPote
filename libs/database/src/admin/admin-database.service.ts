@@ -11,10 +11,8 @@ export class AdminDatabaseService {
       where: params.where,
     });
   }
-  async findByEmail(
-    where: Prisma.AdminWhereUniqueInput
-  ): Promise<Admin | null> {
-    return this.prisma.admin.findUnique({
+  async findByEmail(where: Prisma.AdminWhereInput): Promise<Admin | null> {
+    return this.prisma.admin.findFirst({
       where,
     });
   }
@@ -24,12 +22,7 @@ export class AdminDatabaseService {
     });
   }
 
-  async create(data: {
-    email: string;
-    password: string;
-    publicKey: string;
-    privateKey: string;
-  }): Promise<Admin> {
+  async create(data: { email: string; password: string }): Promise<Admin> {
     return this.prisma.admin.create({
       data,
     });

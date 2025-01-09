@@ -6,7 +6,6 @@ import {
   Delete,
   Param,
   Body,
-  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterUserDto, UnregisterUserDto } from './dto/user.dtos';
@@ -35,13 +34,13 @@ export class UserController {
     });
   }
 
-  // @Put(':id')
-  // async update(
-  //   @Param('id') id: string,
-  //   @Body() data: { name?: string; email?: string; password?: string }
-  // ) {
-  //   return this.userService.update(Number(id), data);
-  // }
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() data: { name?: string; email?: string; password?: string }
+  ) {
+    return this.userService.update(Number(id), data);
+  }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {

@@ -11,6 +11,7 @@ import {
 import { ConfigModule } from '@nestjs/config';
 import generalConfig from '@shared/config/general.config';
 import authConfig from '@shared/config/auth.config';
+import { AuthModule, AuthService } from '@auth';
 
 @Module({
   imports: [
@@ -18,8 +19,10 @@ import authConfig from '@shared/config/auth.config';
     ConfigModule.forFeature(authConfig),
     UserDatabaseModule,
     DatabaseModule,
+    AdminDatabaseModule,
+    AuthModule,
   ],
   controllers: [AdminController],
-  providers: [AdminService, UserDatabaseService],
+  providers: [AdminService, UserDatabaseService, AdminDatabaseModule],
 })
 export class AdminModule {}
