@@ -15,7 +15,6 @@ import { AuthGuard } from '@nestjs/passport';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  // @UseGuards(AuthGuard('jwt'))
   @Post('create')
   async createAdmin(
     @Body() adminData: { email: string; password: string }
@@ -36,6 +35,7 @@ export class AdminController {
     return this.adminService.logout(id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('users')
   async createUser(
     @Body() userData: { email: string; subscription: boolean }
@@ -43,6 +43,7 @@ export class AdminController {
     return this.adminService.addUser(userData);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete('users/:id')
   async deleteUser(@Param('id') id: number): Promise<void> {
     return this.adminService.removeUser(id);

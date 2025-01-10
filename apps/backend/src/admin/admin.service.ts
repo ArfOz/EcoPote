@@ -48,12 +48,6 @@ export class AdminService {
     }
 
     return this.authService.login(credentials);
-
-    // // Implement login logic here
-    // const payload = { email: credentials.email };
-
-    // const token = sign(payload, this.authCfg.jwt_secret, { expiresIn: '1h' });
-    // return { token };
   }
   async logout(userId: number): Promise<void> {
     // Implement logout logic here
