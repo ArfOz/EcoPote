@@ -4,9 +4,11 @@ import { AdminDatabaseService, UserDatabaseService } from '@database';
 import generalConfig from '@shared/config/general.config';
 import authConfig from '@shared/config/auth.config';
 import { ConfigType } from '@nestjs/config';
-import { sign } from 'jsonwebtoken';
+
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '@auth';
+
+import { emailSender } from '@shared/nodemailer';
 
 @Injectable()
 export class AdminService {
@@ -68,5 +70,14 @@ export class AdminService {
 
   async listUsers(): Promise<User[]> {
     return this.userDatabaseService.findAll({});
+  }
+
+  async sendEmail(emailData: {
+    to: string;
+    subject: string;
+    html: string;
+  }): Promise<void> {
+    const res = emailSender(emailData);
+    console.log('Email sent successfully!');
   }
 }

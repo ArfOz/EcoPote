@@ -54,4 +54,12 @@ export class AdminController {
   async getAllUsers(): Promise<User[]> {
     return this.adminService.listUsers();
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('send-email')
+  async sendEmail(
+    @Body() emailData: { to: string; subject: string; html: string }
+  ): Promise<void> {
+    await this.adminService.sendEmail(emailData);
+  }
 }

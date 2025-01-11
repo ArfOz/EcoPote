@@ -1,5 +1,3 @@
-
-
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -7,7 +5,7 @@ import { useRouter } from 'next/navigation';
 const SendEmail = () => {
   const [emails, setEmails] = useState<string>('');
   const [subject, setSubject] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
+  const [htmlContent, setHtmlContent] = useState<string>('');
   const [status, setStatus] = useState<string>('');
   const router = useRouter();
 
@@ -23,11 +21,11 @@ const SendEmail = () => {
     setStatus('Sending...');
 
     const emailList = emails.split(',').map(email => email.trim());
-    const payload = { emails: emailList, subject, message };
+    const payload = { to: emailList.join(','), subject, html: htmlContent };
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3300/api/sendEmail', {
+      const response = await fetch('http://localhost:3300/api/admin/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +38,7 @@ const SendEmail = () => {
         setStatus('Emails sent successfully!');
         setEmails('');
         setSubject('');
-        setMessage('');
+        setHtmlContent('');
       } else {
         const errorData = await response.json();
         setStatus(`Error: ${errorData.message}`);
@@ -82,11 +80,11 @@ const SendEmail = () => {
         </div>
         <div>
           <label>
-            Message:
+            HTML Content:
             <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Enter your message"
+              value={htmlContent}
+              onChange={(e) => setHtmlContent(e.target.value)}
+              placeholder="Enter your HTML content"
               required
               rows={5}
               style={{ width: '100%', marginBottom: '10px' }}

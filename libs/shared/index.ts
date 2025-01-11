@@ -1,2 +1,2 @@
 export * from './config';
-export * from './keypair';
+export * from './nodemailer';
