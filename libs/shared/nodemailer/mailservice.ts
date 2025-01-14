@@ -1,32 +1,49 @@
-import nodemailer from 'nodemailer';
+import { User } from '@prisma/client';
+import nodemailer, { TransportOptions } from 'nodemailer';
 
-export const emailSender = async (emailData: {
-  to: string;
-  subject: string;
-  html: string;
-}) => {
-  const email = {
-    to: 'recipient@example.com', // Replace with recipient email
-    subject: 'Test Email', // Replace with email subject
-    html: '<p>This is a test email</p>', // Replace with email content
-  };
+const transporter = nodemailer.createTransport(<TransportOptions>{
+  host: 'smtp.gmail.com', // Replace with your SMTP server
+  port: 465,
+  secure: true,
+  // true for 465, false for other ports
+  auth: {
+    user: process.env.MAIL_USER, // Replace with your email
+    pass: process.env.MAIL_PASSWORD, // Replace with your email password
+  },
+});
 
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.example.com', // Replace with your SMTP server
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: 'your-email@example.com', // Replace with your email
-      pass: 'your-email-password', // Replace with your email password
-    },
-  });
+export const emailSender = async (
+  user: User,
+  subject: string,
+  html: string
+) => {
+  try {
+    const info = await transporter.sendMail({
+      from: process.env.MAIL_USER, // Sender address
+      to: user.email, // Recipient address
+      subject: subject, // Subject line
+      text: html, // Plain text body
+      // html: `<p>${body}</p>`, // HTML body
+    });
+    console.log(`Email sent to ${user.email}: ${info.messageId}`);
+  } catch (error) {
+    console.error(`Failed to send email to ${user.email}:`, error);
+  }
+};
 
-  const mailOptions = {
-    from: '"Your Name" <your-email@example.com>', // Replace with your email
-    to: email.to,
-    subject: email.subject,
-    html: email.html,
-  };
+// Main function to send emails
+export const sendBulkEmails = async (
+  users: User[],
+  subject: string,
+  html: string
+) => {
+  for (let i = 0; i < users.length; i++) {
+    const user = users[i];
+    await emailSender(user, subject, html);
 
-  return await transporter.sendMail(mailOptions);
+    // Rate limiting to avoid getting blocked
+    await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
+  }
+
+  return 'All emails sent successfully';
 };

@@ -45,7 +45,7 @@ export class AdminController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('users/:id')
-  async deleteUser(@Param('id') id: number): Promise<void> {
+  async deleteUser(@Param('id') id: number): Promise<User> {
     return this.adminService.removeUser(id);
   }
 
@@ -55,11 +55,11 @@ export class AdminController {
     return this.adminService.listUsers();
   }
 
-  @UseGuards(AuthGuard('jwt'))
-  @Post('send-email')
+  // @UseGuards(AuthGuard('jwt'))
+  @Post('sendemail')
   async sendEmail(
     @Body() emailData: { to: string; subject: string; html: string }
-  ): Promise<void> {
-    await this.adminService.sendEmail(emailData);
+  ): Promise<string> {
+    return await this.adminService.sendEmail(emailData);
   }
 }

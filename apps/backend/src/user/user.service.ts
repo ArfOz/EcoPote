@@ -13,7 +13,7 @@ export class UserService {
     const user = await this.userDatabaseService.findAll({
       where: { email: data.email },
     });
-    if (user) {
+    if (user[0]) {
       return { error: 'User already exists' };
     }
     return this.userDatabaseService.create(data);
