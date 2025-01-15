@@ -37,9 +37,16 @@ export const sendBulkEmails = async (
   subject: string,
   html: string
 ) => {
-  for (let i = 0; i < users.length; i++) {
-    const user = users[i];
-    await emailSender(user, subject, html);
+  const BATCH_SIZE = 100; // Adjust the batch size as needed
+
+  const sendEmailBatch = async (batch: User[]) => {
+    const promises = batch.map((user) => emailSender(user, subject, html));
+    await Promise.all(promises);
+  };
+
+  for (let i = 0; i < users.length; i += BATCH_SIZE) {
+    const batch = users.slice(i, i + BATCH_SIZE);
+    await sendEmailBatch(batch);
 
     // Rate limiting to avoid getting blocked
     await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
