@@ -30,17 +30,17 @@ export class UserService {
     if (!user) {
       return { error: 'User not found' };
     }
-    // return this.userDatabaseService.update({
-
-    // });
-    return { error: 'Not implemented' };
+    return await this.userDatabaseService.update(
+      { id: user[0].id },
+      { subscription: false }
+    );
   }
 
   async update(id: number, data: Partial<User>): Promise<User> {
-    return this.userDatabaseService.update(id, data);
+    return await this.userDatabaseService.update({ id }, data);
   }
 
-  async delete(id: number): Promise<void> {
-    await this.userDatabaseService.delete(id);
+  async delete(id: number): Promise<User> {
+    return await this.userDatabaseService.delete(id);
   }
 }

@@ -21,8 +21,8 @@ export const emailSender = async (
     const info = await transporter.sendMail({
       from: process.env.MAIL_USER, // Sender address
       to: user.email, // Recipient address
-      subject: subject, // Subject line
-      text: html, // Plain text body
+      subject: subject || 'Mon Eco pote', // Subject line
+      html: html, // Plain html body
       // html: `<p>${body}</p>`, // HTML body
     });
     console.log(`Email sent to ${user.email}: ${info.messageId}`);
