@@ -6,10 +6,16 @@ import {
   Body,
   Param,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { Multer } from 'multer';
 import { AdminService } from './admin.service';
 import { Admin, User } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller('admin')
 export class AdminController {
@@ -57,9 +63,23 @@ export class AdminController {
 
   // @UseGuards(AuthGuard('jwt'))
   @Post('sendemail')
+  @UseInterceptors(FileInterceptor('file'))
   async sendEmail(
-    @Body() emailData: { to: string; subject: string; html: string }
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: { subject: string }
   ): Promise<string> {
-    return await this.adminService.sendEmail(emailData);
+    if (!file) {
+      throw new Error('File not provided');
+    }
+    const htmlContent = fs.readFileSync(
+      path.join(__dirname, file.path),
+      'utf8'
+    );
+
+    return await this.adminService.sendEmail({
+      to: 'all',
+      subject: body.subject,
+      html: htmlContent,
+    });
   }
 }
