@@ -68,13 +68,11 @@ export class AdminController {
     @UploadedFile() file: Express.Multer.File,
     @Body() body: { subject: string }
   ): Promise<string> {
+    console.log('File:', file); // Log the file to debug
     if (!file) {
       throw new Error('File not provided');
     }
-    const htmlContent = fs.readFileSync(
-      path.join(__dirname, file.path),
-      'utf8'
-    );
+    const htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
 
     return await this.adminService.sendEmail({
       to: 'all',

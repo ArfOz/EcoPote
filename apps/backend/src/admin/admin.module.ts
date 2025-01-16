@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { MulterModule } from '@nestjs/platform-express';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
 import {
@@ -15,6 +16,9 @@ import { AuthModule, AuthService } from '@auth';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: './uploads', // Specify the destination for file uploads
+    }),
     ConfigModule.forFeature(generalConfig),
     ConfigModule.forFeature(authConfig),
     UserDatabaseModule,
