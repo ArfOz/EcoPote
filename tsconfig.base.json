@@ -17,7 +17,8 @@
     "paths": {
       "@database": ["libs/database/src/index.ts"],
       "@auth": ["libs/auth/src/index.ts"],
-      "@shared/*": ["libs/shared/*"]
+      "@shared/*": ["libs/shared/*"],
+      "@utils": ["libs/utils/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

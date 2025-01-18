@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import { User } from '@prisma/client';
+import { fetchWithAuth } from '@utils';
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -10,24 +12,14 @@ const Users = () => {
   const [page, setPage] = useState<number>(1);
   const [error, setError] = useState<string>('');
   const [search, setSearch] = useState<string>('');
+  const router = useRouter();
 
   const limit = 10;
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`http://localhost:3300/api/admin/users`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch users');
-        }
-
-        const data = await response.json();
-
+        const data = await fetchWithAuth('http://localhost:3300/api/admin/users');
         if (Array.isArray(data.users)) {
           setUsers(data.users);
           setFilteredUsers(data.users);
@@ -38,6 +30,10 @@ const Users = () => {
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message);
+          if (error.message === 'Token is expired' || error.message === 'Unauthorized access') {
+            localStorage.removeItem('token');
+            router.push('/login');
+          }
         } else {
           setError('An unknown error occurred');
         }
@@ -45,7 +41,7 @@ const Users = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const filtered = users.filter(user => user.email.toLowerCase().includes(search.toLowerCase()));
