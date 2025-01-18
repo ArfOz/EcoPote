@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Navbar from '../components/Navbar';
 
 const SendEmail = () => {
   const [subject, setSubject] = useState<string>('');
@@ -49,38 +50,49 @@ const SendEmail = () => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: 'auto' }}>
-      <h1>Send Bulk Emails</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Subject:
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Enter the subject"
-              required
-              style={{ width: '100%', marginBottom: '10px' }}
-            />
-          </label>
+      <>
+        <Navbar />
+        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+          <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
+            <h1 className="text-2xl font-bold text-center">Send Email</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Subject:
+                  <input
+                    type="text"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="Enter the subject"
+                    required
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  />
+                </label>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  HTML File:
+                  <input
+                    type="file"
+                    accept=".htm,.html"
+                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                    required
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  />
+                </label>
+              </div>
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Send Emails
+              </button>
+            </form>
+            {status && <p className="mt-4 text-center text-sm text-gray-600">{status}</p>}
+          </div>
         </div>
-        <div>
-          <label>
-            HTML File:
-            <input
-              type="file"
-              accept=".htm,.html"
-              onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
-              required
-              style={{ width: '100%', marginBottom: '10px' }}
-            />
-          </label>
-        </div>
-        <button type="submit">Send Emails</button>
-      </form>
-      {status && <p>{status}</p>}
-    </div>
+      </>
+   
   );
 };
 

@@ -31,7 +31,7 @@ export class AdminController {
   @Post('login')
   async login(
     @Body() credentials: { email: string; password: string }
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ token: string }> {
     return this.adminService.login(credentials);
   }
 
@@ -61,7 +61,7 @@ export class AdminController {
     return this.adminService.listUsers();
   }
 
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @Post('sendemail')
   @UseInterceptors(FileInterceptor('file'))
   async sendEmail(

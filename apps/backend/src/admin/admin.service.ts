@@ -35,7 +35,7 @@ export class AdminService {
   async login(credentials: {
     email: string;
     password: string;
-  }): Promise<{ access_token: string }> {
+  }): Promise<{ token: string }> {
     const admin = await this.adminDatabaseService.findByEmail({
       email: credentials.email,
     });

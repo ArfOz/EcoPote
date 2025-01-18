@@ -23,7 +23,7 @@ export class AuthService {
     const options = { expiresIn: '1h' };
 
     return {
-      access_token: this.jwtService.sign(payload, options),
+      token: this.jwtService.sign(payload, options),
     };
   }
 }
