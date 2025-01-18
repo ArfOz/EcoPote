@@ -8,6 +8,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { Multer } from 'multer';
 import { AdminService } from './admin.service';
@@ -15,7 +16,6 @@ import { Admin, User } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
-import * as path from 'path';
 
 @Controller('admin')
 export class AdminController {
@@ -57,8 +57,13 @@ export class AdminController {
 
   @UseGuards(AuthGuard('jwt'))
   @Get('users')
-  async getAllUsers(): Promise<User[]> {
-    return this.adminService.listUsers();
+  async getAllUsers(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10'
+  ): Promise<{ users: User[]; total: number }> {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    return this.adminService.listUsers(pageNumber, limitNumber);
   }
 
   @UseGuards(AuthGuard('jwt'))

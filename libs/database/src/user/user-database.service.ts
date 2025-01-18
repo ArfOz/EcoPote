@@ -43,4 +43,22 @@ export class UserDatabaseService {
       where: { id },
     });
   }
+  async count(params: { where?: Prisma.UserWhereInput }): Promise<number> {
+    return this.prisma.user.count({
+      where: params.where,
+    });
+  }
+  async findMany(params: {
+    where?: Prisma.UserWhereInput;
+    skip?: number;
+    take?: number;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    return this.prisma.user.findMany({
+      where: params.where,
+      skip: params.skip,
+      take: params.take,
+      orderBy: params.orderBy,
+    });
+  }
 }

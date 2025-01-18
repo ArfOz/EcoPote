@@ -68,8 +68,21 @@ export class AdminService {
     return await this.userDatabaseService.delete(id);
   }
 
-  async listUsers(): Promise<User[]> {
-    return this.userDatabaseService.findAll({});
+  async listUsers(
+    page: number,
+    limit: number
+  ): Promise<{ users: User[]; total: number }> {
+    const skip: number = (page - 1) * limit;
+    const take: number = limit;
+    const [users, total] = await Promise.all([
+      this.userDatabaseService.findMany({
+        skip,
+        take,
+      }),
+      this.userDatabaseService.count({}),
+    ]);
+
+    return { users, total };
   }
 
   async sendEmail(emailData: {
