@@ -50,6 +50,25 @@ const Users = () => {
     setPage(1); // Reset to first page on search
   }, [search, users]);
 
+  const toggleSubscription = async (userId: string) => {
+    try {
+      const updatedUser = await fetchWithAuth(`admin/users/${userId}/toggle-subscription`, {
+        method: 'POST',
+      });
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === Number(userId) ? { ...user, subscription: updatedUser.subscription } : user
+        )
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
+
   const totalPages = Math.ceil(total / limit);
 
   return (
@@ -76,6 +95,12 @@ const Users = () => {
                     <span className={`px-2 py-1 rounded-full text-sm ${user.subscription ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {user.subscription ? 'Subscribed' : 'Not Subscribed'}
                     </span>
+                    <button
+                      onClick={() => toggleSubscription(user.id.toString())}
+                      className="ml-4 px-3 py-1 rounded bg-blue-500 text-white"
+                    >
+                      Toggle Subscription
+                    </button>
                   </li>
                 ))}
               </ul>

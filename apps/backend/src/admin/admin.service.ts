@@ -106,4 +106,12 @@ export class AdminService {
 
     return res;
   }
+
+  async toggleSubscription(userId: number): Promise<User> {
+    const user = await this.userDatabaseService.findOne({ id: userId });
+    return await this.userDatabaseService.update(
+      { id: userId },
+      { subscription: !user.subscription }
+    );
+  }
 }

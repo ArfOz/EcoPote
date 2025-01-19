@@ -85,4 +85,10 @@ export class AdminController {
       html: htmlContent,
     });
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('users/:id/toggle-subscription')
+  async toggleSubscription(@Param('id') id: string): Promise<User> {
+    return this.adminService.toggleSubscription(parseInt(id, 10));
+  }
 }
