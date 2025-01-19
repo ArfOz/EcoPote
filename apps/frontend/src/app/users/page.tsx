@@ -19,7 +19,7 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const data = await fetchWithAuth('http://localhost:3300/api/admin/users');
+        const data = await fetchWithAuth('admin/users');
         if (Array.isArray(data.users)) {
           setUsers(data.users);
           setFilteredUsers(data.users);
