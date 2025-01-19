@@ -28,12 +28,25 @@ const SendEmail = () => {
     }
 
     try {
-      const response = await fetchWithAuth('http://localhost:3300/api/admin/sendemail', {
+      const response = await fetchWithAuth('admin/sendemail', {
         method: 'POST',
         body: formData,
       });
-
-      setStatus('Emails sent successfully!');
+      
+      if (!response) {
+        throw new Error('Failed to send emails');
+      }
+      if (response.message) {
+        throw new Error(response.message);
+      }
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      if(response.status === 201) {
+        setStatus('Emails sent successfully');
+      }
+     
       setSubject('');
       setFile(null);
     } catch (error) {

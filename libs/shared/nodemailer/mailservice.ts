@@ -23,7 +23,6 @@ export const emailSender = async (
       to: user.email, // Recipient address
       subject: subject || 'Mon Eco pote', // Subject line
       html: html, // Plain html body
-      // html: `<p>${body}</p>`, // HTML body
     });
     console.log(`Email sent to ${user.email}: ${info.messageId}`);
   } catch (error) {

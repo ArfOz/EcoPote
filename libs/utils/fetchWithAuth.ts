@@ -9,6 +9,8 @@ export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
     Authorization: `Bearer ${token}`,
   };
 
+  url = `${process.env.BACKEND_URL}${url}`;
+
   const response = await fetch(url, { ...options, headers });
 
   if (response.status === 401) {
