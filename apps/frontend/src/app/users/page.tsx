@@ -19,7 +19,7 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const data = await fetchWithAuth('admin/users');
+        const data = await fetchWithAuth('admin/users', {}, true);  
         if (Array.isArray(data.users)) {
           setUsers(data.users);
           setFilteredUsers(data.users);
@@ -54,7 +54,7 @@ const Users = () => {
     try {
       const updatedUser = await fetchWithAuth(`admin/users/${userId}/toggle-subscription`, {
         method: 'POST',
-      });
+      }, true);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user.id === Number(userId) ? { ...user, subscription: updatedUser.subscription } : user

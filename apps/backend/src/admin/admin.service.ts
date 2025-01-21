@@ -35,7 +35,7 @@ export class AdminService {
   async login(credentials: {
     email: string;
     password: string;
-  }): Promise<{ token: string }> {
+  }): Promise<{ token: string; Success: boolean }> {
     const admin = await this.adminDatabaseService.findByEmail({
       email: credentials.email,
     });
@@ -49,7 +49,12 @@ export class AdminService {
       throw new Error('Invalid password');
     }
 
-    return this.authService.login(credentials);
+    console.log('Admin logged in:', admin.email);
+    const token = await this.authService.login(credentials);
+    return {
+      token,
+      Success: true,
+    };
   }
   async logout(userId: number): Promise<void> {
     // Implement logout logic here

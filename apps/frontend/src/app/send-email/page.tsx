@@ -31,7 +31,8 @@ const SendEmail = () => {
       const response = await fetchWithAuth('admin/sendemail', {
         method: 'POST',
         body: formData,
-      });
+      },
+    true);
       
       if (!response) {
         throw new Error('Failed to send emails');

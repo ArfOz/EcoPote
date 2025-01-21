@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { fetchWithAuth } from '@utils';
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
@@ -13,20 +14,22 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('admin/login', {
+
+      const response = await fetchWithAuth('admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
-      });
+      }, false);
 
-      if (response.ok) {
-        const data = await response.json();
+
+      if (response.Success) {
+        const data = await response;
         localStorage.setItem('token', data.token);
         router.push('/send-email');
       } else {
-        const errorData = await response.json();
+        const errorData = await response;
         setError(`Error: ${errorData.message}`);
       }
     } catch (error) {

@@ -1,13 +1,21 @@
-export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('No token found');
-  }
+export const fetchWithAuth = async (
+  url: string,
+  options: RequestInit = {},
+  takeToken: boolean
+) => {
+  let headers = options.headers || {};
 
-  const headers = {
-    ...options.headers,
-    Authorization: `Bearer ${token}`,
-  };
+  if (takeToken) {
+    const token = localStorage.getItem('token');
+    console.log(token);
+    if (!token) {
+      throw new Error('No token found');
+    }
+    headers = {
+      ...headers,
+      Authorization: `Bearer ${token}`,
+    };
+  }
 
   url = `${process.env.BACKEND_URL}${url}`;
 
