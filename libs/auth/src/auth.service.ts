@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import authConfig from 'libs/auth/src/config/auth.config';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AdminDatabaseService } from '@database';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(authConfig.KEY)
+    private readonly authCfg: ConfigType<typeof authConfig>,
     private readonly userDatabaseService: AdminDatabaseService,
     private readonly jwtService: JwtService
   ) {}
@@ -18,10 +22,23 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
-    const options = { expiresIn: '1h' };
+  async login(email: string, id: number) {
+    const payload = { email: email, sub: id };
+    const options = { secret: this.authCfg.jwt_secret, expiresIn: '1h' };
 
     return this.jwtService.sign(payload, options);
+  }
+  async decodeToken(
+    token: string
+  ): Promise<{ email: string; sub: number } | false> {
+    try {
+      const decoded = await this.jwtService.verify(token, {
+        secret: this.authCfg.jwt_secret,
+      });
+      console.log('decodeddd', decoded);
+      return decoded;
+    } catch {
+      return false;
+    }
   }
 }

@@ -5,13 +5,12 @@ import { AdminService } from './admin.service';
 import {
   AdminDatabaseModule,
   DatabaseModule,
-  PrismaModule,
   UserDatabaseModule,
   UserDatabaseService,
 } from '@database'; // Import the module containing UserDatabaseService
 import { ConfigModule } from '@nestjs/config';
 import generalConfig from '@shared/config/general.config';
-import authConfig from '@shared/config/auth.config';
+import authConfig from '@auth/config/auth.config';
 import { AuthModule, AuthService } from '@auth';
 
 @Module({

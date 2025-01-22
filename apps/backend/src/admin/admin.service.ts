@@ -2,11 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Admin, User } from '@prisma/client';
 import { AdminDatabaseService, UserDatabaseService } from '@database';
 import generalConfig from '@shared/config/general.config';
-import authConfig from '@shared/config/auth.config';
+import authConfig from '@auth/config/auth.config';
 import { ConfigType } from '@nestjs/config';
 
 import * as bcrypt from 'bcrypt';
-import { AuthService } from '@auth';
+import { AuthService } from '@auth/auth.service';
 
 import { sendBulkEmails } from '@shared/nodemailer';
 
@@ -50,16 +50,39 @@ export class AdminService {
     }
 
     console.log('Admin logged in:', admin.email);
-    const token = await this.authService.login(credentials);
+    const token = await this.authService.login(admin.email, admin.id);
+
+    await this.adminDatabaseService.update(admin.id, { token });
     return {
       token,
       Success: true,
     };
   }
-  async logout(userId: number): Promise<void> {
+  async logout(token: string): Promise<void> {
     // Implement logout logic here
     // For example, you can invalidate the user's token or remove the session
-    console.log(`User with ID ${userId} has been logged out.`);
+    console.log('Logging out user with token:', token);
+    const tokenWithoutBearer = token.replace('Bearer ', '');
+    const decodedToken = await this.authService.decodeToken(tokenWithoutBearer);
+
+    if (!decodedToken) {
+      throw new Error('Invalid token');
+    }
+
+    const user = await this.adminDatabaseService.findOne({
+      id: decodedToken.sub,
+      token: tokenWithoutBearer,
+    });
+
+    if (!user) {
+      throw new Error('Token not found');
+    }
+
+    // Invalidate the token or remove the session here
+    await this.adminDatabaseService.update(user.id, {
+      token: null,
+    });
+    console.log(`User with ID  has been logged out.`);
   }
 
   async addUser(userData: {

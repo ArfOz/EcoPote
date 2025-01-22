@@ -15,8 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@database": ["libs/database/src/index.ts"],
-      "@auth": ["libs/auth/src/index.ts"],
+      "@auth": ["libs/auth/src"],
+      "@auth/*": ["libs/auth/src/*"],
+      "@database": ["libs/database/src"],
+      "@database/*": ["libs/database/src/*"],
       "@shared/*": ["libs/shared/*"],
       "@utils": ["libs/utils/index.ts"]
     }

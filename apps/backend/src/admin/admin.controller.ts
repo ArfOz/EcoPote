@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Query,
+  Headers,
 } from '@nestjs/common';
 import { Multer } from 'multer';
 import { AdminService } from './admin.service';
@@ -36,9 +37,9 @@ export class AdminController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('logout')
-  async logout(@Body() { id }: { id: number }): Promise<void> {
-    return this.adminService.logout(id);
+  @Get('logout')
+  async logout(@Headers('Authorization') token: string): Promise<void> {
+    return this.adminService.logout(token);
   }
 
   @UseGuards(AuthGuard('jwt'))
