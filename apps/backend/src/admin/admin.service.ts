@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Admin, User } from '@prisma/client';
 import { AdminDatabaseService, UserDatabaseService } from '@database';
 import generalConfig from '@shared/config/general.config';
@@ -46,7 +46,7 @@ export class AdminService {
     );
 
     if (!isPasswordValid) {
-      throw new Error('Invalid password');
+      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
     }
 
     console.log('Admin logged in:', admin.email);
@@ -66,7 +66,7 @@ export class AdminService {
     const decodedToken = await this.authService.decodeToken(tokenWithoutBearer);
 
     if (!decodedToken) {
-      throw new Error('Invalid token');
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
 
     const user = await this.adminDatabaseService.findOne({
@@ -75,7 +75,7 @@ export class AdminService {
     });
 
     if (!user) {
-      throw new Error('Token not found');
+      throw new HttpException('Token not found', HttpStatus.NOT_FOUND);
     }
 
     // Invalidate the token or remove the session here
@@ -124,7 +124,10 @@ export class AdminService {
 
     if (users.length === 0) {
       console.log('No users to send email to');
-      return;
+      throw new HttpException(
+        'No users to send email to',
+        HttpStatus.NOT_FOUND
+      );
     }
 
     // console.log('Sending email to users:', users);
