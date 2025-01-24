@@ -11,7 +11,7 @@ import authConfig from '@auth/config/auth.config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env'],
+      envFilePath: '.env',
       isGlobal: true,
       load: [generalConfig, authConfig],
     }),

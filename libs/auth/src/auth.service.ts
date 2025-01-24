@@ -1,4 +1,4 @@
-import authConfig from 'libs/auth/src/config/auth.config';
+import authConfig from './config/auth.config';
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AdminDatabaseService } from '@database';
