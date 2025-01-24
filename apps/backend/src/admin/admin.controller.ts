@@ -17,6 +17,7 @@ import { Admin, User } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
+import { JwtAuthGuard } from '@auth';
 
 @Controller('admin')
 export class AdminController {
@@ -36,13 +37,15 @@ export class AdminController {
     return this.adminService.login(credentials);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Get('logout')
-  async logout(@Headers('Authorization') token: string): Promise<void> {
+  async logout(
+    @Headers('Authorization') token: string
+  ): Promise<{ message: string; Success: boolean }> {
     return this.adminService.logout(token);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Post('users')
   async createUser(
     @Body() userData: { email: string; subscription: boolean }
@@ -50,13 +53,13 @@ export class AdminController {
     return this.adminService.addUser(userData);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Delete('users/:id')
   async deleteUser(@Param('id') id: number): Promise<User> {
     return this.adminService.removeUser(id);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Get('users')
   async getAllUsers(
     @Query('page') page = '1',
@@ -67,14 +70,13 @@ export class AdminController {
     return this.adminService.listUsers(pageNumber, limitNumber);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Post('sendemail')
   @UseInterceptors(FileInterceptor('file'))
   async sendEmail(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: { subject: string }
-  ): Promise<string> {
-    console.log('File:', file); // Log the file to debug
+  ): Promise<{ message: string; Sucess: boolean }> {
     if (!file) {
       throw new Error('File not provided');
     }
@@ -87,7 +89,7 @@ export class AdminController {
     });
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   @Post('users/:id/toggle-subscription')
   async toggleSubscription(@Param('id') id: string): Promise<User> {
     return this.adminService.toggleSubscription(parseInt(id, 10));

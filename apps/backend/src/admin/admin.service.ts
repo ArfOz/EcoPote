@@ -58,7 +58,7 @@ export class AdminService {
       Success: true,
     };
   }
-  async logout(token: string): Promise<void> {
+  async logout(token: string): Promise<{ message: string; Success: boolean }> {
     // Implement logout logic here
     // For example, you can invalidate the user's token or remove the session
     console.log('Logging out user with token:', token);
@@ -83,6 +83,7 @@ export class AdminService {
       token: null,
     });
     console.log(`User with ID  has been logged out.`);
+    return { Success: true, message: 'Logged out successfully' };
   }
 
   async addUser(userData: {
@@ -117,7 +118,7 @@ export class AdminService {
     to: string;
     subject: string;
     html: string;
-  }): Promise<string> {
+  }): Promise<{ message: string; Sucess: boolean }> {
     const users: User[] = await this.userDatabaseService.findAll({
       where: { subscription: true },
     });
@@ -135,7 +136,7 @@ export class AdminService {
     // Email sending result can be logged if needed
     console.log('Email sending result:', res);
 
-    return res;
+    return { message: res, Sucess: true };
   }
 
   async toggleSubscription(userId: number): Promise<User> {

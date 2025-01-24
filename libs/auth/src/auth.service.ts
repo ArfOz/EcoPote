@@ -9,12 +9,12 @@ export class AuthService {
   constructor(
     @Inject(authConfig.KEY)
     private readonly authCfg: ConfigType<typeof authConfig>,
-    private readonly userDatabaseService: AdminDatabaseService,
+    private readonly adminDatabaseService: AdminDatabaseService,
     private readonly jwtService: JwtService
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
-    const admin = await this.userDatabaseService.findOne({ email });
+    const admin = await this.adminDatabaseService.findOne({ email });
     if (admin && admin.password === pass) {
       const { password, ...result } = admin;
       return result;
@@ -35,10 +35,18 @@ export class AuthService {
       const decoded = await this.jwtService.verify(token, {
         secret: this.authCfg.jwt_secret,
       });
-      console.log('decodeddd', decoded);
+
       return decoded;
     } catch {
       return false;
     }
+  }
+
+  async isTokenStored(token: string): Promise<boolean> {
+    const tokenRecord = await this.adminDatabaseService.findOne({
+      token,
+    });
+    console.log('Token record', tokenRecord);
+    return !!tokenRecord;
   }
 }
