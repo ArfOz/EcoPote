@@ -16,8 +16,8 @@ export const emailSender = async (
   user: User,
   subject: string,
   html: string,
-  sentUsers: User[],
-  errorUsers: User[]
+  sentUsers: string[],
+  errorUsers: string[]
 ) => {
   try {
     const info = await transporter.sendMail({
@@ -27,10 +27,10 @@ export const emailSender = async (
       html: html, // Plain html body
     });
     console.log(`Email sent to ${user.email}: ${info.messageId}`);
-    sentUsers.push(user);
+    sentUsers.push(user.email);
   } catch (error) {
     console.error(`Failed to send email to ${user.email}:`, error);
-    errorUsers.push(user);
+    errorUsers.push(user.email);
   }
 };
 
@@ -41,8 +41,8 @@ export const sendBulkEmails = async (
   html: string
 ) => {
   const BATCH_SIZE = 100; // Adjust the batch size as needed
-  const sentUsers: User[] = [];
-  const errorUsers: User[] = [];
+  const sentUsers: string[] = [];
+  const errorUsers: string[] = [];
 
   const sendEmailBatch = async (batch: User[]) => {
     const promises = batch.map((user) =>

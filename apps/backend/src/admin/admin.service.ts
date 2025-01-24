@@ -115,7 +115,7 @@ export class AdminService {
     to: string;
     subject: string;
     html: string;
-  }): Promise<{ message: object; Sucess: boolean }> {
+  }): Promise<{ message: object; Success: boolean }> {
     const users: User[] = await this.userDatabaseService.findAll({
       where: { subscription: true },
     });
@@ -129,7 +129,7 @@ export class AdminService {
 
     const res = await sendBulkEmails(users, emailData.subject, emailData.html);
 
-    return { message: res, Sucess: true };
+    return { message: res, Success: true };
   }
 
   async toggleSubscription(userId: number): Promise<User> {
