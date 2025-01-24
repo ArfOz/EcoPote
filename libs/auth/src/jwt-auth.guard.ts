@@ -18,7 +18,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   override async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('JwtAuthGuard: canActivate called');
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromRequest(request);
 
@@ -27,7 +26,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     }
 
     const isTokenValid = await this.authService.isTokenStored(token);
-    console.log('isTokenValid', isTokenValid);
     if (!isTokenValid) {
       throw new UnauthorizedException('Token is not stored in the database');
     }

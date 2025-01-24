@@ -12,7 +12,6 @@ export class LocalAuthGuard extends AuthGuard('local') {
     const request = context.switchToHttp().getRequest<Request>();
     const token = this.extractToken(request);
 
-    console.log('LocalAuthGuard: canActivate called');
     if (this.isTokenExpired(token)) {
       throw new UnauthorizedException('Token is expired');
     }

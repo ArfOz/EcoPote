@@ -15,7 +15,9 @@ const transporter = nodemailer.createTransport(<TransportOptions>{
 export const emailSender = async (
   user: User,
   subject: string,
-  html: string
+  html: string,
+  sentUsers: User[],
+  errorUsers: User[]
 ) => {
   try {
     const info = await transporter.sendMail({
@@ -25,8 +27,10 @@ export const emailSender = async (
       html: html, // Plain html body
     });
     console.log(`Email sent to ${user.email}: ${info.messageId}`);
+    sentUsers.push(user);
   } catch (error) {
     console.error(`Failed to send email to ${user.email}:`, error);
+    errorUsers.push(user);
   }
 };
 
@@ -37,9 +41,13 @@ export const sendBulkEmails = async (
   html: string
 ) => {
   const BATCH_SIZE = 100; // Adjust the batch size as needed
+  const sentUsers: User[] = [];
+  const errorUsers: User[] = [];
 
   const sendEmailBatch = async (batch: User[]) => {
-    const promises = batch.map((user) => emailSender(user, subject, html));
+    const promises = batch.map((user) =>
+      emailSender(user, subject, html, sentUsers, errorUsers)
+    );
     await Promise.all(promises);
   };
 
@@ -51,5 +59,8 @@ export const sendBulkEmails = async (
     await new Promise((resolve) => setTimeout(resolve, 500)); // 500ms delay
   }
 
-  return 'All emails sent successfully';
+  console.log('Sent Users:', sentUsers);
+  console.log('Error Users:', errorUsers);
+
+  return { sentUsers, errorUsers };
 };

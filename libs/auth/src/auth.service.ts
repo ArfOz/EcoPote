@@ -46,7 +46,6 @@ export class AuthService {
     const tokenRecord = await this.adminDatabaseService.findOne({
       token,
     });
-    console.log('Token record', tokenRecord);
     return !!tokenRecord;
   }
 }

@@ -20,13 +20,10 @@ export class UserService {
   }
 
   async unregister(data: { email: string }): Promise<User | { error: string }> {
-    console.log('userunregister', data.email);
-
     const user = await this.userDatabaseService.findAll({
       where: { email: data.email },
     });
 
-    console.log('userunregister', user);
     if (!user) {
       return { error: 'User not found' };
     }

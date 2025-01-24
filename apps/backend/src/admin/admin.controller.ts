@@ -76,7 +76,7 @@ export class AdminController {
   async sendEmail(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: { subject: string }
-  ): Promise<{ message: string; Sucess: boolean }> {
+  ): Promise<{ message: object; Sucess: boolean }> {
     if (!file) {
       throw new Error('File not provided');
     }
