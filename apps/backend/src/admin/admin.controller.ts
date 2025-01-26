@@ -18,16 +18,15 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { JwtAuthGuard } from '@auth';
+import { CreateAdminDto, CreateUserDataDto } from './dto';
 
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post('create')
-  async createAdmin(
-    @Body() adminData: { email: string; password: string }
-  ): Promise<Admin> {
-    return this.adminService.addAdmin(adminData);
+  async createAdmin(@Body() createAdminData: CreateAdminDto): Promise<Admin> {
+    return this.adminService.addAdmin(createAdminData);
   }
 
   @Post('login')
@@ -46,10 +45,10 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('users')
+  @Post('create-user')
   async createUser(
-    @Body() userData: { email: string; subscription: boolean }
-  ): Promise<User> {
+    @Body() userData: CreateUserDataDto
+  ): Promise<{ message: string; Success: boolean }> {
     return this.adminService.addUser(userData);
   }
 

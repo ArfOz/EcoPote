@@ -11,11 +11,13 @@ export class AdminDatabaseService {
       where: params.where,
     });
   }
+
   async findByEmail(where: Prisma.AdminWhereInput): Promise<Admin | null> {
     return this.prisma.admin.findFirst({
       where,
     });
   }
+
   async findOne(where: Prisma.AdminWhereUniqueInput): Promise<Admin | null> {
     return this.prisma.admin.findUnique({
       where,

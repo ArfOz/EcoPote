@@ -20,12 +20,18 @@ const Navbar = () => {
           >
             Show All Users
           </button>
-            <button
-                onClick={() => router.push('/send-email')}
-                className="text-white hover:text-gray-300"
-            >
-                Send Email  
-            </button>
+          <button
+            onClick={() => router.push('/send-email')}
+            className="text-white hover:text-gray-300"
+          >
+            Send Email  
+          </button>
+          <button
+            onClick={() => router.push('/add-user')}
+            className="text-white hover:text-gray-300"
+          >
+            Add User
+          </button>
           <button
             onClick={handleLogout}
             className="text-white hover:text-gray-300"

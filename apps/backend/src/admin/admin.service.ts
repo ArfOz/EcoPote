@@ -26,89 +26,126 @@ export class AdminService {
     email: string;
     password: string;
   }): Promise<Admin> {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(adminData.password, saltRounds);
-    adminData.password = hashedPassword;
-    return this.adminDatabaseService.create(adminData);
+    try {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(adminData.password, saltRounds);
+      adminData.password = hashedPassword;
+      return this.adminDatabaseService.create(adminData);
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to add admin', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async login(credentials: {
     email: string;
     password: string;
   }): Promise<{ token: string; Success: boolean }> {
-    const admin = await this.adminDatabaseService.findByEmail({
-      email: credentials.email,
-    });
+    try {
+      const admin = await this.adminDatabaseService.findByEmail({
+        email: credentials.email,
+      });
 
-    const isPasswordValid = await bcrypt.compare(
-      credentials.password,
-      admin.password
-    );
+      const isPasswordValid = await bcrypt.compare(
+        credentials.password,
+        admin.password
+      );
 
-    if (!isPasswordValid) {
-      throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+      if (!isPasswordValid) {
+        throw new HttpException('Invalid password', HttpStatus.UNAUTHORIZED);
+      }
+
+      const token = await this.authService.login(admin.email, admin.id);
+
+      await this.adminDatabaseService.update(admin.id, { token });
+      return {
+        token,
+        Success: true,
+      };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Login failed', HttpStatus.UNAUTHORIZED);
     }
-
-    const token = await this.authService.login(admin.email, admin.id);
-
-    await this.adminDatabaseService.update(admin.id, { token });
-    return {
-      token,
-      Success: true,
-    };
   }
   async logout(token: string): Promise<{ message: string; Success: boolean }> {
-    // Implement logout logic here
-    // For example, you can invalidate the user's token or remove the session
-    const tokenWithoutBearer = token.replace('Bearer ', '');
-    const decodedToken = await this.authService.decodeToken(tokenWithoutBearer);
+    try {
+      const tokenWithoutBearer = token.replace('Bearer ', '');
+      const decodedToken = await this.authService.decodeToken(
+        tokenWithoutBearer
+      );
 
-    if (!decodedToken) {
-      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+      if (!decodedToken) {
+        throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
+      }
+
+      const user = await this.adminDatabaseService.findOne({
+        id: decodedToken.sub,
+        token: tokenWithoutBearer,
+      });
+
+      if (!user) {
+        throw new HttpException('Token not found', HttpStatus.NOT_FOUND);
+      }
+
+      await this.adminDatabaseService.update(user.id, {
+        token: null,
+      });
+      return { Success: true, message: 'Logged out successfully' };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Logout failed', HttpStatus.BAD_REQUEST);
     }
-
-    const user = await this.adminDatabaseService.findOne({
-      id: decodedToken.sub,
-      token: tokenWithoutBearer,
-    });
-
-    if (!user) {
-      throw new HttpException('Token not found', HttpStatus.NOT_FOUND);
-    }
-
-    // Invalidate the token or remove the session here
-    await this.adminDatabaseService.update(user.id, {
-      token: null,
-    });
-    return { Success: true, message: 'Logged out successfully' };
   }
 
   async addUser(userData: {
     email: string;
-    subscription: boolean;
-  }): Promise<User> {
-    return this.userDatabaseService.create(userData);
+    subscription?: boolean;
+  }): Promise<{ message: string; Success: boolean }> {
+    try {
+      const res = await this.userDatabaseService.create({
+        ...userData,
+        subscription: userData.subscription ?? false,
+      });
+      if (!res) {
+        throw new HttpException('Failed to add user', HttpStatus.BAD_REQUEST);
+      }
+
+      return { message: 'User added successfully', Success: true };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to add user', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async removeUser(id: number): Promise<User> {
-    return await this.userDatabaseService.delete(id);
+    try {
+      return await this.userDatabaseService.delete(id);
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to remove user', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async listUsers(
     page: number,
     limit: number
   ): Promise<{ users: User[]; total: number }> {
-    const skip: number = (page - 1) * limit;
-    const take: number = limit;
-    const [users, total] = await Promise.all([
-      this.userDatabaseService.findMany({
-        skip,
-        take,
-      }),
-      this.userDatabaseService.count({}),
-    ]);
+    try {
+      const skip: number = (page - 1) * limit;
+      const take: number = limit;
+      const [users, total] = await Promise.all([
+        this.userDatabaseService.findMany({
+          skip,
+          take,
+        }),
+        this.userDatabaseService.count({}),
+      ]);
 
-    return { users, total };
+      return { users, total };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to list users', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async sendEmail(emailData: {
@@ -116,27 +153,44 @@ export class AdminService {
     subject: string;
     html: string;
   }): Promise<{ message: object; Success: boolean }> {
-    const users: User[] = await this.userDatabaseService.findAll({
-      where: { subscription: true },
-    });
+    try {
+      const users: User[] = await this.userDatabaseService.findAll({
+        where: { subscription: true },
+      });
 
-    if (users.length === 0) {
-      throw new HttpException(
-        'No users to send email to',
-        HttpStatus.NOT_FOUND
+      if (users.length === 0) {
+        throw new HttpException(
+          'No users to send email to',
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      const res = await sendBulkEmails(
+        users,
+        emailData.subject,
+        emailData.html
       );
+
+      return { message: res, Success: true };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
     }
-
-    const res = await sendBulkEmails(users, emailData.subject, emailData.html);
-
-    return { message: res, Success: true };
   }
 
   async toggleSubscription(userId: number): Promise<User> {
-    const user = await this.userDatabaseService.findOne({ id: userId });
-    return await this.userDatabaseService.update(
-      { id: userId },
-      { subscription: !user.subscription }
-    );
+    try {
+      const user = await this.userDatabaseService.findOne({ id: userId });
+      return await this.userDatabaseService.update(
+        { id: userId },
+        { subscription: !user.subscription }
+      );
+    } catch (error) {
+      // Handle error
+      throw new HttpException(
+        'Failed to toggle subscription',
+        HttpStatus.BAD_REQUEST
+      );
+    }
   }
 }
