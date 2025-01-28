@@ -10,6 +10,7 @@ const AddUser = () => {
   }
 
   const [status, setStatus] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -28,15 +29,15 @@ const AddUser = () => {
         body: JSON.stringify(userData),
       }, true);
 
-      if (!response) {
-        throw new Error('Failed to add emails');
-      }
-      if (response.message) {
-        throw new Error(response.message);
-      }
-      if (response.error) {
-        throw new Error(response.error);
-      }
+      // if (!response) {
+      //   throw new Error('Failed to add emails');
+      // }
+      // if (response.message) {
+      //   throw new Error(response.message);
+      // }
+      // if (response.error) {
+      //   throw new Error(response.error);
+      // }
       if (response.status === 201) {
         setStatus('User added successfully');
       }
@@ -44,11 +45,11 @@ const AddUser = () => {
       // Clear form fields
       (event.target as HTMLFormElement).reset();
     } catch (error) {
-      console.error('Error adding user:', error);
       if (error instanceof Error) {
-        setStatus(`Error: ${error.message}`);
+        setError(error.message);
       } else {
-        setStatus('An unknown error occurred');
+        setError('An unknown error occurred');
+    
       }
     }
   };
@@ -66,6 +67,7 @@ const AddUser = () => {
       </div>
       <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Add User</button>
       {status && <p className="mt-4 text-green-500">{status}</p>}
+      {error && <p className="mt-4 text-red-500">{error}</p>}
     </form>
   );
 };
