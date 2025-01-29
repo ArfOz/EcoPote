@@ -50,6 +50,7 @@ const SendEmail = () => {
      
       setSubject('');
       setFile(null);
+      
     } catch (error) {
       if (error instanceof Error) {
         setStatus(`Error: ${error.message}`);

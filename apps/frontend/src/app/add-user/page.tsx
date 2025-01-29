@@ -1,7 +1,9 @@
 "use client";
 
 import { fetchWithAuth } from "@utils";
-import React from "react";
+import React, { useEffect } from "react";
+import Navbar from "../components/Navbar";
+import { useRouter } from "next/navigation";
 
 const AddUser = () => {
   interface UserData {
@@ -11,6 +13,14 @@ const AddUser = () => {
 
   const [status, setStatus] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const router = useRouter();
+
+    useEffect(() => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+      }
+    }, [router]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,23 +48,38 @@ const AddUser = () => {
       // if (response.error) {
       //   throw new Error(response.error);
       // }
-      if (response.status === 201) {
-        setStatus('User added successfully');
-      }
 
+      if (response.Success) {
+        setTimeout(() => {
+          setStatus(null);
+        }, 5000);
+        setStatus('User added successfully');
+        
+      }
       // Clear form fields
       (event.target as HTMLFormElement).reset();
     } catch (error) {
       if (error instanceof Error) {
+        if (error.message === 'Unauthorized') {
+          router.push('/login');
+        }
+        if (error.message === "Token expired") {
+          router.push('/login');
+        }
+
         setError(error.message);
+        setTimeout(() => {
+          setError(null);
+        }, 5000);
       } else {
         setError('An unknown error occurred');
-    
       }
     }
   };
 
   return (
+    <>
+  <Navbar/>  
     <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 bg-white shadow-md rounded">
       <div className="mb-4">
         <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Email:</label>
@@ -69,6 +94,7 @@ const AddUser = () => {
       {status && <p className="mt-4 text-green-500">{status}</p>}
       {error && <p className="mt-4 text-red-500">{error}</p>}
     </form>
+    </>
   );
 };
 

@@ -1,37 +1,40 @@
-export const fetchWithAuth = async (
+export async function fetchWithAuth(
   url: string,
-  options: RequestInit = {},
-  takeToken: boolean
-) => {
-  let headers = options.headers || {};
-
-  if (takeToken) {
+  options: RequestInit,
+  includeToken = true
+): Promise<any> {
+  try {
     const token = localStorage.getItem('token');
-    if (!token) {
+    if (!token && includeToken) {
       throw new Error('No token found');
     }
-    headers = {
-      ...headers,
-      Authorization: `Bearer ${token}`,
+
+    const headers = {
+      ...options.headers,
+      ...(includeToken && { Authorization: `Bearer ${token}` }),
     };
-  }
 
-  url = `${process.env.BACKEND_URL}${url}`;
+    url = `${process.env.BACKEND_URL}${url}`;
 
-  const response = await fetch(url, { ...options, headers });
+    const response = await fetch(url, { ...options, headers });
 
-  if (response.status === 401) {
-    const errorData = await response.json();
-    if (errorData.message === 'Token is expired') {
-      throw new Error('Token is expired');
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      throw new Error('Unauthorized');
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'An error occurred');
+    }
+
+    return data;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
     } else {
-      throw new Error('Unauthorized access');
+      throw new Error('Unknown error');
     }
   }
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch data');
-  }
-
-  return response.json();
-};
+}

@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { AuthService } from '@auth/auth.service';
 
 import { sendBulkEmails } from '@shared/nodemailer';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AdminService {
@@ -102,6 +103,14 @@ export class AdminService {
     subscription?: boolean;
   }): Promise<{ message: string; Success: boolean }> {
     try {
+      const user = await this.userDatabaseService.findByEmail({
+        email: userData.email,
+      });
+
+      if (user) {
+        throw new HttpException('User already exists', HttpStatus.CONFLICT);
+      }
+
       const res = await this.userDatabaseService.create({
         ...userData,
         subscription: userData.subscription ?? false,
@@ -112,8 +121,24 @@ export class AdminService {
 
       return { message: 'User added successfully', Success: true };
     } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to add user', HttpStatus.BAD_REQUEST);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          // Unique constraint failed
+          throw new HttpException(
+            'User with this email already exists',
+            HttpStatus.CONFLICT
+          );
+        }
+      }
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      throw new HttpException(
+        'Failed to add user catch',
+        HttpStatus.BAD_REQUEST
+      );
     }
   }
 
