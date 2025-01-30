@@ -18,7 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { JwtAuthGuard } from '@auth';
-import { CreateAdminDto, CreateUserDataDto } from './dto';
+import { CreateAdminDto, CreateUserDataDto, ResponseMessageEmail } from './dto';
 
 @Controller('admin')
 export class AdminController {
@@ -75,7 +75,7 @@ export class AdminController {
   async sendEmail(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: { subject: string }
-  ): Promise<{ message: object; Success: boolean }> {
+  ): Promise<ResponseMessageEmail> {
     if (!file) {
       throw new Error('File not provided');
     }
