@@ -34,8 +34,6 @@ const SendEmail = () => {
         body: formData,
       },
     true);
-
-    console.log("responseeeeeeeeeeeeee", response);
       
       if (!response) {
         throw new Error('Failed to send emails');
