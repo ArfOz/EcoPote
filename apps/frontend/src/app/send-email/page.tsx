@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import { fetchWithAuth } from '@utils';
-import { ResponseStatus } from './response.dto';
+import { ResponseStatus, Status } from './response.dto';
 
 const SendEmail = () => {
   const [subject, setSubject] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState<any>(null);
+
+
+  const [status, setStatus] = useState<Status | string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,7 +43,8 @@ const SendEmail = () => {
       if(response.Success) {
         setStatus({
           sentUsers: response.message.sentUsers || [],
-          errorUsers: response.message.errorUsers || []
+          errorUsers: response.message.errorUsers || [],
+          message: response.message.message || ''
         });
       }
      
@@ -63,16 +66,16 @@ const SendEmail = () => {
 
   const handleDownload = () => {
     if (status && typeof status !== 'string') {
-      const data = {
-        sentUsers: status.sentUsers,
-        errorUsers: status.errorUsers,
-        message: status.message,
-      };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const data = `
+        Sent Users: ${status.sentUsers && status.sentUsers.length > 0 ? status.sentUsers.join(', ') : 'None'}
+        Error Users: ${status.errorUsers && status.errorUsers.length > 0 ? status.errorUsers.join(', ') : 'None'}
+        Message: ${status.message}
+      `;
+      const blob = new Blob([data], { type: 'application/msword' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'response_message.json';
+      a.download = 'response_message.doc';
       a.click();
       URL.revokeObjectURL(url);
     }
