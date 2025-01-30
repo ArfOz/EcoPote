@@ -19,11 +19,13 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const data = await fetchWithAuth('admin/users', {}, true);  
+        const data = await fetchWithAuth(`admin/users?page=${page}&limit=${limit}`, {}, true);
         if (Array.isArray(data.users)) {
           setUsers(data.users);
-          setFilteredUsers(data.users);
           setTotal(data.total);
+          if (!search) {
+            setFilteredUsers(data.users);
+          }
         } else {
           throw new Error('Invalid data format');
         }
@@ -41,14 +43,13 @@ const Users = () => {
     };
 
     fetchUsers();
-  }, [router]);
+  }, [router, page]);
 
   useEffect(() => {
     const filtered = users.filter(user => user.email.toLowerCase().includes(search.toLowerCase()));
     setFilteredUsers(filtered);
-    setTotal(filtered.length);
     setPage(1); // Reset to first page on search
-  }, [search, users]);
+  }, [search]);
 
   const toggleSubscription = async (userId: string) => {
     try {
@@ -57,7 +58,12 @@ const Users = () => {
       }, true);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user.id === Number(userId) ? { ...user, subscription: updatedUser.subscription } : user
+          user.id.toString() === userId ? { ...user, subscription: updatedUser.subscription } : user
+        )
+      );
+      setFilteredUsers((prevFilteredUsers) =>
+        prevFilteredUsers.map((user) =>
+          user.id.toString() === userId ? { ...user, subscription: updatedUser.subscription } : user
         )
       );
     } catch (error) {
@@ -89,10 +95,10 @@ const Users = () => {
           ) : (
             <>
               <ul className="divide-y divide-gray-200">
-                {filteredUsers.slice((page - 1) * limit, page * limit).map((user) => (
+                {filteredUsers.map((user) => (
                   <li key={user.id} className="py-4 flex justify-between items-center">
-                    <span className="text-gray-700">{user.email}</span>
-                    <span className={`px-2 py-1 rounded-full text-sm ${user.subscription ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                    <span className="text-gray-700 flex-1">{user.email}</span>
+                    <span className={`px-2 py-1 rounded-full text-sm text-center w-32 ${user.subscription ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                       {user.subscription ? 'Subscribed' : 'Not Subscribed'}
                     </span>
                     <button

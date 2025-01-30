@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import { fetchWithAuth } from '@utils';
+import { ResponseStatus } from './response.dto';
 
 const SendEmail = () => {
   const [subject, setSubject] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState<string>('');
+  const [status, setStatus] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -28,24 +29,22 @@ const SendEmail = () => {
     }
 
     try {
-      const response = await fetchWithAuth('admin/sendemail', {
+      const response:ResponseStatus = await fetchWithAuth('admin/sendemail', {
         method: 'POST',
         body: formData,
       },
     true);
+
+    console.log("responseeeeeeeeeeeeee", response);
       
       if (!response) {
         throw new Error('Failed to send emails');
       }
-      if (response.message) {
-        throw new Error(response.message);
-      }
-      
-      if (response.error) {
-        throw new Error(response.error);
-      }
-      if(response.status === 201) {
-        setStatus('Emails sent successfully');
+      if(response.Success) {
+        setStatus({
+          sentUsers: response.message.sentUsers || [],
+          errorUsers: response.message.errorUsers || []
+        });
       }
      
       setSubject('');
@@ -61,6 +60,23 @@ const SendEmail = () => {
       } else {
         setStatus('An error occurred while sending emails.');
       }
+    }
+  };
+
+  const handleDownload = () => {
+    if (status && typeof status !== 'string') {
+      const data = {
+        sentUsers: status.sentUsers,
+        errorUsers: status.errorUsers,
+        message: status.message,
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'response_message.json';
+      a.click();
+      URL.revokeObjectURL(url);
     }
   };
 
@@ -103,7 +119,25 @@ const SendEmail = () => {
               Send Emails
             </button>
           </form>
-          {status && <p className="mt-4 text-center text-sm text-gray-600">{status}</p>}
+          {status && (
+            <div className="mt-4 text-center text-sm text-gray-600">
+              {typeof status === 'string' ? (
+                status
+              ) : (
+                <>
+                  <p>Sent Users: {status.sentUsers && status.sentUsers.length > 0 ? status.sentUsers.join(', ') : 'None'}</p>
+                  <p>Error Users: {status.errorUsers && status.errorUsers.length > 0 ? status.errorUsers.join(', ') : 'None'}</p>
+                  <p>{status.message}</p>
+                  <button
+                    onClick={handleDownload}
+                    className="mt-2 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Download Response
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </>
