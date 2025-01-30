@@ -10,6 +10,7 @@ import { AuthService } from '@auth/auth.service';
 
 import { sendBulkEmails } from '@shared/nodemailer';
 import { Prisma } from '@prisma/client';
+import { ResponseMessageEmail } from './dto';
 
 @Injectable()
 export class AdminService {
@@ -177,7 +178,7 @@ export class AdminService {
     to: string;
     subject: string;
     html: string;
-  }): Promise<{ message: object; Success: boolean }> {
+  }): Promise<ResponseMessageEmail> {
     try {
       const users: User[] = await this.userDatabaseService.findAll({
         where: { subscription: true },

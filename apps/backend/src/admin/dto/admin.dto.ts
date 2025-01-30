@@ -44,3 +44,39 @@ export class UpdateUserDataDto {
   @IsBoolean()
   subscription?: boolean;
 }
+
+export class LoginAdminDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+}
+
+export class CreateUserDto {
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsOptional()
+  @IsBoolean()
+  subscription?: boolean;
+}
+
+export class SendEmailDto {
+  @IsEmail()
+  @IsNotEmpty()
+  to: string;
+
+  @IsNotEmpty()
+  subject: string;
+
+  @IsNotEmpty()
+  html: string;
+}
+
+export interface ResponseMessageEmail {
+  message: object;
+  Success: boolean;
+}
