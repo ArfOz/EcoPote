@@ -7,7 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class RegisterUserDto {
+export class CreateUserDto {
   @IsNotEmpty()
   @IsEmail(
     {},
@@ -15,8 +15,8 @@ export class RegisterUserDto {
   )
   email: string;
 
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: 'The name field cannot be empty.' })
+  @IsString({ message: 'The name field must be a string.' })
   name: string;
 
   @IsBoolean()

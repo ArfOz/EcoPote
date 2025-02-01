@@ -8,7 +8,7 @@ import {
   Body,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { RegisterUserDto, UnregisterUserDto } from './dto/user.dtos';
+import { CreateUserDto, UnregisterUserDto } from './dto/user.dtos';
 
 @Controller('users')
 export class UserController {
@@ -20,7 +20,7 @@ export class UserController {
   // }
 
   @Post('register')
-  async register(@Body() data: RegisterUserDto) {
+  async register(@Body() data: CreateUserDto) {
     return await this.userService.register({
       email: data.email,
       name: data.name,

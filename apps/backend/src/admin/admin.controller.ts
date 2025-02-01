@@ -17,7 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { Multer } from 'multer';
 import { JwtAuthGuard } from '@auth';
-import { CreateAdminDto, CreateUserDataDto } from './dto';
+import { CreateAdminDto } from './dto';
 import {
   ResponseCreateUser,
   ResponseDeleteUser,
@@ -26,6 +26,7 @@ import {
   ResponseMessageEmail,
   ResponseToggleSubscription,
 } from '@shared/dtos';
+import { CreateUserDto } from '../user/dto';
 
 @Controller('admin')
 export class AdminController {
@@ -54,7 +55,7 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @Post('create-user')
   async createUser(
-    @Body() userData: CreateUserDataDto
+    @Body() userData: CreateUserDto
   ): Promise<ResponseCreateUser> {
     return await this.adminService.addUser(userData);
   }

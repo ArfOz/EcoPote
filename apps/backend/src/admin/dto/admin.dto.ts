@@ -27,26 +27,6 @@ export class UpdateAdminDto {
   email?: string;
 }
 
-export class CreateUserDataDto {
-  @IsNotEmpty()
-  @IsEmail()
-  email: string;
-  @IsNotEmpty()
-  @IsEmail()
-  name: string;
-  @IsOptional()
-  @IsBoolean()
-  subscription?: boolean;
-}
-export class UpdateUserDataDto {
-  @IsOptional()
-  @IsEmail()
-  email?: string;
-  @IsOptional()
-  @IsBoolean()
-  subscription?: boolean;
-}
-
 export class LoginAdminDto {
   @IsEmail()
   @IsNotEmpty()
@@ -54,16 +34,6 @@ export class LoginAdminDto {
 
   @IsNotEmpty()
   password: string;
-}
-
-export class CreateUserDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsOptional()
-  @IsBoolean()
-  subscription?: boolean;
 }
 
 export class SendEmailDto {
