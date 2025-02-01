@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import { fetchWithAuth } from '@utils';
-import { ResponseStatus, Status } from './response.dto';
+import { ResponseStatus, Status } from '../components/dtos';
+
 
 const SendEmail = () => {
   const [subject, setSubject] = useState<string>('');
@@ -31,22 +32,24 @@ const SendEmail = () => {
     }
 
     try {
-      const response:ResponseStatus = await fetchWithAuth('admin/sendemail', {
+      const response = await fetchWithAuth('admin/sendemail', {
         method: 'POST',
         body: formData,
       },
-    true);
+    true) as ResponseStatus;
       
       if (!response) {
         throw new Error('Failed to send emails');
       }
-      if(response.Success) {
+      console.log("asd", response)
+      if(response.success) {
         setStatus({
-          sentUsers: response.message.sentUsers || [],
-          errorUsers: response.message.errorUsers || [],
-          message: response.message.message || ''
+          sentUsers: response.message.sentUsers ?? [],
+          errorUsers: response.message.errorUsers ?? [],
+          message: "Emails sent successfully"
         });
       }
+      
      
       setSubject('');
       setFile(null);

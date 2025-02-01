@@ -24,9 +24,13 @@ const Login = () => {
       }, false);
 
 
-      if (response.Success) {
+      if (response.success) {
         const data = await response;
-        localStorage.setItem('token', data.token);
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+        } else {
+          setError('Token is missing in the response.');
+        }
         router.push('/send-email');
       } else {
         const errorData = await response;

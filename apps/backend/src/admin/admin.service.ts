@@ -10,7 +10,13 @@ import { AuthService } from '@auth/auth.service';
 
 import { sendBulkEmails } from '@shared/nodemailer';
 import { Prisma } from '@prisma/client';
-import { ResponseMessageEmail } from './dto';
+import {
+  ResponseCreateUser,
+  ResponseDeleteUser,
+  ResponseGetAllusers,
+  ResponseLogout,
+  ResponseMessageEmail,
+} from '@shared/dtos';
 
 @Injectable()
 export class AdminService {
@@ -42,7 +48,7 @@ export class AdminService {
   async login(credentials: {
     email: string;
     password: string;
-  }): Promise<{ token: string; Success: boolean }> {
+  }): Promise<{ token: string; success: boolean }> {
     try {
       const admin = await this.adminDatabaseService.findByEmail({
         email: credentials.email,
@@ -62,14 +68,14 @@ export class AdminService {
       await this.adminDatabaseService.update(admin.id, { token });
       return {
         token,
-        Success: true,
+        success: true,
       };
     } catch (error) {
       // Handle error
       throw new HttpException('Login failed', HttpStatus.UNAUTHORIZED);
     }
   }
-  async logout(token: string): Promise<{ message: string; Success: boolean }> {
+  async logout(token: string): Promise<ResponseLogout> {
     try {
       const tokenWithoutBearer = token.replace('Bearer ', '');
       const decodedToken = await this.authService.decodeToken(
@@ -92,7 +98,7 @@ export class AdminService {
       await this.adminDatabaseService.update(user.id, {
         token: null,
       });
-      return { Success: true, message: 'Logged out successfully' };
+      return { success: true, message: 'Logged out successfully' };
     } catch (error) {
       // Handle error
       throw new HttpException('Logout failed', HttpStatus.BAD_REQUEST);
@@ -102,7 +108,7 @@ export class AdminService {
   async addUser(userData: {
     email: string;
     subscription?: boolean;
-  }): Promise<{ message: string; Success: boolean }> {
+  }): Promise<ResponseCreateUser> {
     try {
       const user = await this.userDatabaseService.findByEmail({
         email: userData.email,
@@ -120,7 +126,7 @@ export class AdminService {
         throw new HttpException('Failed to add user', HttpStatus.BAD_REQUEST);
       }
 
-      return { message: 'User added successfully', Success: true };
+      return { message: 'User added successfully', success: true };
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -143,20 +149,23 @@ export class AdminService {
     }
   }
 
-  async removeUser(id: number): Promise<User> {
+  async removeUser(id: number): Promise<ResponseDeleteUser> {
     try {
-      return await this.userDatabaseService.delete(id);
+      const res = await this.userDatabaseService.delete(id);
+      return { message: `${res.email} deleted successfully`, success: true };
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to remove user', HttpStatus.BAD_REQUEST);
     }
   }
 
-  async listUsers(
-    page: number,
-    limit: number
-  ): Promise<{ users: User[]; total: number }> {
+  async listUsers(page?: number, limit?: number): Promise<ResponseGetAllusers> {
     try {
+      if (!page || !limit) {
+        const users = await this.userDatabaseService.findMany({});
+        const total = await this.userDatabaseService.count({});
+        return { success: true, message: '', data: { users, total } };
+      }
       const skip: number = (page - 1) * limit;
       const take: number = limit;
       const [users, total] = await Promise.all([
@@ -167,7 +176,7 @@ export class AdminService {
         this.userDatabaseService.count({}),
       ]);
 
-      return { users, total };
+      return { success: true, message: '', data: { users, total } };
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to list users', HttpStatus.BAD_REQUEST);
@@ -197,20 +206,27 @@ export class AdminService {
         emailData.html
       );
 
-      return { message: res, Success: true };
+      return { data: res, success: true, message: 'Email sent successfully' };
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
     }
   }
 
-  async toggleSubscription(userId: number): Promise<User> {
+  async toggleSubscription(
+    userId: number
+  ): Promise<{ data: User; message: string; success: boolean }> {
     try {
       const user = await this.userDatabaseService.findOne({ id: userId });
-      return await this.userDatabaseService.update(
+      const userUpdated = await this.userDatabaseService.update(
         { id: userId },
         { subscription: !user.subscription }
       );
+      return {
+        data: userUpdated,
+        message: 'User updated successfully',
+        success: true,
+      };
     } catch (error) {
       // Handle error
       throw new HttpException(

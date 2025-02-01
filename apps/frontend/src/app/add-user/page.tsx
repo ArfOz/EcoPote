@@ -4,12 +4,11 @@ import { fetchWithAuth } from "@utils";
 import React, { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useRouter } from "next/navigation";
+import { UserData } from "../components/dtos";
+import { ResponseCreateUser } from "@shared/dtos";
 
 const AddUser = () => {
-  interface UserData {
-    email: FormDataEntryValue | null;
-    subscription?: boolean;
-  }
+
 
   const [status, setStatus] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -31,7 +30,7 @@ const AddUser = () => {
     };
 
     try {
-      const response = await fetchWithAuth('admin/create-user', {
+      const response : ResponseCreateUser  = await fetchWithAuth('admin/create-user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +48,7 @@ const AddUser = () => {
       //   throw new Error(response.error);
       // }
 
-      if (response.Success) {
+      if (response.success) {
         setTimeout(() => {
           setStatus(null);
         }, 5000);

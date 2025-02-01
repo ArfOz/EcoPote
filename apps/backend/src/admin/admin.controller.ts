@@ -11,14 +11,21 @@ import {
   Query,
   Headers,
 } from '@nestjs/common';
-import { Multer } from 'multer';
 import { AdminService } from './admin.service';
 import { Admin, User } from '@prisma/client';
-import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
+import { Multer } from 'multer';
 import { JwtAuthGuard } from '@auth';
-import { CreateAdminDto, CreateUserDataDto, ResponseMessageEmail } from './dto';
+import { CreateAdminDto, CreateUserDataDto } from './dto';
+import {
+  ResponseCreateUser,
+  ResponseDeleteUser,
+  ResponseGetAllusers,
+  ResponseLogout,
+  ResponseMessageEmail,
+  ResponseToggleSubscription,
+} from '@shared/dtos';
 
 @Controller('admin')
 export class AdminController {
@@ -40,33 +47,33 @@ export class AdminController {
   @Get('logout')
   async logout(
     @Headers('Authorization') token: string
-  ): Promise<{ message: string; Success: boolean }> {
-    return this.adminService.logout(token);
+  ): Promise<ResponseLogout> {
+    return await this.adminService.logout(token);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('create-user')
   async createUser(
     @Body() userData: CreateUserDataDto
-  ): Promise<{ message: string; Success: boolean }> {
-    return this.adminService.addUser(userData);
+  ): Promise<ResponseCreateUser> {
+    return await this.adminService.addUser(userData);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete('users/:id')
-  async deleteUser(@Param('id') id: number): Promise<User> {
-    return this.adminService.removeUser(id);
+  async deleteUser(@Param('id') id: number): Promise<ResponseDeleteUser> {
+    return await this.adminService.removeUser(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('users')
   async getAllUsers(
-    @Query('page') page = '1',
-    @Query('limit') limit = '10'
-  ): Promise<{ users: User[]; total: number }> {
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ): Promise<ResponseGetAllusers> {
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
-    return this.adminService.listUsers(pageNumber, limitNumber);
+    return await this.adminService.listUsers(pageNumber, limitNumber);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -90,7 +97,9 @@ export class AdminController {
 
   @UseGuards(JwtAuthGuard)
   @Post('users/:id/toggle-subscription')
-  async toggleSubscription(@Param('id') id: string): Promise<User> {
-    return this.adminService.toggleSubscription(parseInt(id, 10));
+  async toggleSubscription(
+    @Param('id') id: string
+  ): Promise<ResponseToggleSubscription> {
+    return await this.adminService.toggleSubscription(parseInt(id, 10));
   }
 }

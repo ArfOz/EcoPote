@@ -19,8 +19,9 @@ const Users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const data = await fetchWithAuth(`admin/users?page=${page}&limit=${limit}`, {}, true);
-        if (Array.isArray(data.users)) {
+        const res = await fetchWithAuth(`admin/users?page=${page}&limit=${limit}`, {}, true);
+        const data = res.data as { users: User[], total: number } | undefined;
+        if (data && Array.isArray(data.users)) {
           setUsers(data.users);
           setTotal(data.total);
           if (!search) {
@@ -46,24 +47,49 @@ const Users = () => {
   }, [router, page]);
 
   useEffect(() => {
-    const filtered = users.filter(user => user.email.toLowerCase().includes(search.toLowerCase()));
-    setFilteredUsers(filtered);
-    setPage(1); // Reset to first page on search
+    const fetchAllUsers = async () => {
+      try {
+
+        const res = await fetchWithAuth(`admin/users`, {}, true); // Fetch all users
+        console.log("res filter", res)
+        const data = res.data as { users: User[], total: number } | undefined;
+        if (data && Array.isArray(data.users)) {
+          setUsers(data.users);
+          setTotal(data.total);
+          const filtered = data.users.filter(user => user.email.toLowerCase().includes(search.toLowerCase()));
+          setFilteredUsers(filtered);
+        } else {
+          throw new Error('Invalid data format');
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          setError(error.message);
+          if (error.message === 'Token is expired' || error.message === 'Unauthorized access') {
+            localStorage.removeItem('token');
+            router.push('/login');
+          }
+        } else {
+          setError('An unknown error occurred');
+        }
+      }
+    };
+
+    fetchAllUsers();
   }, [search]);
 
   const toggleSubscription = async (userId: string) => {
     try {
-      const updatedUser = await fetchWithAuth(`admin/users/${userId}/toggle-subscription`, {
+      const res = await fetchWithAuth(`admin/users/${userId}/toggle-subscription`, {
         method: 'POST',
       }, true);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user.id.toString() === userId ? { ...user, subscription: updatedUser.subscription } : user
+          user.id.toString() === userId ? { ...user, subscription: res.data.subscription } : user
         )
       );
       setFilteredUsers((prevFilteredUsers) =>
         prevFilteredUsers.map((user) =>
-          user.id.toString() === userId ? { ...user, subscription: updatedUser.subscription } : user
+          user.id.toString() === userId ? { ...user, subscription: res.data.subscription } : user
         )
       );
     } catch (error) {

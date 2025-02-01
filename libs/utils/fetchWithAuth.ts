@@ -2,7 +2,7 @@ export async function fetchWithAuth(
   url: string,
   options: RequestInit,
   includeToken = true
-): Promise<any> {
+) {
   try {
     const token = localStorage.getItem('token');
     if (!token && includeToken) {
