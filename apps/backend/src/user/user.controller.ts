@@ -23,6 +23,7 @@ export class UserController {
   async register(@Body() data: RegisterUserDto) {
     return await this.userService.register({
       email: data.email,
+      name: data.name,
       subscription: data.subscription ?? true,
     });
   }

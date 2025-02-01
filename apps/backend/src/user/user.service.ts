@@ -8,6 +8,7 @@ export class UserService {
 
   async register(data: {
     email: string;
+    name: string;
     subscription: boolean;
   }): Promise<User | { error: string }> {
     const user = await this.userDatabaseService.findAll({

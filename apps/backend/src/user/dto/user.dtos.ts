@@ -15,6 +15,10 @@ export class RegisterUserDto {
   )
   email: string;
 
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
   @IsBoolean()
   @IsOptional()
   subscription: boolean;

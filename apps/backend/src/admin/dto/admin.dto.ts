@@ -31,6 +31,9 @@ export class CreateUserDataDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+  @IsNotEmpty()
+  @IsEmail()
+  name: string;
   @IsOptional()
   @IsBoolean()
   subscription?: boolean;

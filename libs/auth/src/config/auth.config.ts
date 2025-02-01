@@ -11,4 +11,5 @@ export default registerAs('auth', () => ({
   jwt_refresh_expired: process.env['JWT_REFRESH_EXPIRED_TIME'] as string,
   differentIpTemplateName: process.env['DIFFERENT_IP_TEMPLATE_NAME'] as string,
   baseTemplateUrl: process.env['BASE_TEMPLATE_URL'] as string,
+  admin_email: process.env['ADMIN_EMAIL'] as string,
 }));

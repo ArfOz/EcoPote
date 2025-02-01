@@ -35,6 +35,18 @@ export class AdminService {
     password: string;
   }): Promise<Admin> {
     try {
+      if (adminData.email !== this.generalCfg.admin_Email) {
+        throw new HttpException(
+          'Only can be One admin',
+          HttpStatus.UNAUTHORIZED
+        );
+      }
+      const admin = await this.adminDatabaseService.findByEmail({
+        email: adminData.email,
+      });
+      if (admin) {
+        throw new HttpException('Admin already exists', HttpStatus.CONFLICT);
+      }
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(adminData.password, saltRounds);
       adminData.password = hashedPassword;
@@ -107,6 +119,7 @@ export class AdminService {
 
   async addUser(userData: {
     email: string;
+    name: string;
     subscription?: boolean;
   }): Promise<ResponseCreateUser> {
     try {

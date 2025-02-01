@@ -9,5 +9,6 @@ export default registerAs('general', () => ({
   database_url: process.env.DATABASE_URL,
   publicKey: process.env.PUBLIC_KEY,
   privateKey: process.env.PRIVATE_KEY,
+  admin_Email: process.env.ADMIN_EMAIL,
   nonce: process.env.NONCE,
 }));
