@@ -8,7 +8,8 @@ import {
   Body,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto, UnregisterUserDto } from './dto/user.dtos';
+import { UnregisterUserDto } from './dto/user.dtos';
+import { CreateUserDto } from '@shared/dtos';
 
 @Controller('users')
 export class UserController {

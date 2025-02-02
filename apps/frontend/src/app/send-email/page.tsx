@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import { fetchWithAuth } from '@utils';
 import { ResponseStatus, Status } from '../components/dtos';
+import { ResponseMessageEmail } from '@shared/dtos';
 
 
 const SendEmail = () => {
@@ -32,7 +33,7 @@ const SendEmail = () => {
     }
 
     try {
-      const response = await fetchWithAuth('admin/sendemail', {
+      const response :ResponseMessageEmail= await fetchWithAuth('admin/sendemail', {
         method: 'POST',
         body: formData,
       },
@@ -41,11 +42,10 @@ const SendEmail = () => {
       if (!response) {
         throw new Error('Failed to send emails');
       }
-      console.log("asd", response)
       if(response.success) {
         setStatus({
-          sentUsers: response.message.sentUsers ?? [],
-          errorUsers: response.message.errorUsers ?? [],
+          sentUsers: response.data.sentUsers ?? [],
+          errorUsers: response.data.errorUsers ?? [],
           message: "Emails sent successfully"
         });
       }

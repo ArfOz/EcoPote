@@ -5,7 +5,7 @@ import React, { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useRouter } from "next/navigation";
 import { UserData } from "../components/dtos";
-import { ResponseCreateUser } from "@shared/dtos";
+import { CreateUserDto, ResponseCreateUser } from "@shared/dtos";
 
 const AddUser = () => {
 
@@ -24,9 +24,10 @@ const AddUser = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
-    const userData: UserData = {
-      email: formData.get('email'),
+    const userData: CreateUserDto = {
+      email: formData.get('email') as string,
       subscription:   formData.get('subscription') === 'on' ? true : false,
+      name: formData.get('name') as string,
     };
 
     try {
@@ -81,6 +82,8 @@ const AddUser = () => {
   <Navbar/>  
     <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 bg-white shadow-md rounded">
       <div className="mb-4">
+        <label htmlFor="name" className="block text-gray-700 font-bold mb-2">Name:</label>
+        <input type="text" id="name" name="name" required className="w-full px-3 py-2 border rounded" />
         <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Email:</label>
         <input type="email" id="email" name="email" required className="w-full px-3 py-2 border rounded" />
         <div className="mb-4">

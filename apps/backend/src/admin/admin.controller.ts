@@ -19,6 +19,7 @@ import { Multer } from 'multer';
 import { JwtAuthGuard } from '@auth';
 import { CreateAdminDto } from './dto';
 import {
+  CreateUserDto,
   ResponseCreateUser,
   ResponseDeleteUser,
   ResponseGetAllusers,
@@ -26,7 +27,6 @@ import {
   ResponseMessageEmail,
   ResponseToggleSubscription,
 } from '@shared/dtos';
-import { CreateUserDto } from '../user/dto';
 
 @Controller('admin')
 export class AdminController {
