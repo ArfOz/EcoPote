@@ -4,7 +4,6 @@ import { fetchWithAuth } from "@utils";
 import React, { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useRouter } from "next/navigation";
-import { UserData } from "../components/dtos";
 import { CreateUserDto, ResponseCreateUser } from "@shared/dtos";
 
 const AddUser = () => {

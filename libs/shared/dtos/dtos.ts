@@ -62,3 +62,9 @@ export class CreateUserDto {
   @IsOptional()
   subscription!: boolean;
 }
+
+export class ResponseLogin {
+  message!: string;
+  success!: boolean;
+  data!: { token: string };
+}

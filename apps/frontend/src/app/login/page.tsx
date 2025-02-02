@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
+import { ResponseLogin } from '@shared/dtos';
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
@@ -15,7 +16,7 @@ const Login = () => {
 
     try {
 
-      const response = await fetchWithAuth('admin/login', {
+      const response :ResponseLogin = await fetchWithAuth('admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,16 +26,15 @@ const Login = () => {
 
 
       if (response.success) {
-        const data = await response;
-        if (data.token) {
-          localStorage.setItem('token', data.token);
+       
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
         } else {
           setError('Token is missing in the response.');
         }
         router.push('/send-email');
       } else {
-        const errorData = await response;
-        setError(`Error: ${errorData.message}`);
+        setError(`Error: ${response.message}`);
       }
     } catch (error) {
       setError('An error occurred during login.');

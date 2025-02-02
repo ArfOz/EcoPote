@@ -14,6 +14,7 @@ import {
   ResponseCreateUser,
   ResponseDeleteUser,
   ResponseGetAllusers,
+  ResponseLogin,
   ResponseLogout,
   ResponseMessageEmail,
 } from '@shared/dtos';
@@ -60,7 +61,7 @@ export class AdminService {
   async login(credentials: {
     email: string;
     password: string;
-  }): Promise<{ token: string; success: boolean }> {
+  }): Promise<ResponseLogin> {
     try {
       const admin = await this.adminDatabaseService.findByEmail({
         email: credentials.email,
@@ -79,8 +80,9 @@ export class AdminService {
 
       await this.adminDatabaseService.update(admin.id, { token });
       return {
-        token,
+        data: { token },
         success: true,
+        message: 'Logged in successfully',
       };
     } catch (error) {
       // Handle error

@@ -12,7 +12,7 @@ import {
   Headers,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { Admin, User } from '@prisma/client';
+import { Admin } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { Multer } from 'multer';
@@ -23,6 +23,7 @@ import {
   ResponseCreateUser,
   ResponseDeleteUser,
   ResponseGetAllusers,
+  ResponseLogin,
   ResponseLogout,
   ResponseMessageEmail,
   ResponseToggleSubscription,
@@ -40,8 +41,8 @@ export class AdminController {
   @Post('login')
   async login(
     @Body() credentials: { email: string; password: string }
-  ): Promise<{ token: string }> {
-    return this.adminService.login(credentials);
+  ): Promise<ResponseLogin> {
+    return await this.adminService.login(credentials);
   }
 
   @UseGuards(JwtAuthGuard)
