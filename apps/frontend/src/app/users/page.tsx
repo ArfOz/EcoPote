@@ -121,31 +121,36 @@ const Users = () => {
           ) : (
             <>
               <ul className="divide-y divide-gray-200">
-                {filteredUsers.map((user) => (
-                  <li key={user.id} className="py-4 flex justify-between items-center">
-                    <span className="text-gray-700 flex-1">{user.email}</span>
-                    <span className={`px-2 py-1 rounded-full text-sm text-center w-32 ${user.subscription ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                      {user.subscription ? 'Subscribed' : 'Not Subscribed'}
-                    </span>
-                    <button
-                      onClick={() => toggleSubscription(user.id.toString())}
-                      className="ml-4 px-3 py-1 rounded bg-blue-500 text-white"
-                    >
-                      Toggle Subscription
-                    </button>
-                  </li>
-                ))}
+              <li className="py-2 flex justify-between items-center font-bold">
+                <span className="text-gray-700 flex-1">Email</span>
+                <span className="text-gray-700 flex-1 text-center">Name</span>
+                <span className="text-gray-700 flex-1 text-right">Status</span>
+              </li>
+              {filteredUsers.map((user) => (
+                <li key={user.id} className="py-4 flex justify-between items-center">
+                <span className="text-gray-700 flex-1">{user.email}</span>
+                <span className="text-gray-700 flex-1 text-center">{user.name}</span>
+                <span className="text-gray-700 flex-1 text-right">
+                  <button
+                    onClick={() => toggleSubscription(user.id.toString())}
+                    className={`ml-4 px-3 py-1 rounded text-white ${user.subscription ? 'bg-green-500': 'bg-red-500' }`}
+                  >
+                    {user.subscription ? 'Subscribed':'Unsubscribed'}
+                  </button>
+                </span>
+                </li>
+              ))}
               </ul>
               <div className="flex justify-center space-x-2 mt-4">
-                {Array.from({ length: totalPages }, (_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setPage(index + 1)}
-                    className={`px-3 py-1 rounded ${page === index + 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                key={index}
+                onClick={() => setPage(index + 1)}
+                className={`px-3 py-1 rounded ${page === index + 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+                >
+                {index + 1}
+                </button>
+              ))}
               </div>
             </>
           )}
