@@ -26,3 +26,11 @@ model Admin {
   PrivateKey String?
   PublicKey  String?
 }
+
+model News {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
