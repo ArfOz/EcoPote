@@ -7,6 +7,8 @@ import { DatabaseModule } from '@database';
 import { AdminModule } from './admin/admin.module';
 import { AuthModule } from '@auth';
 import authConfig from '@auth/config/auth.config';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronModule } from './cron/cron.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import authConfig from '@auth/config/auth.config';
     UserModule,
     AdminModule,
     AuthModule,
+    ScheduleModule.forRoot(),
+    CronModule,
   ],
   controllers: [],
   providers: [],
