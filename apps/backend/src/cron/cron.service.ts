@@ -3,12 +3,13 @@ import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { sendBulkEmails } from '@shared/nodemailer';
 import { CronTime, CronJob } from 'cron';
 import { User } from '@prisma/client';
-import { UserDatabaseService } from '@database';
+import { CronDatabaseService, UserDatabaseService } from '@database';
 
 @Injectable()
 export class CronService {
   constructor(
     private readonly userDatabaseService: UserDatabaseService,
+    private readonly cronDatabaseService: CronDatabaseService,
     private readonly schedulerRegistry: SchedulerRegistry
   ) {}
 
