@@ -33,6 +33,12 @@ const Navbar = () => {
             Add User
           </button>
           <button
+            onClick={() => router.push('/cron')}
+            className="text-white hover:text-gray-300"
+          >
+            Cron
+          </button>
+          <button
             onClick={handleLogout}
             className="text-white hover:text-gray-300"
           >
