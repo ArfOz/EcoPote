@@ -2,8 +2,8 @@ import { User } from '@prisma/client';
 import nodemailer, { TransportOptions } from 'nodemailer';
 
 const transporter = nodemailer.createTransport(<TransportOptions>{
-  host: 'smtp.gmail.com', // Replace with your SMTP server
-  port: 465,
+  host: process.env.MAIL_HOST, // Replace with your SMTP server
+  port: process.env.MAIL_PORT ? parseInt(process.env.MAIL_PORT) : 587,
   secure: true,
   // true for 465, false for other ports
   auth: {
