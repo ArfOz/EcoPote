@@ -6,12 +6,10 @@ import { fetchWithAuth } from '@utils';
 import { ResponseStatus, Status } from '../components/dtos';
 import { ResponseMessageEmail } from '@shared/dtos';
 
-
 const SendEmail = () => {
   const [subject, setSubject] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
-
-
+  const [fileName, setFileName] = useState<string | null>(null); // State for file name
   const [status, setStatus] = useState<Status | string | null>(null);
   const router = useRouter();
 
@@ -33,27 +31,29 @@ const SendEmail = () => {
     }
 
     try {
-      const response :ResponseMessageEmail= await fetchWithAuth('admin/sendemail', {
+      const response: ResponseMessageEmail = await fetchWithAuth('admin/sendemail', {
         method: 'POST',
         body: formData,
-      },
-    true) as ResponseStatus;
-      
+      }, true) as ResponseStatus;
+
       if (!response) {
         throw new Error('Failed to send emails');
       }
-      if(response.success) {
+      if (response.success) {
         setStatus({
           sentUsers: response.data.sentUsers ?? [],
           errorUsers: response.data.errorUsers ?? [],
           message: "Emails sent successfully"
         });
       }
-      
-     
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
       setSubject('');
       setFile(null);
-      
+      setFileName(null); // Reset file name
+
     } catch (error) {
       if (error instanceof Error) {
         setStatus(`Error: ${error.message}`);
@@ -110,11 +110,18 @@ const SendEmail = () => {
                 <input
                   type="file"
                   accept=".htm,.html"
-                  onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                  onChange={(e) => {
+                    const selectedFile = e.target.files ? e.target.files[0] : null;
+                    setFile(selectedFile);
+                    setFileName(selectedFile ? selectedFile.name : null); // Update file name
+                  }}
                   required
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </label>
+              {fileName && (
+                <p className="mt-2 text-sm text-gray-600">Selected file: {fileName}</p>
+              )}
             </div>
             <button
               type="submit"
