@@ -1,5 +1,6 @@
 // filepath: /d:/GithubProjects/ecopote/libs/shared/nodemailer/azuremailer.ts
 import { EmailClient, EmailMessage } from '@azure/communication-email';
+import { User } from '@prisma/client';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -11,10 +12,12 @@ if (!connectionString) {
 const emailClient = new EmailClient(connectionString);
 
 export const sendEmailAzure = async (
-  to: string,
+  to: User[],
   subject: string,
   htmlContent: string
 ) => {
+  const sentUsers: string[] = [];
+  const errorUsers: string[] = [];
   const emailMessage: EmailMessage = {
     senderAddress: process.env.SENDER_EMAIL_ADDRESS || '',
     content: {
@@ -23,20 +26,23 @@ export const sendEmailAzure = async (
       html: htmlContent,
     },
     recipients: {
-      to: [
-        {
-          address: to,
-        },
-      ],
+      to: to.map((user) => ({ address: user.email, displayName: user.email })),
     },
   };
 
   try {
     const poller = await emailClient.beginSend(emailMessage);
     const response = await poller.pollUntilDone();
-    return response;
-    console.log(`Email sent successfully: ${response.id}`);
+    console.log('Email sent:', response);
+    if (response.status === 'Succeeded') {
+      sentUsers.push(...to.map((user) => user.email));
+    } else {
+      errorUsers.push(...to.map((user) => user.email));
+    }
+
+    return { sentUsers, errorUsers };
   } catch (error) {
     console.error('Failed to send email:', error);
+    throw new Error('Failed to send email');
   }
 };

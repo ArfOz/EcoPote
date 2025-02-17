@@ -216,18 +216,13 @@ export class AdminService {
         );
       }
 
-      // const res = await sendBulkEmails(
-      //   users,
-      //   emailData.subject,
-      //   emailData.html
-      // );
-      const res = await sendEmailAzure(
-        'arfoz1245@gmail.com',
+      const { sentUsers, errorUsers } = await sendEmailAzure(
+        users,
         emailData.subject,
         emailData.html
       );
       return {
-        data: { sentUsers: [], errorUsers: [] },
+        data: { sentUsers, errorUsers },
         success: true,
         message: 'Email sent successfully',
       };
