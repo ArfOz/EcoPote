@@ -1,1 +1,2 @@
-export * from './mailservice';
+export * from './azuremailer';
+export * from './nodemailservice';

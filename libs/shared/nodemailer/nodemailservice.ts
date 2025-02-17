@@ -4,8 +4,8 @@ import nodemailer, { TransportOptions } from 'nodemailer';
 const transporter = nodemailer.createTransport(<TransportOptions>{
   host: process.env.MAIL_HOST, // Replace with your SMTP server
   port: process.env.MAIL_PORT ? parseInt(process.env.MAIL_PORT) : 587,
-  secure: true,
-  // true for 465, false for other ports
+  // secure: true,
+
   auth: {
     user: process.env.MAIL_USER, // Replace with your email
     pass: process.env.MAIL_PASSWORD, // Replace with your email password

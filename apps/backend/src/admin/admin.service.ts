@@ -8,7 +8,8 @@ import { ConfigType } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '@auth/auth.service';
 
-import { sendBulkEmails } from '@shared/nodemailer';
+import { sendEmailAzure } from '@shared/nodemailer/azuremailer';
+
 import { Prisma } from '@prisma/client';
 import {
   ResponseCreateUser,
@@ -215,13 +216,23 @@ export class AdminService {
         );
       }
 
-      const res = await sendBulkEmails(
-        users,
+      // const res = await sendBulkEmails(
+      //   users,
+      //   emailData.subject,
+      //   emailData.html
+      // );
+      const res = await sendEmailAzure(
+        'arfoz1245@gmail.com',
         emailData.subject,
         emailData.html
       );
+      return {
+        data: { sentUsers: [], errorUsers: [] },
+        success: true,
+        message: 'Email sent successfully',
+      };
 
-      return { data: res, success: true, message: 'Email sent successfully' };
+      // return { data: res, success: true, message: 'Email sent successfully' };
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
