@@ -1,3 +1,4 @@
+import { UpdateAdminDto } from './../admin/dto/admin.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { sendBulkEmails, sendEmailAzure } from '@shared/nodemailer';
@@ -13,11 +14,11 @@ export class CronService {
     private readonly schedulerRegistry: SchedulerRegistry
   ) {}
 
-  @Cron(CronExpression.EVERY_WEEK)
-  async sendWeeklyEmails() {
-    console.log('Cron job running every week');
-    await this.sendScheduledEmails();
-  }
+  // @Cron(CronExpression.EVERY_WEEK)
+  // async sendWeeklyEmails() {
+  //   console.log('Cron job running every week');
+  //   await this.sendScheduledEmails();
+  // }
 
   // @Cron(CronExpression.EVERY_MINUTE)
   // async sendEmailsEveryMinute() {
@@ -63,6 +64,23 @@ export class CronService {
     console.log(`Cron job ${cronName} scheduled to start at ${startTime}`);
   }
 
+  async stopCronJob(cronName: string) {
+    const cronJob = this.schedulerRegistry.getCronJob(cronName);
+  }
+
+  async updateCronJob(cronName: string, cronTime: string, startTime: Date) {
+    const cronJob = this.schedulerRegistry.getCronJob(cronName);
+    if (cronJob) {
+      cronJob.setTime(new CronTime(cronTime));
+      this.schedulerRegistry.deleteCronJob(cronName);
+      this.schedulerRegistry.addCronJob(cronName, cronJob);
+      cronJob.start();
+      console.log(`Cron job ${cronName} updated to run at ${cronTime}`);
+    } else {
+      console.error(`Cron job ${cronName} not found`);
+    }
+  }
+
   private async sendScheduledEmails() {
     try {
       const users: User[] = await this.userDatabaseService.findAll({
@@ -75,7 +93,7 @@ export class CronService {
           HttpStatus.NOT_FOUND
         );
       }
-
+      // emaildata will be taken from the database
       const emailData = {
         subject: 'Scheduled Email',
         html: '<p>This is a scheduled email.</p>',
