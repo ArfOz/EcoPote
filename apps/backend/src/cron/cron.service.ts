@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { sendBulkEmails } from '@shared/nodemailer';
+import { sendBulkEmails, sendEmailAzure } from '@shared/nodemailer';
 import { CronTime, CronJob } from 'cron';
 import { User } from '@prisma/client';
 import { CronDatabaseService, UserDatabaseService } from '@database';
@@ -57,6 +57,7 @@ export class CronService {
       null,
       true
     );
+
     cronJob.start();
     this.schedulerRegistry.addCronJob(cronName, cronJob);
     console.log(`Cron job ${cronName} scheduled to start at ${startTime}`);
@@ -80,13 +81,13 @@ export class CronService {
         html: '<p>This is a scheduled email.</p>',
       };
 
-      const res = await sendBulkEmails(
+      const { sentUsers, errorUsers } = await sendEmailAzure(
         users,
         emailData.subject,
         emailData.html
       );
 
-      console.log('Scheduled emails sent successfully', res);
+      console.log('Scheduled emails sent successfully', sentUsers, errorUsers);
     } catch (error) {
       console.error('Failed to send scheduled emails', error);
     }
