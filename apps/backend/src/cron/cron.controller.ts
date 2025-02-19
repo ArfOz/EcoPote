@@ -7,23 +7,32 @@ import {
   Post,
 } from '@nestjs/common';
 import { CronService } from './cron.service';
+import { CronStartDto } from './dto';
 
 @Controller('cron')
 export class CronController {
   constructor(private readonly cronService: CronService) {}
 
   @Post('start-job')
-  async startCronJob(
-    @Body('cronName') cronName: string,
-    @Body('cronTime') cronTime: string,
-    @Body('startTime') startTime: Date
-  ) {
+  async startCronJob(@Body() cronData: CronStartDto) {
     try {
-      await this.cronService.startCronJob(cronName, cronTime, startTime);
+      await this.cronService.startCronJob(cronData);
       return { success: true, message: 'Cron job started successfully' };
     } catch (error) {
       throw new HttpException(
         'Failed to start cron job',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+  @Post('stop-job')
+  async stopCronJob(@Body('cronName') cronName: string) {
+    try {
+      await this.cronService.stopCronJob(cronName);
+      return { success: true, message: 'Cron job stopped successfully' };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to stop cron job',
         HttpStatus.BAD_REQUEST
       );
     }

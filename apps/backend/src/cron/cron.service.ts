@@ -5,6 +5,7 @@ import { sendBulkEmails, sendEmailAzure } from '@shared/nodemailer';
 import { CronTime, CronJob } from 'cron';
 import { User } from '@prisma/client';
 import { CronDatabaseService, UserDatabaseService } from '@database';
+import { CronStartDto } from './dto';
 
 @Injectable()
 export class CronService {
@@ -32,7 +33,8 @@ export class CronService {
   //   await this.sendScheduledEmails();
   // }
 
-  async updateCronTime(cronName: string, cronTime: string, startTime: Date) {
+  async updateCronTime(cronData: CronStartDto) {
+    const { cronName, cronTime, startTime } = cronData;
     const cronJob = this.schedulerRegistry.getCronJob(cronName);
     if (cronJob) {
       cronJob.setTime(new CronTime(cronTime));
@@ -45,7 +47,8 @@ export class CronService {
     }
   }
 
-  async startCronJob(cronName: string, cronTime: string, startTime: Date) {
+  async startCronJob(cronData: CronStartDto) {
+    const { cronName, cronTime, startTime } = cronData;
     const cronJob = new CronJob(
       cronTime,
       async () => {
@@ -66,6 +69,13 @@ export class CronService {
 
   async stopCronJob(cronName: string) {
     const cronJob = this.schedulerRegistry.getCronJob(cronName);
+    if (cronJob) {
+      cronJob.stop();
+      this.schedulerRegistry.deleteCronJob(cronName);
+      console.log(`Cron job ${cronName} stopped`);
+    } else {
+      console.error(`Cron job ${cronName} not found`);
+    }
   }
 
   async updateCronJob(cronName: string, cronTime: string, startTime: Date) {
