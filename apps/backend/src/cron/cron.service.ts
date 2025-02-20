@@ -1,113 +1,74 @@
-import { UpdateAdminDto } from './../admin/dto/admin.dto';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { sendBulkEmails, sendEmailAzure } from '@shared/nodemailer';
-import { CronTime, CronJob } from 'cron';
-import { User } from '@prisma/client';
-import { CronDatabaseService, UserDatabaseService } from '@database';
+import { Injectable } from '@nestjs/common';
 import { CronStartDto } from './dto';
+import { UserDatabaseService } from '@database';
+import { sendEmailAzure } from '@shared/nodemailer';
+import { User } from '@prisma/client';
+import * as cron from 'node-cron';
 
 @Injectable()
 export class CronService {
-  constructor(
-    private readonly userDatabaseService: UserDatabaseService,
-    private readonly cronDatabaseService: CronDatabaseService,
-    private readonly schedulerRegistry: SchedulerRegistry
-  ) {}
+  private cronJobs: Map<string, cron.ScheduledTask> = new Map();
 
-  // @Cron(CronExpression.EVERY_WEEK)
-  // async sendWeeklyEmails() {
-  //   console.log('Cron job running every week');
-  //   await this.sendScheduledEmails();
-  // }
+  constructor(private readonly userDatabaseService: UserDatabaseService) {}
 
-  // @Cron(CronExpression.EVERY_MINUTE)
-  // async sendEmailsEveryMinute() {
-  //   console.log('Cron job running every minute');
-  //   await this.sendScheduledEmails();
-  // }
+  async scheduleEmail(
+    cronName: string,
+    date: Date,
+    emailData: { subject: string; html: string }
+  ) {
+    const cronTime = `${date.getSeconds()} ${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${
+      date.getMonth() + 1
+    } *`;
 
-  // @Cron(CronExpression.EVERY_6_MONTHS)
-  // async sendMonthlyEmails() {
-  //   console.log('Cron job running every month');
-  //   await this.sendScheduledEmails();
-  // }
-
-  async updateCronTime(cronData: CronStartDto) {
-    const { cronName, cronTime, startTime } = cronData;
-    const cronJob = this.schedulerRegistry.getCronJob(cronName);
-    if (cronJob) {
-      cronJob.setTime(new CronTime(cronTime));
-      this.schedulerRegistry.deleteCronJob(cronName);
-      this.schedulerRegistry.addCronJob(cronName, cronJob);
-      cronJob.start();
-      console.log(`Cron job ${cronName} updated to run at ${cronTime}`);
-    } else {
-      console.error(`Cron job ${cronName} not found`);
-    }
-  }
-
-  async startCronJob(cronData: CronStartDto) {
-    const { cronName, cronTime, startTime } = cronData;
-    const cronJob = new CronJob(
+    const job = cron.schedule(
       cronTime,
       async () => {
-        console.log(`Cron job ${cronName} started at ${startTime}`);
-        await this.sendScheduledEmails();
+        console.log(`Cron job ${cronName} started at ${new Date()}`);
+        await this.sendScheduledEmails(emailData);
+        job.stop(); // Stop the job after it runs
       },
-      null,
-      true,
-      undefined,
-      null,
-      true
+      {
+        scheduled: true,
+      }
     );
 
-    cronJob.start();
-    this.schedulerRegistry.addCronJob(cronName, cronJob);
-    console.log(`Cron job ${cronName} scheduled to start at ${startTime}`);
+    this.cronJobs.set(cronName, job);
+    console.log(`Cron job ${cronName} scheduled to run at ${date}`);
   }
 
   async stopCronJob(cronName: string) {
-    const cronJob = this.schedulerRegistry.getCronJob(cronName);
-    if (cronJob) {
-      cronJob.stop();
-      this.schedulerRegistry.deleteCronJob(cronName);
+    const job = this.cronJobs.get(cronName);
+    if (job) {
+      job.stop();
+      this.cronJobs.delete(cronName);
       console.log(`Cron job ${cronName} stopped`);
     } else {
       console.error(`Cron job ${cronName} not found`);
     }
   }
 
-  async updateCronJob(cronName: string, cronTime: string, startTime: Date) {
-    const cronJob = this.schedulerRegistry.getCronJob(cronName);
-    if (cronJob) {
-      cronJob.setTime(new CronTime(cronTime));
-      this.schedulerRegistry.deleteCronJob(cronName);
-      this.schedulerRegistry.addCronJob(cronName, cronJob);
-      cronJob.start();
-      console.log(`Cron job ${cronName} updated to run at ${cronTime}`);
-    } else {
-      console.error(`Cron job ${cronName} not found`);
-    }
+  async updateCronJob(
+    cronName: string,
+    date: Date,
+    emailData: { subject: string; html: string }
+  ) {
+    await this.stopCronJob(cronName);
+    await this.scheduleEmail(cronName, date, emailData);
+    console.log(`Cron job ${cronName} updated to run at ${date}`);
   }
 
-  private async sendScheduledEmails() {
+  private async sendScheduledEmails(emailData: {
+    subject: string;
+    html: string;
+  }) {
     try {
       const users: User[] = await this.userDatabaseService.findAll({
         where: { subscription: true },
       });
 
       if (users.length === 0) {
-        throw new HttpException(
-          'No users to send email to',
-          HttpStatus.NOT_FOUND
-        );
+        throw new Error('No users to send email to');
       }
-      // emaildata will be taken from the database
-      const emailData = {
-        subject: 'Scheduled Email',
-        html: '<p>This is a scheduled email.</p>',
-      };
 
       const { sentUsers, errorUsers } = await sendEmailAzure(
         users,
