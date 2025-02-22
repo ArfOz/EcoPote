@@ -16,7 +16,11 @@ export class CronController {
   @Post('start-job')
   async startCronJob(@Body() cronData: CronStartDto) {
     try {
-      await this.cronService.startCronJob(cronData);
+      await this.cronService.scheduleEmail(
+        cronData.cronName,
+        cronData.date,
+        cronData.emailData
+      );
       return { success: true, message: 'Cron job started successfully' };
     } catch (error) {
       throw new HttpException(
@@ -25,6 +29,7 @@ export class CronController {
       );
     }
   }
+
   @Post('stop-job')
   async stopCronJob(@Body('cronName') cronName: string) {
     try {
@@ -41,11 +46,11 @@ export class CronController {
   @Put('update-time')
   async updateCronTime(
     @Body('cronName') cronName: string,
-    @Body('cronTime') cronTime: string,
-    @Body('startTime') startTime: Date
+    @Body('date') date: Date,
+    @Body('emailData') emailData: { subject: string; html: string }
   ) {
     try {
-      await this.cronService.updateCronJob(cronName, cronTime, startTime);
+      await this.cronService.updateCronJob(cronName, date, emailData);
       return { success: true, message: 'Cron time updated successfully' };
     } catch (error) {
       throw new HttpException(
