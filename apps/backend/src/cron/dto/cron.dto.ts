@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class CronStartDto {
   @IsString()
   @IsNotEmpty()
-  cronName: string;
+  name: string;
 
   @IsString()
   @IsNotEmpty()
@@ -12,4 +12,8 @@ export class CronStartDto {
   @IsString()
   @IsNotEmpty()
   startTime: Date;
+
+  @IsString()
+  @IsNotEmpty()
+  schedule: string;
 }

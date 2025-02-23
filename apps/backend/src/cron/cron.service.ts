@@ -1,8 +1,8 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { CronStartDto } from './dto';
-import { UserDatabaseService } from '@database';
+import { CronDatabaseService, UserDatabaseService } from '@database';
 import { sendEmailAzure } from '@shared/nodemailer';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import * as cron from 'node-cron';
 import {
   Controller,
@@ -17,7 +17,7 @@ import {
 export class CronService implements OnModuleInit {
   private cronJobs: Map<string, cron.ScheduledTask> = new Map();
 
-  constructor(private readonly userDatabaseService: UserDatabaseService) {}
+  constructor(private readonly cronDatabaseService: CronDatabaseService) {}
 
   onModuleInit() {
     // Schedule your cron jobs here
@@ -26,130 +26,73 @@ export class CronService implements OnModuleInit {
       html: '<p>This is a scheduled email.</p>',
     };
 
-    const date = new Date('2025-03-15T10:00:00Z'); // Specific date and time
-    this.scheduleEmail('sendEmailOnSpecificDate', date, emailData);
+    const date = new Date(); // Specific date and time
   }
 
-  async scheduleEmail(
-    cronName: string,
-    date: Date,
-    emailData: { subject: string; html: string }
-  ) {
-    const cronTime = `${date.getSeconds()} ${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${
-      date.getMonth() + 1
-    } *`;
-
-    const job = cron.schedule(
+  async saveDatabase(name, startTime, cronTime, schedule) {
+    const dateNow = new Date();
+    const savedCron: Prisma.CronCreateInput = {
+      name,
       cronTime,
-      async () => {
-        console.log(`Cron job ${cronName} started at ${new Date()}`);
-        await this.sendScheduledEmails(emailData);
-        job.stop(); // Stop the job after it runs
-      },
-      {
-        scheduled: true,
-      }
-    );
-
-    this.cronJobs.set(cronName, job);
-    console.log(`Cron job ${cronName} scheduled to run at ${date}`);
+      schedule: 'test',
+      startTime: dateNow,
+      createdAt: dateNow,
+      updatedAt: dateNow,
+    };
+    await this.cronDatabaseService.createCron(savedCron).catch((error) => {
+      console.error('Error saving to database:', error);
+    });
+    return { success: true, message: 'Cron job started successfully' };
   }
 
-  async stopCronJob(cronName: string) {
-    const job = this.cronJobs.get(cronName);
-    if (job) {
-      job.stop();
-      this.cronJobs.delete(cronName);
-      console.log(`Cron job ${cronName} stopped`);
-    } else {
-      console.error(`Cron job ${cronName} not found`);
-    }
+  async getCronJobs() {
+    const cronJobs = await this.cronDatabaseService.findManyCron();
+    return cronJobs;
   }
 
-  async updateCronJob(
-    cronName: string,
-    date: Date,
-    emailData: { subject: string; html: string }
-  ) {
-    await this.stopCronJob(cronName);
-    await this.scheduleEmail(cronName, date, emailData);
-    console.log(`Cron job ${cronName} updated to run at ${date}`);
-  }
+  // async stopCronJob(cronName: string) {
+  //   const job = this.cronJobs.get(cronName);
+  //   if (job) {
+  //     job.stop();
+  //     this.cronJobs.delete(cronName);
+  //     console.log(`Cron job ${cronName} stopped`);
+  //   } else {
+  //     console.error(`Cron job ${cronName} not found`);
+  //   }
+  // }
 
-  private async sendScheduledEmails(emailData: {
-    subject: string;
-    html: string;
-  }) {
-    try {
-      const users: User[] = await this.userDatabaseService.findAll({
-        where: { subscription: true },
-      });
+  // async updateCronJob(
+  //   cronName: string,
+  //   date: Date,
+  //   emailData: { subject: string; html: string }
+  // ) {
+  //   await this.stopCronJob(cronName);
+  //   await this.scheduleEmail(cronName, date, emailData);
+  //   console.log(`Cron job ${cronName} updated to run at ${date}`);
+  // }
 
-      if (users.length === 0) {
-        throw new Error('No users to send email to');
-      }
+  // private async sendScheduledEmails(emailData: {
+  //   subject: string;
+  //   html: string;
+  // }) {
+  //   try {
+  //     const users: User[] = await this.userDatabaseService.findAll({
+  //       where: { subscription: true },
+  //     });
 
-      const { sentUsers, errorUsers } = await sendEmailAzure(
-        users,
-        emailData.subject,
-        emailData.html
-      );
+  //     if (users.length === 0) {
+  //       throw new Error('No users to send email to');
+  //     }
 
-      console.log('Scheduled emails sent successfully', sentUsers, errorUsers);
-    } catch (error) {
-      console.error('Failed to send scheduled emails', error);
-    }
-  }
-}
+  //     const { sentUsers, errorUsers } = await sendEmailAzure(
+  //       users,
+  //       emailData.subject,
+  //       emailData.html
+  //     );
 
-@Controller('cron')
-export class CronController {
-  constructor(private readonly cronService: CronService) {}
-
-  @Post('start-job')
-  async startCronJob(@Body() cronData: CronStartDto) {
-    try {
-      await this.cronService.scheduleEmail(
-        cronData.cronName,
-        cronData.date,
-        cronData.emailData
-      );
-      return { success: true, message: 'Cron job started successfully' };
-    } catch (error) {
-      throw new HttpException(
-        'Failed to start cron job',
-        HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  @Post('stop-job')
-  async stopCronJob(@Body('cronName') cronName: string) {
-    try {
-      await this.cronService.stopCronJob(cronName);
-      return { success: true, message: 'Cron job stopped successfully' };
-    } catch (error) {
-      throw new HttpException(
-        'Failed to stop cron job',
-        HttpStatus.BAD_REQUEST
-      );
-    }
-  }
-
-  @Put('update-time')
-  async updateCronTime(
-    @Body('cronName') cronName: string,
-    @Body('date') date: Date,
-    @Body('emailData') emailData: { subject: string; html: string }
-  ) {
-    try {
-      await this.cronService.updateCronJob(cronName, date, emailData);
-      return { success: true, message: 'Cron time updated successfully' };
-    } catch (error) {
-      throw new HttpException(
-        'Failed to update cron time',
-        HttpStatus.BAD_REQUEST
-      );
-    }
-  }
+  //     console.log('Scheduled emails sent successfully', sentUsers, errorUsers);
+  //   } catch (error) {
+  //     console.error('Failed to send scheduled emails', error);
+  //   }
+  // }
 }

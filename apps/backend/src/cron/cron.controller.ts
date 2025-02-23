@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Get,
 } from '@nestjs/common';
 import { CronService } from './cron.service';
 import { CronStartDto } from './dto';
@@ -13,16 +14,18 @@ import { CronStartDto } from './dto';
 export class CronController {
   constructor(private readonly cronService: CronService) {}
 
-  @Post('start-job')
-  async startCronJob(@Body() cronData: CronStartDto) {
+  @Post('create-job')
+  async cretaeCronJobs(@Body() cronData: CronStartDto) {
     try {
-      await this.cronService.scheduleEmail(
-        cronData.cronName,
-        cronData.date,
-        cronData.emailData
+      await this.cronService.saveDatabase(
+        cronData.name,
+        cronData.startTime,
+        cronData.cronTime,
+        cronData.schedule
       );
       return { success: true, message: 'Cron job started successfully' };
     } catch (error) {
+      console.error('Error starting cron job:', error);
       throw new HttpException(
         'Failed to start cron job',
         HttpStatus.BAD_REQUEST
@@ -30,35 +33,49 @@ export class CronController {
     }
   }
 
-  @Post('stop-job')
-  async stopCronJob(@Body('cronName') cronName: string) {
+  @Get('get-jobs')
+  async getCronJobs() {
     try {
-      await this.cronService.stopCronJob(cronName);
-      return { success: true, message: 'Cron job stopped successfully' };
+      const jobs = await this.cronService.getCronJobs();
+      return { success: true, jobs };
     } catch (error) {
+      console.error('Error fetching cron jobs:', error);
       throw new HttpException(
-        'Failed to stop cron job',
-        HttpStatus.BAD_REQUEST
+        'Failed to fetch cron jobs',
+        HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }
 
-  @Put('update-time')
-  async updateCronTime(
-    @Body('cronName') cronName: string,
-    @Body('date') date: Date,
-    @Body('emailData') emailData: { subject: string; html: string }
-  ) {
-    try {
-      await this.cronService.updateCronJob(cronName, date, emailData);
-      return { success: true, message: 'Cron time updated successfully' };
-    } catch (error) {
-      throw new HttpException(
-        'Failed to update cron time',
-        HttpStatus.BAD_REQUEST
-      );
-    }
-  }
+  // @Post('stop-job')
+  // async stopCronJob(@Body('cronName') cronName: string) {
+  //   try {
+  //     await this.cronService.stopCronJob(cronName);
+  //     return { success: true, message: 'Cron job stopped successfully' };
+  //   } catch (error) {
+  //     throw new HttpException(
+  //       'Failed to stop cron job',
+  //       HttpStatus.BAD_REQUEST
+  //     );
+  //   }
+  // }
+
+  // @Put('update-time')
+  // async updateCronTime(
+  //   @Body('cronName') cronName: string,
+  //   @Body('date') date: Date,
+  //   @Body('emailData') emailData: { subject: string; html: string }
+  // ) {
+  //   try {
+  //     await this.cronService.updateCronJob(cronName, date, emailData);
+  //     return { success: true, message: 'Cron time updated successfully' };
+  //   } catch (error) {
+  //     throw new HttpException(
+  //       'Failed to update cron time',
+  //       HttpStatus.BAD_REQUEST
+  //     );
+  //   }
+  // }
 }
 
 // *    *    *    *    *    *
