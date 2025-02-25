@@ -58,13 +58,12 @@ export class CronService implements OnModuleInit {
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
       cronTime,
-      schedule: 'test',
-      startTime: dateNow,
+      schedule,
       createdAt: dateNow,
       updatedAt: dateNow,
     };
 
-    const where: Prisma.CronWhereUniqueInput = { id, name: cronName }; // Replace 1 with the actual id value
+    const where: Prisma.CronWhereUniqueInput = { id };
     const data: Prisma.CronUpdateInput = updatedCron;
 
     await this.cronDatabaseService
