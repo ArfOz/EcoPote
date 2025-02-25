@@ -8,7 +8,7 @@ import {
   Get,
 } from '@nestjs/common';
 import { CronService } from './cron.service';
-import { CronStartDto } from './dto';
+import { CronStartDto, CronUpdateDto } from './dto';
 
 @Controller('cron')
 export class CronController {
@@ -43,6 +43,26 @@ export class CronController {
       throw new HttpException(
         'Failed to fetch cron jobs',
         HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post('update-job')
+  async updateCronJob(@Body() cronData: CronUpdateDto) {
+    try {
+      await this.cronService.updateCronJob(
+        cronData.id,
+        cronData.name,
+        cronData.startTime,
+        cronData.cronTime,
+        cronData.schedule
+      );
+      return { success: true, message: 'Cron job updated successfully' };
+    } catch (error) {
+      console.error('Error updating cron job:', error);
+      throw new HttpException(
+        'Failed to update cron job',
+        HttpStatus.BAD_REQUEST
       );
     }
   }

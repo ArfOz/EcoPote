@@ -17,7 +17,10 @@ import {
 export class CronService implements OnModuleInit {
   private cronJobs: Map<string, cron.ScheduledTask> = new Map();
 
-  constructor(private readonly cronDatabaseService: CronDatabaseService) {}
+  constructor(
+    private readonly cronDatabaseService: CronDatabaseService,
+    private readonly userDatabaseService: UserDatabaseService
+  ) {}
 
   onModuleInit() {
     // Schedule your cron jobs here
@@ -50,49 +53,61 @@ export class CronService implements OnModuleInit {
     return cronJobs;
   }
 
-  // async stopCronJob(cronName: string) {
-  //   const job = this.cronJobs.get(cronName);
-  //   if (job) {
-  //     job.stop();
-  //     this.cronJobs.delete(cronName);
-  //     console.log(`Cron job ${cronName} stopped`);
-  //   } else {
-  //     console.error(`Cron job ${cronName} not found`);
-  //   }
-  // }
+  async updateCronJob(id, cronName, startTime, cronTime, schedule) {
+    const dateNow = new Date();
+    const updatedCron: Prisma.CronUpdateInput = {
+      name: cronName,
+      cronTime,
+      schedule: 'test',
+      startTime: dateNow,
+      createdAt: dateNow,
+      updatedAt: dateNow,
+    };
 
-  // async updateCronJob(
-  //   cronName: string,
-  //   date: Date,
-  //   emailData: { subject: string; html: string }
-  // ) {
-  //   await this.stopCronJob(cronName);
-  //   await this.scheduleEmail(cronName, date, emailData);
-  //   console.log(`Cron job ${cronName} updated to run at ${date}`);
-  // }
+    const where: Prisma.CronWhereUniqueInput = { id, name: cronName }; // Replace 1 with the actual id value
+    const data: Prisma.CronUpdateInput = updatedCron;
 
-  // private async sendScheduledEmails(emailData: {
-  //   subject: string;
-  //   html: string;
-  // }) {
-  //   try {
-  //     const users: User[] = await this.userDatabaseService.findAll({
-  //       where: { subscription: true },
-  //     });
+    await this.cronDatabaseService
+      .updateCron({ where, data })
+      .catch((error) => {
+        console.error('Error updating database:', error);
+      });
+    return { success: true, message: 'Cron job updated successfully' };
+  }
 
-  //     if (users.length === 0) {
-  //       throw new Error('No users to send email to');
-  //     }
+  async stopCronJob(cronName: string) {
+    const job = this.cronJobs.get(cronName);
+    if (job) {
+      job.stop();
+      this.cronJobs.delete(cronName);
+      console.log(`Cron job ${cronName} stopped`);
+    } else {
+      console.error(`Cron job ${cronName} not found`);
+    }
+  }
 
-  //     const { sentUsers, errorUsers } = await sendEmailAzure(
-  //       users,
-  //       emailData.subject,
-  //       emailData.html
-  //     );
+  private async sendScheduledEmails(emailData: {
+    subject: string;
+    html: string;
+  }) {
+    try {
+      const users: User[] = await this.userDatabaseService.findAll({
+        where: { subscription: true },
+      });
 
-  //     console.log('Scheduled emails sent successfully', sentUsers, errorUsers);
-  //   } catch (error) {
-  //     console.error('Failed to send scheduled emails', error);
-  //   }
-  // }
+      if (users.length === 0) {
+        throw new Error('No users to send email to');
+      }
+
+      const { sentUsers, errorUsers } = await sendEmailAzure(
+        users,
+        emailData.subject,
+        emailData.html
+      );
+
+      console.log('Scheduled emails sent successfully', sentUsers, errorUsers);
+    } catch (error) {
+      console.error('Failed to send scheduled emails', error);
+    }
+  }
 }
