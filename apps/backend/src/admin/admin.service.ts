@@ -19,6 +19,7 @@ import {
   ResponseLogout,
   ResponseMessageEmail,
 } from '@shared/dtos';
+import { NewsDatabaseService } from '@database/news';
 
 @Injectable()
 export class AdminService {
@@ -29,7 +30,8 @@ export class AdminService {
     @Inject(authConfig.KEY)
     private readonly authCfg: ConfigType<typeof authConfig>,
     private readonly userDatabaseService: UserDatabaseService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly newsDatabaseService: NewsDatabaseService
   ) {}
 
   async addAdmin(adminData: {
@@ -254,6 +256,16 @@ export class AdminService {
         'Failed to toggle subscription',
         HttpStatus.BAD_REQUEST
       );
+    }
+  }
+
+  async addNews(newsData: { title: string; content: string }) {
+    try {
+      // Implement your logic to add news here
+      return { message: 'News added successfully', success: true };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to add news', HttpStatus.BAD_REQUEST);
     }
   }
 }

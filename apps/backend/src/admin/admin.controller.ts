@@ -104,4 +104,9 @@ export class AdminController {
   ): Promise<ResponseToggleSubscription> {
     return await this.adminService.toggleSubscription(parseInt(id, 10));
   }
+
+  @Post('news/add')
+  async addNews(@Body() newsData: { title: string; content: string }) {
+    return await this.adminService.addNews(newsData);
+  }
 }

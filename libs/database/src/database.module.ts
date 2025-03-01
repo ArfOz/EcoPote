@@ -1,9 +1,11 @@
+import { News } from '@prisma/client';
 import { UserDatabaseModule } from './user/user-database.module';
 import { Global, Module } from '@nestjs/common';
 
 import { AdminDatabaseModule } from './admin';
 import { PrismaModule } from './prisma/prisma.module';
 import { CronDatabaseModule } from './cron';
+import { NewsDatabaseModule } from './news';
 
 @Global()
 @Module({
@@ -12,6 +14,7 @@ import { CronDatabaseModule } from './cron';
     AdminDatabaseModule,
     PrismaModule,
     CronDatabaseModule,
+    NewsDatabaseModule,
   ],
   providers: [PrismaModule],
   exports: [
@@ -19,6 +22,7 @@ import { CronDatabaseModule } from './cron';
     AdminDatabaseModule,
     PrismaModule,
     CronDatabaseModule,
+    NewsDatabaseModule,
   ],
 })
 export class DatabaseModule {}
