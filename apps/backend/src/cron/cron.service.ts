@@ -53,7 +53,7 @@ export class CronService implements OnModuleInit {
     return cronJobs;
   }
 
-  async updateCronJob(id, cronName, startTime, cronTime, schedule) {
+  async updateCronJob(id, cronName, startTime, cronTime, schedule, status) {
     const dateNow = new Date();
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
@@ -61,6 +61,7 @@ export class CronService implements OnModuleInit {
       schedule,
       createdAt: dateNow,
       updatedAt: dateNow,
+      status,
     };
 
     const where: Prisma.CronWhereUniqueInput = { id };
@@ -74,7 +75,7 @@ export class CronService implements OnModuleInit {
     return { success: true, message: 'Cron job updated successfully' };
   }
 
-  async stopCronJob(cronName: string) {
+  async deleteCronJob(cronName: string) {
     const job = this.cronJobs.get(cronName);
     if (job) {
       job.stop();

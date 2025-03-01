@@ -55,7 +55,8 @@ export class CronController {
         cronData.name,
         cronData.startTime,
         cronData.cronTime,
-        cronData.schedule
+        cronData.schedule,
+        cronData.status
       );
       return { success: true, message: 'Cron job updated successfully' };
     } catch (error) {
@@ -67,18 +68,18 @@ export class CronController {
     }
   }
 
-  // @Post('stop-job')
-  // async stopCronJob(@Body('cronName') cronName: string) {
-  //   try {
-  //     await this.cronService.stopCronJob(cronName);
-  //     return { success: true, message: 'Cron job stopped successfully' };
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       'Failed to stop cron job',
-  //       HttpStatus.BAD_REQUEST
-  //     );
-  //   }
-  // }
+  @Post('sdelete-job')
+  async deleteCronJob(@Body('cronName') cronName: string) {
+    try {
+      await this.cronService.deleteCronJob(cronName);
+      return { success: true, message: 'Cron job stopped successfully' };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to stop cron job',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
 
   // @Put('update-time')
   // async updateCronTime(

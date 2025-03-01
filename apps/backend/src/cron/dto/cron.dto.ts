@@ -5,6 +5,7 @@ import {
   IsString,
   IsEnum,
   IsNumber,
+  IsBoolean,
 } from 'class-validator';
 
 export enum ScheduleEnum {
@@ -38,20 +39,24 @@ export class CronUpdateDto {
   id: number;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   name: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   cronTime: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   startTime: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(ScheduleEnum)
   schedule: ScheduleEnum;
+
+  @IsOptional()
+  @IsBoolean()
+  status: boolean;
 }
 
 export class CronStopDto {

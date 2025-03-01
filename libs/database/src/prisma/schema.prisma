@@ -36,11 +36,13 @@ model News {
 }
 
 model Cron {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
   cronTime  String
   startTime DateTime
   schedule  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  status    Boolean   @default(false)
+  lastRun   DateTime?
 }
