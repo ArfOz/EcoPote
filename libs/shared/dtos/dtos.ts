@@ -68,3 +68,17 @@ export class ResponseLogin {
   success!: boolean;
   data!: { token: string };
 }
+export class ResponseCron {
+  data!: {
+    name: string;
+    id: number;
+    cronTime: string;
+    startTime: Date;
+    schedule: string;
+    createdAt: Date;
+    updatedAt: Date;
+    status: boolean;
+    lastRun: Date;
+  }[];
+  success!: boolean;
+}

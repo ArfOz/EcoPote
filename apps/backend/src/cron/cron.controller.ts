@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { CronService } from './cron.service';
 import { CronStartDto, CronUpdateDto } from './dto';
+import { ResponseCron } from '@shared/dtos';
 
 @Controller('cron')
 export class CronController {
@@ -34,10 +35,10 @@ export class CronController {
   }
 
   @Get('get-jobs')
-  async getCronJobs() {
+  async getCronJobs(): Promise<ResponseCron> {
     try {
       const jobs = await this.cronService.getCronJobs();
-      return { success: true, jobs };
+      return { success: true, data: jobs };
     } catch (error) {
       console.error('Error fetching cron jobs:', error);
       throw new HttpException(
