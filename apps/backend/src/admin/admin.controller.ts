@@ -106,7 +106,20 @@ export class AdminController {
   }
 
   @Post('news/add')
-  async addNews(@Body() newsData: { title: string; content: string }) {
-    return await this.adminService.addNews(newsData);
+  @UseInterceptors(FileInterceptor('file'))
+  async addNews(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() newsData: { title: string }
+  ) {
+    if (!file) {
+      throw new Error('File not provided');
+    }
+    const htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
+    return await this.adminService.addNews(newsData, htmlContent);
+  }
+
+  @Get('news')
+  async getNews() {
+    return await this.adminService.getNews();
   }
 }

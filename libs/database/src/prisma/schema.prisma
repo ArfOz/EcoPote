@@ -30,7 +30,7 @@ model Admin {
 model News {
   id        Int      @id @default(autoincrement())
   title     String
-  content   String
+  content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
