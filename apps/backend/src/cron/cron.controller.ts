@@ -16,7 +16,7 @@ export class CronController {
   constructor(private readonly cronService: CronService) {}
 
   @Post('create-job')
-  async cretaeCronJobs(@Body() cronData: CronStartDto) {
+  async createCronJobs(@Body() cronData: CronStartDto) {
     try {
       await this.cronService.saveDatabase(
         cronData.name,

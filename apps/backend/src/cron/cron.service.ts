@@ -4,14 +4,6 @@ import { CronDatabaseService, UserDatabaseService } from '@database';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
 import * as cron from 'node-cron';
-import {
-  Controller,
-  Put,
-  Body,
-  HttpException,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
 
 @Injectable()
 export class CronService implements OnModuleInit {
@@ -32,19 +24,38 @@ export class CronService implements OnModuleInit {
     const date = new Date(); // Specific date and time
   }
 
-  async saveDatabase(name, startTime, cronTime, schedule) {
+  async saveDatabase(
+    name: string,
+    startTime: Date,
+    cronTime: string,
+    schedule: string
+  ) {
     const dateNow = new Date();
+
+    // Parse the startTime to a Date object
+    const startDateTime = new Date(startTime);
+
+    // Check if startTime is at least one hour after dateNow
+    const oneHourInMillis = 60 * 60 * 1000;
+    if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
+      throw new Error(
+        'Start time must be at least one hour after the current time.'
+      );
+    }
+
     const savedCron: Prisma.CronCreateInput = {
       name,
       cronTime,
-      schedule: 'test',
-      startTime: dateNow,
+      schedule,
+      startTime: startDateTime,
       createdAt: dateNow,
       updatedAt: dateNow,
     };
+
     await this.cronDatabaseService.createCron(savedCron).catch((error) => {
       console.error('Error saving to database:', error);
     });
+
     return { success: true, message: 'Cron job started successfully' };
   }
 
@@ -53,12 +64,32 @@ export class CronService implements OnModuleInit {
     return cronJobs;
   }
 
-  async updateCronJob(id, cronName, startTime, cronTime, schedule, status) {
+  async updateCronJob(
+    id: number,
+    cronName: string,
+    startTime: Date,
+    cronTime: string,
+    schedule: string,
+    status: boolean
+  ) {
     const dateNow = new Date();
+
+    // Parse the startTime to a Date object
+    const startDateTime = new Date(startTime);
+
+    // Check if startTime is at least one hour after dateNow
+    const oneHourInMillis = 60 * 60 * 1000;
+    if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
+      throw new Error(
+        'Start time must be at least one hour after the current time.'
+      );
+    }
+
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
       cronTime,
       schedule,
+      startTime: startDateTime,
       createdAt: dateNow,
       updatedAt: dateNow,
       status,
@@ -72,6 +103,7 @@ export class CronService implements OnModuleInit {
       .catch((error) => {
         console.error('Error updating database:', error);
       });
+
     return { success: true, message: 'Cron job updated successfully' };
   }
 
