@@ -69,7 +69,7 @@ export class CronController {
     }
   }
 
-  @Post('sdelete-job')
+  @Post('delete-job')
   async deleteCronJob(@Body('cronName') cronName: string) {
     try {
       await this.cronService.deleteCronJob(cronName);
