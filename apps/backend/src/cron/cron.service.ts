@@ -33,7 +33,7 @@ export class CronService implements OnModuleInit {
     const dateNow = new Date();
 
     // Parse the startTime to a Date object
-    const startDateTime = new Date(startTime);
+    const startDateTime = startTime ? new Date(startTime) : undefined;
 
     // Check if startTime is at least one hour after dateNow
     const oneHourInMillis = 60 * 60 * 1000;
@@ -66,24 +66,27 @@ export class CronService implements OnModuleInit {
 
   async updateCronJob(
     id: number,
-    cronName: string,
-    startTime: Date,
-    cronTime: string,
-    schedule: string,
-    status: boolean
+    cronName?: string,
+    startTime?: Date,
+    cronTime?: string,
+    schedule?: string,
+    status?: boolean
   ) {
     const dateNow = new Date();
 
+    const data = await this.cronDatabaseService.findUniqueCron({ id });
+
     // Parse the startTime to a Date object
-    const startDateTime = new Date(startTime);
+
+    const startDateTime = startTime ? new Date(startTime) : data.startTime;
 
     // Check if startTime is at least one hour after dateNow
-    const oneHourInMillis = 60 * 60 * 1000;
-    if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
-      throw new Error(
-        'Start time must be at least one hour after the current time.'
-      );
-    }
+    // const oneHourInMillis = 60 * 60 * 1000;
+    // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
+    //   throw new Error(
+    //     'Start time must be at least one hour after the current time.'
+    //   );
+    // }
 
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
@@ -96,15 +99,19 @@ export class CronService implements OnModuleInit {
     };
 
     const where: Prisma.CronWhereUniqueInput = { id };
-    const data: Prisma.CronUpdateInput = updatedCron;
+    const dataUpdate: Prisma.CronUpdateInput = updatedCron;
 
     await this.cronDatabaseService
-      .updateCron({ where, data })
+      .updateCron({ where, data: dataUpdate })
       .catch((error) => {
         console.error('Error updating database:', error);
       });
 
-    return { success: true, message: 'Cron job updated successfully' };
+    return {
+      success: true,
+      message: 'Cron job updated successfully',
+      data: dataUpdate,
+    };
   }
 
   async deleteCronJob(cronName: string) {

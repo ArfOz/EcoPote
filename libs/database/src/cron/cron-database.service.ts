@@ -11,6 +11,11 @@ export class CronDatabaseService {
   async findManyCron(): Promise<Cron[]> {
     return this.prisma.cron.findMany();
   }
+  async findUniqueCron(
+    where: Prisma.CronWhereUniqueInput
+  ): Promise<Cron | null> {
+    return this.prisma.cron.findUnique({ where });
+  }
   async deleteCron(where: Prisma.CronWhereUniqueInput): Promise<Cron> {
     return this.prisma.cron.delete({ where });
   }

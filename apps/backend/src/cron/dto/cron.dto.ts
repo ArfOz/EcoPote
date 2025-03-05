@@ -40,23 +40,23 @@ export class CronUpdateDto {
 
   @IsString()
   @IsOptional()
-  name: string;
+  name?: string;
 
   @IsString()
   @IsOptional()
-  cronTime: string;
+  cronTime?: string;
 
   @IsString()
   @IsOptional()
-  startTime: Date;
+  startTime?: Date;
 
   @IsOptional()
   @IsEnum(ScheduleEnum)
-  schedule: ScheduleEnum;
+  schedule?: ScheduleEnum;
 
   @IsOptional()
   @IsBoolean()
-  status: boolean;
+  status?: boolean;
 }
 
 export class CronStopDto {

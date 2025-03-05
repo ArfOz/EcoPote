@@ -32,6 +32,23 @@ export const CronTime = () => {
     fetchCronJobs();
   }, [router]);
 
+
+
+  const handleStatusChange = async (id: number, status: boolean) => {
+    try {
+    await fetchWithAuth("cron/update-job", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id,status }),
+    });
+    } catch (error) {
+      console.error('Failed to update status', error);
+    }
+  };
+
+
   return (
     <div className="bg-gray-100 p-4 rounded shadow-md">
       <h2 className="text-lg font-semibold mb-4">Cron Jobs</h2>
@@ -45,6 +62,7 @@ export const CronTime = () => {
             <th className="py-2 px-4 border-b">Time</th>
             <th className="py-2 px-4 border-b">Created</th>
             <th className="py-2 px-4 border-b">Updated</th>
+
             <th className="py-2 px-4 border-b">Status</th>
             <th className="py-2 px-4 border-b">Last Run</th>
             <th className="py-2 px-4 border-b">Next Run</th>
@@ -60,7 +78,17 @@ export const CronTime = () => {
               <td className="py-2 px-4 border-b">{cronJob.cronTime}</td>
               <td className="py-2 px-4 border-b">{new Date(cronJob.startTime).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">{new Date(cronJob.startTime).toLocaleString()}</td>
-              <td className="py-2 px-4 border-b">{cronJob.status ? 'Active' : 'Inactive'}</td>
+              <td className="py-2 px-4 border-b">
+                <div className="flex items-center">
+                  <span>{cronJob.status ? 'Active' : 'Inactive'}</span>
+                  <button
+                    className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
+                    onClick={() => handleStatusChange(cronJob.id, !cronJob.status)}
+                  >
+                    {cronJob.status ? 'Deactivate' : 'Activate'}
+                  </button>
+                </div>
+              </td>
               <td className="py-2 px-4 border-b">{cronJob.lastRun ? new Date(cronJob.lastRun).toLocaleString() : 'N/A'}</td>
               <td className="py-2 px-4 border-b">N/A</td>
             </tr>
