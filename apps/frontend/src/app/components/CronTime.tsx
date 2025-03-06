@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchWithAuth } from '@utils';
 import { useRouter } from 'next/navigation';
-import { ResponseCron } from '@shared/dtos';
+import { ResponseCron, ResponseCronUpdateDto } from '@shared/dtos';
 
 export const CronTime = () => {
   const [data, setData] = useState<ResponseCron['data']>([]);
@@ -36,7 +36,7 @@ export const CronTime = () => {
 
   const handleStatusChange = async (id: number, status: boolean) => {
     try {
-    await fetchWithAuth("cron/update-job", {
+     const response : ResponseCronUpdateDto = await fetchWithAuth("cron/update-job", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CronService } from './cron.service';
 import { CronStartDto, CronUpdateDto } from './dto';
-import { ResponseCron } from '@shared/dtos';
+import { ResponseCron, ResponseCronUpdateDto } from '@shared/dtos';
 
 @Controller('cron')
 export class CronController {
@@ -49,9 +49,11 @@ export class CronController {
   }
 
   @Post('update-job')
-  async updateCronJob(@Body() cronData: CronUpdateDto) {
+  async updateCronJob(
+    @Body() cronData: CronUpdateDto
+  ): Promise<ResponseCronUpdateDto> {
     try {
-      await this.cronService.updateCronJob(
+      const response = await this.cronService.updateCronJob(
         cronData.id,
         cronData.name,
         cronData.startTime,
@@ -59,7 +61,7 @@ export class CronController {
         cronData.schedule,
         cronData.status
       );
-      return { success: true, message: 'Cron job updated successfully' };
+      return response;
     } catch (error) {
       console.error('Error updating cron job:', error);
       throw new HttpException(

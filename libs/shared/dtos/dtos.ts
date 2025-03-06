@@ -7,23 +7,23 @@ import {
   IsString,
 } from 'class-validator';
 
-export class ResponseGetAllusers {
-  message!: string;
-  success!: boolean;
-  data!: {
+export interface ResponseGetAllusers {
+  message: string;
+  success: boolean;
+  data: {
     users: User[];
     total: number;
   };
 }
 
-export class ResponseLogout {
-  message!: string;
-  success!: boolean;
+export interface ResponseLogout {
+  message: string;
+  success: boolean;
 }
 
-export class ResponseCreateUser {
-  message!: string;
-  success!: boolean;
+export interface ResponseCreateUser {
+  message: string;
+  success: boolean;
 }
 
 export interface ResponseMessageEmail {
@@ -68,8 +68,8 @@ export class ResponseLogin {
   success!: boolean;
   data!: { token: string };
 }
-export class ResponseCron {
-  data!: {
+export interface ResponseCron {
+  data: {
     name: string;
     id: number;
     cronTime: string;
@@ -80,5 +80,10 @@ export class ResponseCron {
     status: boolean;
     lastRun: Date;
   }[];
-  success!: boolean;
+  success: boolean;
+}
+
+export interface ResponseCronUpdateDto {
+  success: boolean;
+  message: string;
 }

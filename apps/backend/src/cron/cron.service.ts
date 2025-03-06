@@ -110,7 +110,6 @@ export class CronService implements OnModuleInit {
     return {
       success: true,
       message: 'Cron job updated successfully',
-      data: dataUpdate,
     };
   }
 
