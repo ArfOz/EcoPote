@@ -87,3 +87,10 @@ export interface ResponseCronUpdateDto {
   success: boolean;
   message: string;
 }
+
+export enum ScheduleEnum {
+  EVERY_WEEK = 'every-week',
+  EVERY_MONTH = 'every-month',
+  EVERY_DAY = 'every-day',
+  EVERY_YEAR = 'every-year',
+}
