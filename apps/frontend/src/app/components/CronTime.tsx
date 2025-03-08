@@ -63,17 +63,7 @@ export const CronTime = () => {
       if (response.success) {
         // Update the local state with the new status or schedule
         
-        setData((prevData) =>
-          prevData.map((job) =>
-            job.id === id
-              ? {
-            ...job,
-            ...(status !== undefined && { status: !job.status }),
-            ...(schedule !== undefined && { schedule }),
-          }
-              : job
-          )
-        );
+        setData([response.data]);
 
         console.log('Cron job updated successfully');
       } else {

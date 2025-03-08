@@ -4,6 +4,7 @@ import { CronDatabaseService, UserDatabaseService } from '@database';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
 import * as cron from 'node-cron';
+import { ResponseCronUpdateDto } from '@shared/dtos';
 
 @Injectable()
 export class CronService implements OnModuleInit {
@@ -71,7 +72,7 @@ export class CronService implements OnModuleInit {
     cronTime?: string,
     schedule?: string,
     status?: boolean
-  ) {
+  ): Promise<ResponseCronUpdateDto> {
     const dateNow = new Date();
 
     const data = await this.cronDatabaseService.findUniqueCron({ id });
@@ -105,15 +106,21 @@ export class CronService implements OnModuleInit {
 
     const where: Prisma.CronWhereUniqueInput = { id };
 
-    await this.cronDatabaseService
+    const updatedData = await this.cronDatabaseService
       .updateCron({ where, data: updatedCron })
       .catch((error) => {
         console.error('Error updating database:', error);
+        return null;
       });
+
+    if (!updatedData) {
+      throw new Error('Failed to update cron job');
+    }
 
     return {
       success: true,
       message: 'Cron job updated successfully',
+      data: updatedData,
     };
   }
 

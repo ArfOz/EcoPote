@@ -86,6 +86,17 @@ export interface ResponseCron {
 export interface ResponseCronUpdateDto {
   success: boolean;
   message: string;
+  data: {
+    name: string;
+    id: number;
+    cronTime: string;
+    startTime: Date;
+    schedule: string;
+    createdAt: Date;
+    updatedAt: Date;
+    status: boolean;
+    lastRun: Date;
+  };
 }
 
 export enum ScheduleEnum {
