@@ -157,7 +157,7 @@ export const CronTime = () => {
                 {new Date(cronJob.startTime).toLocaleString()}
               </td>
               <td className="py-2 px-4 border-b">
-                {new Date(cronJob.startTime).toLocaleString()}
+                {new Date(cronJob.updatedAt).toLocaleString()}
               </td>
               <td className="py-2 px-4 border-b">
                 <div className="flex flex-col items-center">

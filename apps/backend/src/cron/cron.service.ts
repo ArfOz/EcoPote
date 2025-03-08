@@ -88,21 +88,25 @@ export class CronService implements OnModuleInit {
     //   );
     // }
 
+    const oneHourInMillis = 60 * 60 * 1000;
+    if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
+      throw new Error(
+        'Start time must be at least one hour after the current time.'
+      );
+    }
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
       cronTime,
       schedule,
       startTime: startDateTime,
-      createdAt: dateNow,
       updatedAt: dateNow,
       status,
     };
 
     const where: Prisma.CronWhereUniqueInput = { id };
-    const dataUpdate: Prisma.CronUpdateInput = updatedCron;
 
     await this.cronDatabaseService
-      .updateCron({ where, data: dataUpdate })
+      .updateCron({ where, data: updatedCron })
       .catch((error) => {
         console.error('Error updating database:', error);
       });
