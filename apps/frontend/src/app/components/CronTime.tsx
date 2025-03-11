@@ -62,8 +62,9 @@ export const CronTime = () => {
     const selectedTime = new Date(e.target.value).getTime();
     const now = new Date().getTime();
   
-    if (selectedTime < now) {
-      alert('Start time cannot be in the past');
+    const oneHourLater = now + 60 * 60 * 1000;
+    if (selectedTime < oneHourLater) {
+      alert('Start time must be at least 60 minutes in the future');
       return;
     }
     setData((prevData) =>
