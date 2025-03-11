@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { fetchWithAuth } from '@utils';
 import { useRouter } from 'next/navigation';
 import { ResponseCron, ResponseCronUpdateDto, ScheduleEnum } from '@shared/dtos';
@@ -9,7 +9,7 @@ export const CronTime = () => {
   const [editingName, setEditingName] = useState<number | null>(null);
   const [editingStartTime, setEditingStartTime] = useState<number | null>(null);
   const originalNameRef = useRef<{ [key: number]: string }>({}); // Store original names
-  const originalStartTimeRef = useRef<{ [key: number]: string | Date }>({}); // Store original start times
+  const originalStartTimeRef = useRef<{ [key: number]: Date }>({}); // Store original start times
 
   const router = useRouter();
 
@@ -36,8 +36,6 @@ export const CronTime = () => {
 
   const handleChange = async ({ id, name, schedule, status, startTime }: { id: number; name?: string; schedule?: string; status?: boolean; startTime?: Date }) => {
     try {
-
-      console.log('Updating cron job:', { id, name, schedule, status });
       const body = { id, ...(name !== undefined && { name }), ...(schedule !== undefined && { schedule }), ...(status !== undefined && { status }), ...(startTime !== undefined && { startTime }) };
       const response: ResponseCronUpdateDto = await fetchWithAuth('cron/update-job', {
         method: 'POST',
@@ -50,6 +48,7 @@ export const CronTime = () => {
       if (response.success) {
         setData((prevData) => prevData.map((job) => (job.id === id ? response.data : job)));
         setEditingName(null);
+        setEditingStartTime(null);
         console.log('Cron job updated successfully');
       } else {
         console.error('Failed to update cron job', response.message);
@@ -67,8 +66,47 @@ export const CronTime = () => {
       alert('Start time cannot be in the past');
       return;
     }
+    setData((prevData) =>
+      prevData.map((job) =>
+        job.id === id ? { ...job, startTime: new Date(selectedTime) } : job
+      )
+    );
+  };
+
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (editingStartTime !== null && !event.composedPath().some(el => (el as HTMLElement).classList?.contains('datetime-input'))) {
+      // Do not set editingStartTime to null here to keep the buttons visible
+    } else if (editingName !== null && !event.composedPath().some(el => (el as HTMLElement).classList?.contains('bg-transparent'))) {
+      setEditingName(null);
+    }
+  }, [editingStartTime, editingName]);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
+  const handleSave = (id: number) => {
+    const updatedJob = data.find((job) => job.id === id);
+    if (updatedJob) {
+      handleChange({ id, startTime: updatedJob.startTime });
+    }
+    setEditingStartTime(null);
+    delete originalStartTimeRef.current[id]; // Remove the stored original start time
+  };
   
-    handleChange({ id, startTime: new Date(e.target.value) });
+  const handleDiscard = (id: number) => {
+    setData((prevData) =>
+      prevData.map((job) =>
+        job.id === id
+          ? { ...job, startTime: originalStartTimeRef.current[id] } // Revert to the original start time  
+          : job
+      )
+    );
+    setEditingStartTime(null);
+    // Do not delete originalStartTimeRef.current[id] here
   };
 
   return (
@@ -152,36 +190,31 @@ export const CronTime = () => {
               <td className="py-2 px-4 border-b">{new Date(cronJob.createdAt).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">{new Date(cronJob.updatedAt).toLocaleString()}</td>
 
-              <td className="py-2 px-4 border-b">
+              <td className="py-2 px-4 border-b relative">
                 <input
                   type="datetime-local"
-                  className="ml-2 px-2 py-1 bg-gray-200 rounded"
-                  value={new Date(cronJob.startTime).toISOString().substring(0, 16)}
+                  className="ml-2 px-2 py-1 bg-gray-200 rounded z-10 datetime-input"
+                  value={cronJob.startTime ? new Date(cronJob.startTime).toISOString().substring(0, 16) : ''}
                   onFocus={() => {
                     setEditingStartTime(cronJob.id);
-                    originalStartTimeRef.current[cronJob.id] = cronJob.startTime; // Store original start time
+                    originalStartTimeRef.current[cronJob.id] = new Date(cronJob.startTime); // Store original start time       
                   }}
                   onChange={(e) => handleStartTimeChange(e, cronJob.id)}
                 />
                 {editingStartTime === cronJob.id && (
-                  <div className="flex space-x-2 mt-2">
+                  <div className="flex space-x-2 mt-2 z-0">
                     <button
                       className="px-2 py-1 bg-green-500 text-white rounded"
-                      onClick={() => handleChange({ id: cronJob.id, startTime: new Date(cronJob.startTime) })}
+                      onClick={() => {
+                        handleSave(cronJob.id);
+                      }}
                     >
                       Save
                     </button>
                     <button
                       className="px-2 py-1 bg-red-500 text-white rounded"
                       onClick={() => {
-                        setData((prevData) =>
-                          prevData.map((job) =>
-                            job.id === cronJob.id
-                              ? { ...job, startTime: new Date(originalStartTimeRef.current[cronJob.id]) }
-                              : job
-                          )
-                        );
-                        setEditingStartTime(null);
+                        handleDiscard(cronJob.id);
                       }}
                     >
                       Discard
