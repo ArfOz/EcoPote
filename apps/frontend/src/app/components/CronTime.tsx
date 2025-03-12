@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { fetchWithAuth } from '@utils';
 import { useRouter } from 'next/navigation';
 import { ResponseCron, ResponseCronUpdateDto, ScheduleEnum } from '@shared/dtos';
+import { CronJobStartTime } from './croncomponents';
 
 export const CronTime = () => {
   const [data, setData] = useState<ResponseCron['data']>([]);
@@ -191,38 +192,15 @@ export const CronTime = () => {
               <td className="py-2 px-4 border-b">{new Date(cronJob.createdAt).toLocaleString()}</td>
               <td className="py-2 px-4 border-b">{new Date(cronJob.updatedAt).toLocaleString()}</td>
 
-              <td className="py-2 px-4 border-b relative">
-                <input
-                  type="datetime-local"
-                  className="ml-2 px-2 py-1 bg-gray-200 rounded z-10 datetime-input"
-                  value={cronJob.startTime ? new Date(cronJob.startTime).toISOString().substring(0, 16) : ''}
-                  onFocus={() => {
-                    setEditingStartTime(cronJob.id);
-                    originalStartTimeRef.current[cronJob.id] = new Date(cronJob.startTime); // Store original start time       
-                  }}
-                  onChange={(e) => handleStartTimeChange(e, cronJob.id)}
+                <CronJobStartTime
+                cronJob={cronJob}
+                editingStartTime={editingStartTime}
+                setEditingStartTime={setEditingStartTime}
+                originalStartTimeRef={originalStartTimeRef}
+                handleStartTimeChange={handleStartTimeChange}
+                handleSave={handleSave}
+                handleDiscard={handleDiscard}
                 />
-                {editingStartTime === cronJob.id && (
-                  <div className="flex space-x-2 mt-2 z-0">
-                    <button
-                      className="px-2 py-1 bg-green-500 text-white rounded"
-                      onClick={() => {
-                        handleSave(cronJob.id);
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button
-                      className="px-2 py-1 bg-red-500 text-white rounded"
-                      onClick={() => {
-                        handleDiscard(cronJob.id);
-                      }}
-                    >
-                      Discard
-                    </button>
-                  </div>
-                )}
-              </td>
               <td className="py-2 px-4 border-b">
                 <div className="flex flex-col items-center">
                   <div>
