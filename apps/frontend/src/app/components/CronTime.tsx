@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { fetchWithAuth } from '@utils';
 import { useRouter } from 'next/navigation';
 import { ResponseCron, ResponseCronUpdateDto, ScheduleEnum } from '@shared/dtos';
-import { CronJobStartTime } from './croncomponents';
+import { CronJobStartTime, Cronname } from './croncomponents';
 
 export const CronTime = () => {
   const [data, setData] = useState<ResponseCron['data']>([]);
@@ -108,7 +108,6 @@ export const CronTime = () => {
       )
     );
     setEditingStartTime(null);
-    // Do not delete originalStartTimeRef.current[id] here
   };
 
   return (
@@ -133,49 +132,14 @@ export const CronTime = () => {
           {data.map((cronJob) => (
             <tr key={cronJob.id}>
               <td className="py-2 px-4 border-b">{cronJob.id}</td>
-              <td className="py-2 px-4 border-b">
-                <input
-                  type="text"
-                  className="bg-transparent border-none"
-                  value={cronJob.name}
-                  onFocus={() => {
-                    setEditingName(cronJob.id);
-                    originalNameRef.current[cronJob.id] = cronJob.name; // Store original name
-                  }}
-                  onChange={(e) => {
-                    setData((prevData) =>
-                      prevData.map((job) =>
-                        job.id === cronJob.id ? { ...job, name: e.target.value } : job
-                      )
-                    );
-                  }}
-                />
-                {editingName === cronJob.id && (
-                  <div className="flex space-x-2 mt-2">
-                    <button
-                      className="px-2 py-1 bg-green-500 text-white rounded"
-                      onClick={() => handleChange({ id: cronJob.id, name: cronJob.name })}
-                    >
-                      Save
-                    </button>
-                    <button
-                      className="px-2 py-1 bg-red-500 text-white rounded"
-                      onClick={() => {
-                        setData((prevData) =>
-                          prevData.map((job) =>
-                            job.id === cronJob.id
-                              ? { ...job, name: originalNameRef.current[cronJob.id] }
-                              : job
-                          )
-                        );
-                        setEditingName(null);
-                      }}
-                    >
-                      Discard
-                    </button>
-                  </div>
-                )}
-              </td>
+            <Cronname
+            cronJob={cronJob}
+                editingName={editingName}
+                setEditingName={setEditingName}
+                originalNameRef={originalNameRef}
+                setData={setData}
+                handleChange={handleChange}
+            />
               <td className="py-2 px-4 border-b">
                 <select
                   className="ml-2 px-2 py-1 bg-gray-200 rounded"
