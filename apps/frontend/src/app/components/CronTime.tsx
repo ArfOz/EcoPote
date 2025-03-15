@@ -94,27 +94,27 @@ export const CronTime = () => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded shadow-md">
+    <div className="bg-gray-100 p-4 rounded shadow-md overflow-x-auto w-full">
       <h2 className="text-lg font-semibold mb-4">Cron Jobs</h2>
       {error && <p className="text-red-500">{error}</p>}
       <table className="min-w-full bg-white border border-gray-300">
         <thead>
           <tr>
-            <th className="py-2 px-4 border-b">ID</th>
-            <th className="py-2 px-4 border-b">Name</th>
-            <th className="py-2 px-4 border-b">Schedule</th>
-            <th className="py-2 px-4 border-b">Created</th>
-            <th className="py-2 px-4 border-b">Updated</th>
-            <th className="py-2 px-4 border-b">Start Time</th>
-            <th className="py-2 px-4 border-b">Status</th>
-            <th className="py-2 px-4 border-b">Last Run</th>
-            <th className="py-2 px-4 border-b">Next Run</th>
+            <th className="py-2 px-2 border-b">ID</th>
+            <th className="py-2 px-2 border-b">Name</th>
+            <th className="py-2 px-2 border-b">Schedule</th>
+            <th className="py-2 px-2 border-b">Created</th>
+            <th className="py-2 px-2 border-b">Updated</th>
+            <th className="py-2 px-2 border-b">Start Time</th>
+            <th className="py-2 px-2 border-b">Status</th>
+            <th className="py-2 px-2 border-b">Last Run</th>
+            <th className="py-2 px-2 border-b">Next Run</th>
           </tr>
         </thead>
         <tbody>
           {data.map((cronJob) => (
             <tr key={cronJob.id}>
-              <td className="py-2 px-4 border-b">{cronJob.id}</td>
+              <td className="py-2 px-2 border-b">{cronJob.id}</td>
               <CronName
                 cronJob={cronJob}
                 editingName={editingName}
@@ -126,7 +126,7 @@ export const CronTime = () => {
                 data={data}
                 setData={setData}
               />
-              <td className="py-2 px-4 border-b">
+              <td className="py-2 px-2 border-b">
                 <select
                   className="ml-2 px-2 py-1 bg-gray-200 rounded"
                   value={cronJob.schedule}
@@ -143,10 +143,10 @@ export const CronTime = () => {
                   ))}
                 </select>
               </td>
-              <td className="py-2 px-4 border-b">
+              <td className="py-2 px-2 border-b">
                 {new Date(cronJob.createdAt).toLocaleString()}
               </td>
-              <td className="py-2 px-4 border-b">
+              <td className="py-2 px-2 border-b">
                 {new Date(cronJob.updatedAt).toLocaleString()}
               </td>
 
@@ -161,7 +161,7 @@ export const CronTime = () => {
                 data={data}
                 setData={setData}
               />
-              <td className="py-2 px-4 border-b">
+              <td className="py-2 px-2 border-b">
                 <div className="flex flex-col items-center">
                   <div>
                     <span
@@ -183,12 +183,12 @@ export const CronTime = () => {
                   </button>
                 </div>
               </td>
-              <td className="py-2 px-4 border-b">
+              <td className="py-2 px-2 border-b">
                 {cronJob.lastRun
                   ? new Date(cronJob.lastRun).toLocaleString()
                   : 'N/A'}
               </td>
-              <td className="py-2 px-4 border-b">N/A</td>
+              <td className="py-2 px-2 border-b">N/A</td>
             </tr>
           ))}
         </tbody>
