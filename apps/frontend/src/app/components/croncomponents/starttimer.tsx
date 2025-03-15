@@ -39,7 +39,6 @@ export const CronJobStartTime = ({
 
   const handleSave = (id: number) => {
     const updatedJob = data.find((job) => job.id === id);
-    console.log('updatedJob', updatedJob);
     if (updatedJob) {
       handleChange(id, updatedJob.startTime);
     }
@@ -48,7 +47,6 @@ export const CronJobStartTime = ({
   };
 
   const handleDiscard = (id: number) => {
-    console.log(' handleeeeee', cronJob.startTime);
     setData((prevData) =>
       prevData.map((job) =>
         job.id === id

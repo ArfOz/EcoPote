@@ -6,7 +6,7 @@ import {
   ResponseCronUpdateDto,
   ScheduleEnum,
 } from '@shared/dtos';
-import { CronJobStartTime, Cronname } from './croncomponents';
+import { CronJobStartTime, CronName } from './croncomponents';
 
 export const CronTime = () => {
   const [data, setData] = useState<ResponseCron['data']>([]);
@@ -68,8 +68,6 @@ export const CronTime = () => {
         ...(startTime !== undefined && { startTime }),
       };
 
-      console.log('Request body:', body); // Log the request body for debugging
-      console.log('Cron job ID:', id); // Log the cron job ID for debugging
       const response: ResponseCronUpdateDto = await fetchWithAuth(
         'cron/update-job',
         {
@@ -87,7 +85,6 @@ export const CronTime = () => {
         );
         setEditingName(null);
         setEditingStartTime(null);
-        console.log('Cron job updated successfully');
       } else {
         console.error('Failed to update cron job', response.message);
       }
@@ -95,38 +92,6 @@ export const CronTime = () => {
       console.error('Failed to update cron job', error);
     }
   };
-
-  const handleClickOutside = useCallback(
-    (event: MouseEvent) => {
-      if (
-        editingStartTime !== null &&
-        !event
-          .composedPath()
-          .some((el) =>
-            (el as HTMLElement).classList?.contains('datetime-input')
-          )
-      ) {
-        // Do not set editingStartTime to null here to keep the buttons visible
-      } else if (
-        editingName !== null &&
-        !event
-          .composedPath()
-          .some((el) =>
-            (el as HTMLElement).classList?.contains('bg-transparent')
-          )
-      ) {
-        setEditingName(null);
-      }
-    },
-    [editingStartTime, editingName]
-  );
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [handleClickOutside]);
 
   return (
     <div className="bg-gray-100 p-4 rounded shadow-md">
@@ -150,7 +115,7 @@ export const CronTime = () => {
           {data.map((cronJob) => (
             <tr key={cronJob.id}>
               <td className="py-2 px-4 border-b">{cronJob.id}</td>
-              <Cronname
+              <CronName
                 cronJob={cronJob}
                 editingName={editingName}
                 setEditingName={setEditingName}

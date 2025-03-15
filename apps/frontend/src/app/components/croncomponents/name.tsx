@@ -1,7 +1,7 @@
-import { ResponseCron } from '@shared/dtos';
 import React from 'react';
+import { ResponseCron } from '@shared/dtos';
 
-export const Cronname = ({
+export const CronName = ({
   cronJob,
   setEditingName,
   originalNameRef,
@@ -16,7 +16,7 @@ export const Cronname = ({
   editingName: number | null;
   handleChange: (id: number, name: string) => Promise<void>;
   data: ResponseCron['data'];
-  setData: React.Dispatch<React.SetStateAction<ResponseCron['data']>>; // Add this line
+  setData: React.Dispatch<React.SetStateAction<ResponseCron['data']>>;
 }) => {
   const handleNameChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -28,49 +28,53 @@ export const Cronname = ({
       )
     );
   };
+
   const handleSave = (id: number) => {
-    console.log('handleSave called with id:', id);
     const updatedJob = data.find((job) => job.id === id);
-    console.log('updatedJob:', updatedJob?.name);
+    console.log('updatedJob', updatedJob);
+    if (!updatedJob) {
+      console.error('Job not found');
+    }
     if (updatedJob) {
-      handleChange(id, updatedJob.name);
+      handleChange(id, updatedJob.name)
+        .then(() => {
+          console.log('handleChange resolved');
+        })
+        .catch((error) => {
+          console.error('handleChange error:', error);
+        });
     }
     setEditingName(null);
-    delete originalNameRef.current[id]; // Remove the stored original start time
+    delete originalNameRef.current[id];
   };
 
   const handleDiscard = (id: number) => {
-    console.log(' handleeeeee', cronJob.name);
+    console.log('handleDiscard called with id:', id);
     setData((prevData) =>
       prevData.map((job) =>
-        job.id === id
-          ? { ...job, name: originalNameRef.current[id] } // Revert to the original start time
-          : job
+        job.id === id ? { ...job, name: originalNameRef.current[id] } : job
       )
     );
     setEditingName(null);
   };
 
   return (
-    <td className="py-2 px-4 border-b">
+    <td className="py-2 px-4 border-b relative">
       <input
         type="text"
-        className="bg-transparent border-none"
+        className="ml-2 px-2 py-1 bg-gray-200 rounded z-10 name-input"
         value={cronJob.name}
         onFocus={() => {
           setEditingName(cronJob.id);
-          originalNameRef.current[cronJob.id] = cronJob.name; // Store original name
+          originalNameRef.current[cronJob.id] = cronJob.name;
+          console.log('onFocus called with id:', cronJob.id);
         }}
-        // onBlur={() => {
-        //   setEditingName(null);
-        // }}
-        onChange={(e) => {
-          handleNameChange(e, cronJob.id);
-        }}
+        onChange={(e) => handleNameChange(e, cronJob.id)}
       />
       {editingName === cronJob.id && (
-        <div className="flex space-x-2 mt-2">
+        <div className="flex space-x-2 mt-2 z-0">
           <button
+            type="submit"
             className="px-2 py-1 bg-green-500 text-white rounded"
             onClick={() => {
               handleSave(cronJob.id);
@@ -79,9 +83,9 @@ export const Cronname = ({
             Save
           </button>
           <button
+            type="button"
             className="px-2 py-1 bg-red-500 text-white rounded"
             onClick={() => {
-              console.log(' handleeeeee', cronJob.name);
               handleDiscard(cronJob.id);
             }}
           >
