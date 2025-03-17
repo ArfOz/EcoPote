@@ -58,3 +58,11 @@ export class CronStopDto {
   @IsNotEmpty()
   cronName: string;
 }
+
+export interface CronTimeSet {
+  everyWeek: '0 0 * * 0';
+  everyDay: '0 0 * * *';
+  everyMonth: '0 0 1 * *';
+  everyYear: '0 0 1 1 *';
+  everyHour: '0 * * * *';
+}

@@ -13,9 +13,9 @@ export class TaskService implements OnModuleInit {
     // Fetch the cron schedule time from the database
     const cronTime = await this.cronDatabaseService.findManyCron();
 
-    // Schedule the email to be sent based on the time fetched from the database
+    // Schedule the email to be sent daily at 00:00
     cron.schedule(
-      cronTime.daily, // Assuming cronTime has daily and weekly properties
+      '0 0 * * *', // Daily at midnight
       async () => {
         console.log('Running daily cron job: Sending scheduled email...');
         // await this.emailService.sendEmail();
@@ -26,8 +26,9 @@ export class TaskService implements OnModuleInit {
       }
     );
 
+    // Schedule the email to be sent weekly on Sunday at 00:00
     cron.schedule(
-      cronTime.weekly, // Assuming cronTime has daily and weekly properties
+      '0 0 * * 0', // Weekly on Sunday at midnight
       async () => {
         console.log('Running weekly cron job: Sending scheduled email...');
         // await this.emailService.sendEmail();
@@ -38,8 +39,6 @@ export class TaskService implements OnModuleInit {
       }
     );
 
-    console.log(
-      `✅ Cron jobs scheduled: Daily at ${cronTime.daily} and weekly at ${cronTime.weekly}.`
-    );
+    console.log('✅ Cron jobs scheduled: Daily at 00:00 and weekly on Sunday at 00:00.');
   }
 }
