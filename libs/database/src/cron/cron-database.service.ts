@@ -9,7 +9,19 @@ export class CronDatabaseService {
     return this.prisma.cron.create({ data });
   }
   async findManyCron(): Promise<Cron[]> {
-    return this.prisma.cron.findMany();
+    return this.prisma.cron.findMany({
+      select: {
+        name: true,
+        id: true,
+        cronTime: true,
+        startTime: true,
+        schedule: true,
+        createdAt: true,
+        updatedAt: true,
+        status: true,
+        lastRun: true,
+      },
+    });
   }
   async findUniqueCron(
     where: Prisma.CronWhereUniqueInput
