@@ -33,6 +33,8 @@ model News {
   content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  tipsId    Int
+  tips      Tips     @relation(fields: [tipsId], references: [id], onDelete: Cascade)
 }
 
 model Cron {
@@ -45,4 +47,12 @@ model Cron {
   updatedAt DateTime  @updatedAt
   status    Boolean   @default(false)
   lastRun   DateTime?
+}
+
+model Tips {
+  id        Int      @id @default(autoincrement())
+  title     String
+  news      News[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

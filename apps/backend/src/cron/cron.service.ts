@@ -7,23 +7,13 @@ import * as cron from 'node-cron';
 import { ResponseCronUpdateDto } from '@shared/dtos';
 
 @Injectable()
-export class CronService implements OnModuleInit {
+export class CronService {
   private cronJobs: Map<string, cron.ScheduledTask> = new Map();
 
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
     private readonly userDatabaseService: UserDatabaseService
   ) {}
-
-  onModuleInit() {
-    // Schedule your cron jobs here
-    const emailData = {
-      subject: 'Scheduled Email',
-      html: '<p>This is a scheduled email.</p>',
-    };
-
-    const date = new Date(); // Specific date and time
-  }
 
   async saveDatabase(
     name: string,
@@ -157,6 +147,27 @@ export class CronService implements OnModuleInit {
       console.log('Scheduled emails sent successfully', sentUsers, errorUsers);
     } catch (error) {
       console.error('Failed to send scheduled emails', error);
+    }
+  }
+
+  async restartCronJobs() {
+    try {
+      const cronJobs = await this.cronDatabaseService.findManyCron();
+      for (const cronJob of cronJobs) {
+        const { name, cronTime, startTime, schedule } = cronJob;
+        const job = cron.schedule(cronTime, () => {
+          this.sendScheduledEmails({
+            subject: 'Scheduled Email',
+            html: '<p>This is a scheduled email.</p>',
+          });
+        });
+
+        job.start();
+        this.cronJobs.set(name, job);
+        console.log(`Cron job ${name} restarted`);
+      }
+    } catch (error) {
+      console.error('Failed to restart cron jobs', error);
     }
   }
 }
