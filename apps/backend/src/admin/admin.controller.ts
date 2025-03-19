@@ -105,11 +105,29 @@ export class AdminController {
     return await this.adminService.toggleSubscription(parseInt(id, 10));
   }
 
+  @Post('tips-add')
+  @UseInterceptors(FileInterceptor('file'))
+  async addTips(
+    @Body() tipsData: { title: string; description: string },
+    @UploadedFile() file?: Express.Multer.File | undefined
+  ) {
+    let htmlContent;
+    if (file) {
+      htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
+    }
+    return await this.adminService.addTips(tipsData, htmlContent);
+  }
+
+  @Get('tips')
+  async getTips() {
+    return await this.adminService.getTips();
+  }
+
   @Post('news/add')
   @UseInterceptors(FileInterceptor('file'))
   async addNews(
     @UploadedFile() file: Express.Multer.File,
-    @Body() newsData: { title: string }
+    @Body() newsData: { title: string; tipsId: string }
   ) {
     if (!file) {
       throw new Error('File not provided');

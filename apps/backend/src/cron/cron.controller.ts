@@ -84,6 +84,19 @@ export class CronController {
     }
   }
 
+  @Get('restart')
+  async restartCronJobs() {
+    try {
+      await this.cronService.restartCronJobs();
+      return { success: true, message: 'Cron jobs restarted successfully' };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to restart cron jobs',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
   // @Put('update-time')
   // async updateCronTime(
   //   @Body('cronName') cronName: string,

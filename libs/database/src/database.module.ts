@@ -6,6 +6,7 @@ import { AdminDatabaseModule } from './admin';
 import { PrismaModule } from './prisma/prisma.module';
 import { CronDatabaseModule } from './cron';
 import { NewsDatabaseModule } from './news';
+import { TipsDatabaseModule } from './tips';
 
 @Global()
 @Module({
@@ -15,6 +16,7 @@ import { NewsDatabaseModule } from './news';
     PrismaModule,
     CronDatabaseModule,
     NewsDatabaseModule,
+    TipsDatabaseModule,
   ],
   providers: [PrismaModule],
   exports: [
@@ -23,6 +25,7 @@ import { NewsDatabaseModule } from './news';
     PrismaModule,
     CronDatabaseModule,
     NewsDatabaseModule,
+    TipsDatabaseModule,
   ],
 })
 export class DatabaseModule {}
