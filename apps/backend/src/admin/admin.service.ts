@@ -325,7 +325,6 @@ export class AdminService {
 
   async addNews(newsData: { title: string; tipsId: string }, html: string) {
     try {
-      console.log('newsData', newsData);
       const tips = await this.tipsDatabaseService.findUniqueTips({
         id: parseInt(newsData.tipsId, 10),
       });
@@ -377,7 +376,7 @@ export class AdminService {
   }
   async updateNews(id: number, newsData: { title: string }, html: string) {
     try {
-      const news = await this.newsDatabaseService.updateNews(id, {
+      await this.newsDatabaseService.updateNews(id, {
         title: newsData.title,
         content: html,
       });
