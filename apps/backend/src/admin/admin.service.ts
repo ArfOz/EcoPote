@@ -23,6 +23,7 @@ import {
   ResponseLogin,
   ResponseLogout,
   ResponseMessageEmail,
+  ResponseTips,
 } from '@shared/dtos';
 
 @Injectable()
@@ -309,11 +310,14 @@ export class AdminService {
       throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
     }
   }
-  async getTips() {
+  async getTips(): Promise<ResponseTips> {
     try {
       const tips = await this.tipsDatabaseService.findManyTips();
       return {
-        data: tips,
+        data: {
+          tips: tips,
+          total: tips.length,
+        },
         message: 'Tips fetched successfully',
         success: true,
       };

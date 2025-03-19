@@ -99,6 +99,23 @@ export interface ResponseCronUpdateDto {
   };
 }
 
+export interface Tips {
+  id: number;
+  title: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ResponseTips {
+  message: string;
+  success: boolean;
+  data: {
+    tips: Tips[];
+    total: number;
+  };
+}
+
 export enum ScheduleEnum {
   EVERY_WEEK = 'every-week',
   EVERY_MONTH = 'every-month',

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
@@ -24,13 +24,19 @@ const Navbar = () => {
             onClick={() => router.push('/send-email')}
             className="text-white hover:text-gray-300"
           >
-            Send Email  
+            Send Email
           </button>
           <button
             onClick={() => router.push('/add-user')}
             className="text-white hover:text-gray-300"
           >
             Add User
+          </button>
+          <button
+            onClick={() => router.push('/tips')}
+            className="text-white hover:text-gray-300"
+          >
+            Tips
           </button>
           <button
             onClick={() => router.push('/auto-email')}

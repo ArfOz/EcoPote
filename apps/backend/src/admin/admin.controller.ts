@@ -26,6 +26,7 @@ import {
   ResponseLogin,
   ResponseLogout,
   ResponseMessageEmail,
+  ResponseTips,
   ResponseToggleSubscription,
 } from '@shared/dtos';
 
@@ -119,7 +120,7 @@ export class AdminController {
   }
 
   @Get('tips')
-  async getTips() {
+  async getTips(): Promise<ResponseTips> {
     return await this.adminService.getTips();
   }
 
