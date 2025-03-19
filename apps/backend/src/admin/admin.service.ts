@@ -309,6 +309,19 @@ export class AdminService {
       throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
     }
   }
+  async getTips() {
+    try {
+      const tips = await this.tipsDatabaseService.findManyTips();
+      return {
+        data: tips,
+        message: 'Tips fetched successfully',
+        success: true,
+      };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to fetch tips', HttpStatus.BAD_REQUEST);
+    }
+  }
 
   // async addNews(newsData: { title: string }, html: string) {
   //   try {

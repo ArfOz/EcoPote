@@ -118,6 +118,11 @@ export class AdminController {
     return await this.adminService.addTips(tipsData, htmlContent);
   }
 
+  @Get('tips')
+  async getTips() {
+    return await this.adminService.getTips();
+  }
+
   // @Post('news/add')
   // @UseInterceptors(FileInterceptor('file'))
   // async addNews(

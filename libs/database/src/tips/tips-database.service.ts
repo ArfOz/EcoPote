@@ -8,7 +8,7 @@ export class TipsDatabaseService {
   async createTips(data: Prisma.TipsCreateInput): Promise<Tips> {
     return this.prisma.tips.create({ data });
   }
-  async findManyTips(where: Prisma.TipsWhereInput): Promise<Tips[]> {
+  async findManyTips(where?: Prisma.TipsWhereInput): Promise<Tips[]> {
     return this.prisma.tips.findMany({
       where,
     });
