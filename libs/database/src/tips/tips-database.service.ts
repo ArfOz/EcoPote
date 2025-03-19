@@ -8,9 +8,12 @@ export class TipsDatabaseService {
   async createTips(data: Prisma.TipsCreateInput): Promise<Tips> {
     return this.prisma.tips.create({ data });
   }
-  async findManyCron(): Promise<Tips[]> {
-    return this.prisma.tips.findMany({});
+  async findManyTips(where: Prisma.TipsWhereInput): Promise<Tips[]> {
+    return this.prisma.tips.findMany({
+      where,
+    });
   }
+
   async findUniqueTips(
     where: Prisma.TipsWhereUniqueInput
   ): Promise<Tips | null> {

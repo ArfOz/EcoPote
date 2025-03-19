@@ -105,21 +105,34 @@ export class AdminController {
     return await this.adminService.toggleSubscription(parseInt(id, 10));
   }
 
-  @Post('news/add')
+  @Post('tips-add')
   @UseInterceptors(FileInterceptor('file'))
-  async addNews(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() newsData: { title: string }
+  async addTips(
+    @Body() tipsData: { title: string; description: string },
+    @UploadedFile() file?: Express.Multer.File | undefined
   ) {
-    if (!file) {
-      throw new Error('File not provided');
+    let htmlContent;
+    if (file) {
+      htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
     }
-    const htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
-    return await this.adminService.addNews(newsData, htmlContent);
+    return await this.adminService.addTips(tipsData, htmlContent);
   }
 
-  @Get('news')
-  async getNews() {
-    return await this.adminService.getNews();
-  }
+  // @Post('news/add')
+  // @UseInterceptors(FileInterceptor('file'))
+  // async addNews(
+  //   @UploadedFile() file: Express.Multer.File,
+  //   @Body() newsData: { title: string }
+  // ) {
+  //   if (!file) {
+  //     throw new Error('File not provided');
+  //   }
+  //   const htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
+  //   return await this.adminService.addNews(newsData, htmlContent);
+  // }
+
+  // @Get('news')
+  // async getNews() {
+  //   return await this.adminService.getNews();
+  // }
 }

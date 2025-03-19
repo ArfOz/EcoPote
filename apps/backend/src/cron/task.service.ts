@@ -15,7 +15,6 @@ export class TaskService implements OnModuleInit {
   async onModuleInit() {
     try {
       // Fetch the cron schedule time from the database
-
       await this.cronService.restartCronJobs();
       const cronTime = await this.cronDatabaseService.findManyCron();
 

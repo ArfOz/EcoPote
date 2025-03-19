@@ -1,6 +1,11 @@
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Admin, User } from '@prisma/client';
-import { AdminDatabaseService, UserDatabaseService } from '@database';
+import {
+  AdminDatabaseService,
+  UserDatabaseService,
+  TipsDatabaseService,
+  NewsDatabaseService,
+} from '@database';
 import generalConfig from '@shared/config/general.config';
 import authConfig from '@auth/config/auth.config';
 import { ConfigType } from '@nestjs/config';
@@ -19,7 +24,6 @@ import {
   ResponseLogout,
   ResponseMessageEmail,
 } from '@shared/dtos';
-import { NewsDatabaseService } from '@database/news';
 
 @Injectable()
 export class AdminService {
@@ -31,7 +35,8 @@ export class AdminService {
     private readonly authCfg: ConfigType<typeof authConfig>,
     private readonly userDatabaseService: UserDatabaseService,
     private readonly authService: AuthService,
-    private readonly newsDatabaseService: NewsDatabaseService
+    private readonly newsDatabaseService: NewsDatabaseService,
+    private readonly tipsDatabaseService: TipsDatabaseService
   ) {}
 
   async addAdmin(adminData: {
@@ -259,69 +264,115 @@ export class AdminService {
     }
   }
 
-  async addNews(newsData: { title: string }, html: string) {
+  async addTips(
+    tipsData: { title: string; description: string },
+    html?: string
+  ): Promise<{ message: string; success: boolean }> {
     try {
-      const news = await this.newsDatabaseService.createNews({
-        title: newsData.title,
-        content: html,
+      const tips = await this.tipsDatabaseService.findManyTips({
+        title: tipsData.title,
       });
+      console.log('tips', tips);
 
-      return { message: 'News added successfully', success: true };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to add news', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async getNews() {
-    try {
-      const news = await this.newsDatabaseService.findAllNews();
-      return {
-        data: news,
-        message: 'News fetched successfully',
-        success: true,
-      };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to fetch news', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async getNewsById(id: number) {
-    try {
-      const news = await this.newsDatabaseService.findNewsById(id);
-      return {
-        data: news,
-        message: 'News fetched successfully',
-        success: true,
-      };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to fetch news', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async updateNews(id: number, newsData: { title: string }, html: string) {
-    try {
-      const news = await this.newsDatabaseService.updateNews(id, {
-        title: newsData.title,
-        content: html,
-      });
+      if (tips.length > 0) {
+        // Tips already exist
+        throw new HttpException('Tips already exists', HttpStatus.CONFLICT);
+      }
 
-      return { message: 'News updated successfully', success: true };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to update news', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async deleteNews(id: number) {
-    try {
-      const news = await this.newsDatabaseService.deleteNews(id);
-      return {
-        data: news,
-        message: 'News deleted successfully',
-        success: true,
+      const data: Prisma.TipsCreateInput = {
+        title: tipsData.title,
+        description: tipsData.description,
       };
+      console.log('html', html);
+      if (html) {
+        data.news = {
+          create: {
+            title: tipsData.title,
+            content: html,
+          },
+        };
+      }
+
+      console.log('tipsData', data);
+      const response = await this.tipsDatabaseService.createTips(data);
+      console.log('response', response);
+      if (!response) {
+        throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
+      }
+
+      return { message: 'Tips added successfully', success: true };
     } catch (error) {
+      if (error) {
+        throw new HttpException(error.response, error.status);
+      }
       // Handle error
-      throw new HttpException('Failed to delete news', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
     }
   }
+
+  // async addNews(newsData: { title: string }, html: string) {
+  //   try {
+  //     const news = await this.newsDatabaseService.createNews({
+  //       title: newsData.title,
+  //       content: html,
+  //     });
+
+  //     return { message: 'News added successfully', success: true };
+  //   } catch (error) {
+  //     // Handle error
+  //     throw new HttpException('Failed to add news', HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+  // async getNews() {
+  //   try {
+  //     const news = await this.newsDatabaseService.findAllNews();
+  //     return {
+  //       data: news,
+  //       message: 'News fetched successfully',
+  //       success: true,
+  //     };
+  //   } catch (error) {
+  //     // Handle error
+  //     throw new HttpException('Failed to fetch news', HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+  // async getNewsById(id: number) {
+  //   try {
+  //     const news = await this.newsDatabaseService.findNewsById(id);
+  //     return {
+  //       data: news,
+  //       message: 'News fetched successfully',
+  //       success: true,
+  //     };
+  //   } catch (error) {
+  //     // Handle error
+  //     throw new HttpException('Failed to fetch news', HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+  // async updateNews(id: number, newsData: { title: string }, html: string) {
+  //   try {
+  //     const news = await this.newsDatabaseService.updateNews(id, {
+  //       title: newsData.title,
+  //       content: html,
+  //     });
+
+  //     return { message: 'News updated successfully', success: true };
+  //   } catch (error) {
+  //     // Handle error
+  //     throw new HttpException('Failed to update news', HttpStatus.BAD_REQUEST);
+  //   }
+  // }
+  // async deleteNews(id: number) {
+  //   try {
+  //     const news = await this.newsDatabaseService.deleteNews(id);
+  //     return {
+  //       data: news,
+  //       message: 'News deleted successfully',
+  //       success: true,
+  //     };
+  //   } catch (error) {
+  //     // Handle error
+  //     throw new HttpException('Failed to delete news', HttpStatus.BAD_REQUEST);
+  //   }
+  // }
 }
