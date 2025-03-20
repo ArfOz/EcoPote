@@ -1,5 +1,5 @@
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Admin, User } from '@prisma/client';
+import { Admin, Tips, User } from '@prisma/client';
 import {
   AdminDatabaseService,
   UserDatabaseService,
@@ -24,6 +24,7 @@ import {
   ResponseLogout,
   ResponseMessageEmail,
   ResponseTips,
+  ResponseTipsDetails,
 } from '@shared/dtos';
 
 @Injectable()
@@ -402,6 +403,50 @@ export class AdminService {
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to delete news', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async getTipsById(id: number): Promise<ResponseTipsDetails> {
+    try {
+      const select = {
+        id: true,
+        title: true,
+        description: true,
+
+        createdAt: true,
+        updatedAt: true,
+        news: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      };
+      const tip = await this.tipsDatabaseService.findUniqueTips(
+        {
+          id: id,
+        },
+        select
+      );
+
+      if (!tip) {
+        throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
+      }
+
+      const total = await this.tipsDatabaseService.count({
+        id: id,
+      });
+      return {
+        data: { ...tip, total },
+        message: 'Tips fetched successfully',
+        success: true,
+      };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to fetch tips', HttpStatus.BAD_REQUEST);
     }
   }
 }
