@@ -117,7 +117,7 @@ const TipsPage: React.FC = () => {
       {error && <p>{error}</p>}
       {selectedTip && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 relative">
             <button
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
               onClick={closeModal}
@@ -125,20 +125,24 @@ const TipsPage: React.FC = () => {
               &times;
             </button>
             <h2 className="text-2xl font-semibold mb-4">{selectedTip.title}</h2>
-            <p className="mb-2">{selectedTip.description}</p>
-            <p className="text-sm text-gray-500 mb-2">
-              Created at: {selectedTip.createdAt.toString()}
-            </p>
-            <p className="text-sm text-gray-500 mb-4">
-              Updated at: {selectedTip.updatedAt.toString()}
-            </p>
-            <p className="text-lg font-medium mb-4">
-              News Name: {selectedTip.title}
-            </p>
-            {/* <div
-              className="prose"
-              dangerouslySetInnerHTML={{ __html: selectedTip.news[0].content }}
-            /> */}
+            <div className="flex flex-row ">
+              <div className="w-full md:w-1/2 mb-2">
+                <p className="font-medium">Description:</p>
+                <p>{selectedTip.description}</p>
+              </div>
+              <div className="w-full md:w-1/2 mb-2">
+                <p className="font-medium">Created at:</p>
+                <p className="text-sm text-gray-500">
+                  {selectedTip.createdAt.toString()}
+                </p>
+              </div>
+              <div className="w-full md:w-1/2 mb-2">
+                <p className="font-medium">Updated at:</p>
+                <p className="text-sm text-gray-500">
+                  {selectedTip.updatedAt.toString()}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
