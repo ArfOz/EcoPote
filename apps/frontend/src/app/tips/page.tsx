@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
-import { ResponseTips, Tips } from '@shared/dtos';
+import { ResponseTips, ResponseTipsDetails, Tips } from '@shared/dtos';
 
 const TipsPage: React.FC = () => {
   const [tips, setTips] = React.useState<Tips[]>([]);
@@ -11,7 +11,9 @@ const TipsPage: React.FC = () => {
   const [filteredUsers, setFilteredUsers] = React.useState<any[]>([]);
   const [search, setSearch] = React.useState<string>('');
   const [error, setError] = React.useState<string | null>(null);
-  const [selectedTip, setSelectedTip] = React.useState<Tips | null>(null);
+  const [selectedTip, setSelectedTip] = React.useState<
+    ResponseTipsDetails['data'] | null
+  >(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -51,15 +53,15 @@ const TipsPage: React.FC = () => {
 
   const handleTipClick = async (id: number) => {
     try {
-      const res: ResponseTips = await fetchWithAuth(
+      const res: ResponseTipsDetails = await fetchWithAuth(
         `admin/tips/${id}`,
         {},
         false
       );
       const data = res.data;
       console.log('res tip', res);
-      if (data && data.tips && data.tips.length > 0) {
-        setSelectedTip(data.tips[0]);
+      if (data) {
+        setSelectedTip(data);
       } else {
         throw new Error('Invalid data format');
       }
@@ -114,15 +116,29 @@ const TipsPage: React.FC = () => {
       </div>
       {error && <p>{error}</p>}
       {selectedTip && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded shadow-lg">
-            <span className="close" onClick={closeModal}>
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2">
+            <button
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              onClick={closeModal}
+            >
               &times;
-            </span>
-            <h2>{selectedTip.title}</h2>
-            <p>{selectedTip.description}</p>
-            <p>Created at: {selectedTip.createdAt.toString()}</p>
-            <p>Updated at: {selectedTip.updatedAt.toString()}</p>
+            </button>
+            <h2 className="text-2xl font-semibold mb-4">{selectedTip.title}</h2>
+            <p className="mb-2">{selectedTip.description}</p>
+            <p className="text-sm text-gray-500 mb-2">
+              Created at: {selectedTip.createdAt.toString()}
+            </p>
+            <p className="text-sm text-gray-500 mb-4">
+              Updated at: {selectedTip.updatedAt.toString()}
+            </p>
+            <p className="text-lg font-medium mb-4">
+              News Name: {selectedTip.title}
+            </p>
+            {/* <div
+              className="prose"
+              dangerouslySetInnerHTML={{ __html: selectedTip.news[0].content }}
+            /> */}
           </div>
         </div>
       )}
