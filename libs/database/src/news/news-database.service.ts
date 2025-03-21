@@ -21,6 +21,9 @@ export class NewsDatabaseService {
       where: { id },
     });
   }
+  async count(where?: Prisma.NewsWhereInput): Promise<number> {
+    return this.prisma.news.count({ where });
+  }
 
   async updateNews(id: number, data: Prisma.NewsUpdateInput): Promise<News> {
     return this.prisma.news.update({

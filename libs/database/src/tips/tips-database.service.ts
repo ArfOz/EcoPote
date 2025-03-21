@@ -15,9 +15,10 @@ export class TipsDatabaseService {
   }
 
   async findUniqueTips(
-    where: Prisma.TipsWhereUniqueInput
-  ): Promise<Tips | null> {
-    return this.prisma.tips.findUnique({ where });
+    where: Prisma.TipsWhereUniqueInput,
+    select?: Prisma.TipsSelect
+  ) {
+    return this.prisma.tips.findUnique({ where, select });
   }
   async deleteTips(where: Prisma.TipsWhereUniqueInput): Promise<Tips> {
     return this.prisma.tips.delete({ where });
@@ -27,5 +28,9 @@ export class TipsDatabaseService {
     data: Prisma.TipsUpdateInput;
   }): Promise<Tips> {
     return this.prisma.tips.update({ where: params.where, data: params.data });
+  }
+
+  async count(where?: Prisma.TipsWhereInput): Promise<number> {
+    return this.prisma.tips.count({ where });
   }
 }

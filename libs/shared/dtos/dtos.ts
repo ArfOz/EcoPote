@@ -63,10 +63,10 @@ export class CreateUserDto {
   subscription!: boolean;
 }
 
-export class ResponseLogin {
-  message!: string;
-  success!: boolean;
-  data!: { token: string };
+export interface ResponseLogin {
+  message: string;
+  success: boolean;
+  data: { token: string };
 }
 export interface ResponseCron {
   data: {
@@ -99,6 +99,23 @@ export interface ResponseCronUpdateDto {
   };
 }
 
+export interface Tips {
+  id: number;
+  title: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ResponseTips {
+  message: string;
+  success: boolean;
+  data: {
+    tips: Tips[];
+    total: number;
+  };
+}
+
 export enum ScheduleEnum {
   EVERY_WEEK = 'every-week',
   EVERY_MONTH = 'every-month',
@@ -110,4 +127,24 @@ export enum CronTimeSetEnum {
   EVERY_DAY = '0 0 * * *',
   EVERY_MONTH = '0 0 1 * *',
   EVERY_YEAR = '0 0 1 1 *',
+}
+
+export interface ResponseTipsDetails {
+  message: string;
+  success: boolean;
+  data: {
+    total: number;
+    id: number;
+    title: string;
+    description: string;
+    createdAt: Date;
+    updatedAt: Date;
+    news?: {
+      id: number;
+      title: string;
+      content: string;
+      createdAt: Date;
+      updatedAt: Date;
+    }[];
+  };
 }
