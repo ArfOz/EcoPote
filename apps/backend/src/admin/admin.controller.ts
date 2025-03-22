@@ -147,4 +147,25 @@ export class AdminController {
   async getNews() {
     return await this.adminService.getNews();
   }
+
+  @Get('news/:id')
+  async getNewsById(@Param('id') id: string) {
+    return await this.adminService.getNewsById(parseInt(id, 10));
+  }
+  // @UseGuards(JwtAuthGuard)
+  @Delete('news/:id')
+  async deleteNews(@Param('id') id: string): Promise<{
+    data: {
+      id: number;
+      createdAt: Date;
+      updatedAt: Date;
+      title: string;
+      content: string;
+      tipsId: number;
+    };
+    message: string;
+    success: boolean;
+  }> {
+    return await this.adminService.deleteNews(parseInt(id, 10));
+  }
 }

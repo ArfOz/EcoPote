@@ -78,6 +78,42 @@ const TipsPage: React.FC = () => {
     setSelectedTip(null);
   };
 
+  const handleDeleteNews = async (newsId: number) => {
+    try {
+      const res = await fetchWithAuth(
+        `admin/news/${newsId}`,
+        {
+          method: 'DELETE',
+        },
+        false
+      );
+      const data = res.data;
+      console.log('res delete news', res);
+
+      if (data) {
+        setSelectedTip((prevTip) => {
+          if (prevTip) {
+            return {
+              ...prevTip,
+              news: prevTip.news
+                ? prevTip.news.filter((news) => news.id !== newsId)
+                : [],
+            };
+          }
+          return prevTip;
+        });
+      } else {
+        throw new Error('Invalid data format');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -125,22 +161,54 @@ const TipsPage: React.FC = () => {
               &times;
             </button>
             <h2 className="text-2xl font-semibold mb-4">{selectedTip.title}</h2>
-            <div className="flex flex-row ">
+            <div className="flex flex-row">
               <div className="w-full md:w-1/2 mb-2">
                 <p className="font-medium">Description:</p>
                 <p>{selectedTip.description}</p>
               </div>
               <div className="w-full md:w-1/2 mb-2">
-                <p className="font-medium">Created at:</p>
-                <p className="text-sm text-gray-500">
-                  {selectedTip.createdAt.toString()}
-                </p>
-              </div>
-              <div className="w-full md:w-1/2 mb-2">
-                <p className="font-medium">Updated at:</p>
-                <p className="text-sm text-gray-500">
-                  {selectedTip.updatedAt.toString()}
-                </p>
+                <p className="font-medium">News:</p>
+                {selectedTip.news && selectedTip.news.length > 0 ? (
+                  <ul className="space-y-2">
+                    {selectedTip.news.map((newsItem, index) => (
+                      <li key={index} className="text-sm text-gray-500">
+                        <p>News Name: {newsItem.title}</p>
+                        <button
+                          className="text-blue-500 hover:underline"
+                          onClick={() => {
+                            const newWindow = window.open();
+                            if (newWindow) {
+                              newWindow.document.write(newsItem.content);
+                              newWindow.document.close();
+                            }
+                          }}
+                        >
+                          <span className="text-blue-500 hover:underline">
+                            View Content
+                          </span>
+                        </button>
+                        <button
+                          className="text-red-500 hover:underline ml-2"
+                          onClick={async () => {
+                            handleDeleteNews(newsItem.id);
+                          }}
+                        >
+                          Delete
+                        </button>
+                        <p className="text-xs text-gray-400">
+                          Created At:{' '}
+                          {new Date(newsItem.createdAt).toLocaleString()}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          Updated At:{' '}
+                          {new Date(newsItem.updatedAt).toLocaleString()}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-gray-500">No news available</p>
+                )}
               </div>
             </div>
           </div>
