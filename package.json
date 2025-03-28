@@ -8,7 +8,8 @@
     "database:push": "npx prisma db push --schema=./libs/database/src/prisma/schema.prisma",
     "backend": "npx nx run backend:serve",
     "frontend": "npx nx run frontend:dev",
-    "all": "concurrently \"npm run backend\" \"npm run frontend\""
+    "all": "concurrently -k \"npm run backend\" \"npm run frontend\"",
+    "all:sequential": "npx nx run-many --targets=backend:serve,frontend:dev --parallel=false"
   },
   "private": true,
   "dependencies": {
@@ -83,7 +84,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-environment-node": "^29.7.0",
     "next": "^15.0.3",
-    "nx": "^20.3.3",
+    "nx": "^20.6.4",
     "postcss": "8.4.38",
     "prettier": "^2.6.2",
     "prisma": "^6.1.0",

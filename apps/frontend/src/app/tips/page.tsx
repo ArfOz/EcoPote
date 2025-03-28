@@ -14,6 +14,9 @@ const TipsPage: React.FC = () => {
   const [selectedTip, setSelectedTip] = React.useState<
     ResponseTipsDetails['data'] | null
   >(null);
+  const [showNewsForm, setShowNewsForm] = React.useState<boolean>(false);
+  const [newsTitle, setNewsTitle] = React.useState<string>('');
+  const [newsContent, setNewsContent] = React.useState<File | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -114,6 +117,76 @@ const TipsPage: React.FC = () => {
     }
   };
 
+  const addNews = async () => {
+    setShowNewsForm(true);
+    console.log('showNewsForm', showNewsForm);
+    setSelectedTip((prevTip) => {
+      if (prevTip) {
+        return {
+          ...prevTip,
+          news: prevTip.news ? [...prevTip.news] : [],
+        };
+      }
+      return prevTip;
+    });
+
+    console.log('selectedTip', selectedTip);
+    setNewsTitle('');
+    setNewsContent(null);
+  };
+
+  const addNewsBackend = async (id: number) => {
+    if (!newsTitle || !newsContent) {
+      alert('Please fill in all fields');
+      return;
+    }
+    console.log('newsTitle', newsTitle);
+    console.log('newsContent', newsContent);
+    try {
+      const formData = new FormData();
+      formData.append('title', newsTitle);
+      if (newsContent) {
+        formData.append('content', newsContent);
+      }
+
+      formData.append('title', newsTitle);
+      if (selectedTip?.id !== undefined) {
+        formData.append('tipsId', selectedTip.id.toString());
+      }
+      if (selectedTip?.id !== undefined) {
+        formData.append('tipsId', selectedTip.id.toString());
+      }
+
+      const res = await fetchWithAuth('admin/news/add', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = res.data;
+
+      console.log('res add news', res);
+      if (data) {
+        setSelectedTip((prevTip) => {
+          if (prevTip) {
+            return {
+              ...prevTip,
+              news: prevTip.news ? [...prevTip.news, data] : [data],
+            };
+          }
+          return prevTip;
+        });
+        setShowNewsForm(false);
+      } else {
+        throw new Error('Invalid data format');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -165,6 +238,48 @@ const TipsPage: React.FC = () => {
               <div className="w-full md:w-1/2 mb-2">
                 <p className="font-medium">Description:</p>
                 <p>{selectedTip.description}</p>
+                <button
+                  className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+                  onClick={() => {
+                    addNews();
+                  }}
+                >
+                  Add News
+                </button>
+                {showNewsForm && (
+                  <div className="mt-4">
+                    <textarea
+                      className="w-full p-2 border border-gray-300 rounded mb-2"
+                      placeholder="News Title"
+                      value={newsTitle}
+                      onChange={(e) => setNewsTitle(e.target.value)}
+                    />
+
+                    <input
+                      type="file"
+                      className="w-full p-2 border border-gray-300 rounded mb-2"
+                      onChange={(e) => {
+                        const formData = new FormData();
+                        formData.append('title', newsTitle);
+                        if (newsContent) {
+                          formData.append('content', newsContent);
+                        }
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setNewsContent(file);
+                        } else {
+                          setNewsContent(null);
+                        }
+                      }}
+                    />
+                    <button
+                      className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700"
+                      onClick={() => addNewsBackend(selectedTip.id)}
+                    >
+                      Submit News
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="w-full md:w-1/2 mb-2">
                 <p className="font-medium">News:</p>

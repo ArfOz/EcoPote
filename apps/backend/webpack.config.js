@@ -1,21 +1,10 @@
-const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
-const { join } = require('path');
+const { composePlugins, withNx } = require('@nx/webpack');
 
-module.exports = {
-  output: {
-    path: join(__dirname, '../../dist/apps/backend'),
-  },
-  plugins: [
-    new NxAppWebpackPlugin({
-      target: 'node',
-      compiler: 'tsc',
-      main: './src/main.ts',
-      tsConfig: './tsconfig.app.json',
-      assets: ['./src/assets'],
-      optimization: false,
-      outputHashing: 'none',
-      generatePackageJson: true,
-      watch: true,
-    }),
-  ],
-};
+module.exports = composePlugins(withNx(), (config) => {
+  // Explicitly define Webpack configuration to avoid using deprecated options.
+
+  // Add any additional configuration as needed.
+  // e.g., config.plugins.push(new MyPlugin());
+
+  return config;
+});
