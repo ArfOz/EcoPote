@@ -26,6 +26,7 @@ import {
   ResponseTips,
   ResponseTipsDetails,
 } from '@shared/dtos';
+import { CreateAddNewsDto } from './dto';
 
 @Injectable()
 export class AdminService {
@@ -328,8 +329,9 @@ export class AdminService {
     }
   }
 
-  async addNews(newsData: { title: string; tipsId: string }, html: string) {
+  async addNews(newsData: CreateAddNewsDto, html: string) {
     try {
+      console.log('geldi', newsData.tipsId);
       const tips = await this.tipsDatabaseService.findUniqueTips({
         id: parseInt(newsData.tipsId, 10),
       });
@@ -350,6 +352,7 @@ export class AdminService {
       return { message: 'News added successfully', success: true };
     } catch (error) {
       // Handle error
+      console.error('Error adding news:', error);
       throw new HttpException('Failed to add news', HttpStatus.BAD_REQUEST);
     }
   }

@@ -17,7 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { Multer } from 'multer';
 import { JwtAuthGuard } from '@auth';
-import { CreateAdminDto } from './dto';
+import { CreateAddNewsDto, CreateAdminDto } from './dto';
 import {
   CreateUserDto,
   ResponseCreateUser,
@@ -134,12 +134,18 @@ export class AdminController {
   @UseInterceptors(FileInterceptor('file'))
   async addNews(
     @UploadedFile() file: Express.Multer.File,
-    @Body() newsData: { title: string; tipsId: string }
+    @Body() newsData: CreateAddNewsDto
   ) {
     if (!file) {
+      console.error('File not provided');
       throw new Error('File not provided');
     }
+
     const htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
+
+    console.log('file', file);
+    console.log('htmlContent', htmlContent);
+    console.log('newsData', newsData);
     return await this.adminService.addNews(newsData, htmlContent);
   }
 
