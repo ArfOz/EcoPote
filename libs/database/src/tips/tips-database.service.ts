@@ -16,8 +16,9 @@ export class TipsDatabaseService {
 
   async findUniqueTips(
     where: Prisma.TipsWhereUniqueInput,
-    select?: Prisma.TipsSelect
-  ) {
+    select?: Prisma.TipsSelect,
+    include?: Prisma.TipsInclude
+  ): Promise<Tips | null> {
     return this.prisma.tips.findUnique({ where, select });
   }
   async deleteTips(where: Prisma.TipsWhereUniqueInput): Promise<Tips> {

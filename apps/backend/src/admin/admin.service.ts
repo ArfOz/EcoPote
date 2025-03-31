@@ -296,9 +296,8 @@ export class AdminService {
         };
       }
 
-      console.log('tipsData', data);
       const response = await this.tipsDatabaseService.createTips(data);
-      console.log('response', response);
+
       if (!response) {
         throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
       }
@@ -409,7 +408,7 @@ export class AdminService {
     }
   }
 
-  async getTipsById(id: number): Promise<ResponseTipsDetails> {
+  async getTipsById(id: number, page, limit): Promise<ResponseTipsDetails> {
     try {
       const select = {
         id: true,
@@ -439,9 +438,7 @@ export class AdminService {
         throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
       }
 
-      const total = await this.tipsDatabaseService.count({
-        id: id,
-      });
+      const total = await this.newsDatabaseService.count({ tipsId: id });
       return {
         data: { ...tip, total },
         message: 'Tips fetched successfully',

@@ -126,8 +126,12 @@ export class AdminController {
   }
 
   @Get('tips/:id')
-  async getTipsById(@Param('id') id: string): Promise<ResponseTipsDetails> {
-    return await this.adminService.getTipsById(parseInt(id, 10));
+  async getTipsById(
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ): Promise<ResponseTipsDetails> {
+    return await this.adminService.getTipsById(parseInt(id, 10), page, limit);
   }
 
   @Post('news/add')
@@ -143,9 +147,6 @@ export class AdminController {
 
     const htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
 
-    console.log('file', file);
-    console.log('htmlContent', htmlContent);
-    console.log('newsData', newsData);
     return await this.adminService.addNews(newsData, htmlContent);
   }
 
