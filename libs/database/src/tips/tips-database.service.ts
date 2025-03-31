@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Tips } from '@prisma/client';
+import { take } from 'rxjs';
 
 @Injectable()
 export class TipsDatabaseService {
@@ -8,23 +9,30 @@ export class TipsDatabaseService {
   async createTips(data: Prisma.TipsCreateInput): Promise<Tips> {
     return this.prisma.tips.create({ data });
   }
-  async findManyTips(where?: Prisma.TipsWhereInput): Promise<Tips[]> {
+  async findMany(
+    where?: Prisma.TipsWhereInput,
+    take?: number,
+    skip?: number,
+    orderBy?: Prisma.TipsOrderByWithRelationInput
+  ): Promise<Tips[]> {
     return this.prisma.tips.findMany({
       where,
+      orderBy,
+      take,
+      skip,
     });
   }
 
-  async findUniqueTips(
-    where: Prisma.TipsWhereUniqueInput,
-    select?: Prisma.TipsSelect,
-    include?: Prisma.TipsInclude
-  ): Promise<Tips | null> {
-    return this.prisma.tips.findUnique({ where, select });
+  async findUnique(params: {
+    where: Prisma.TipsWhereUniqueInput;
+    select?: Prisma.TipsSelect;
+  }): Promise<Tips | null> {
+    return this.prisma.tips.findUnique(params);
   }
   async deleteTips(where: Prisma.TipsWhereUniqueInput): Promise<Tips> {
     return this.prisma.tips.delete({ where });
   }
-  async updateTips(params: {
+  async update(params: {
     where: Prisma.TipsWhereUniqueInput;
     data: Prisma.TipsUpdateInput;
   }): Promise<Tips> {

@@ -272,7 +272,7 @@ export class AdminService {
     html?: string
   ): Promise<{ message: string; success: boolean }> {
     try {
-      const tips = await this.tipsDatabaseService.findManyTips({
+      const tips = await this.tipsDatabaseService.findMany({
         title: tipsData.title,
       });
       console.log('tips', tips);
@@ -313,7 +313,7 @@ export class AdminService {
   }
   async getTips(): Promise<ResponseTips> {
     try {
-      const tips = await this.tipsDatabaseService.findManyTips();
+      const tips = await this.tipsDatabaseService.findMany();
       return {
         data: {
           tips: tips,
@@ -330,9 +330,8 @@ export class AdminService {
 
   async addNews(newsData: CreateAddNewsDto, html: string) {
     try {
-      console.log('geldi', newsData.tipsId);
-      const tips = await this.tipsDatabaseService.findUniqueTips({
-        id: parseInt(newsData.tipsId, 10),
+      const tips = await this.tipsDatabaseService.findUnique({
+        where: { id: parseInt(newsData.tipsId) },
       });
       if (!tips) {
         throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
@@ -408,39 +407,37 @@ export class AdminService {
     }
   }
 
-  async getTipsById(id: number, page, limit): Promise<ResponseTipsDetails> {
+  async getTipsById(
+    id: number,
+    page?: number,
+    limit?: number
+  ): Promise<ResponseTipsDetails> {
     try {
-      const select = {
-        id: true,
-        title: true,
-        description: true,
+      if (!page || !limit) {
+        const tips = await this.tipsDatabaseService.findMany({ id });
+        const total = await this.newsDatabaseService.count({ tipsId: id });
+        return { success: true, message: '', data: { ...tips[0], total } };
+      }
+      const skip: number = (page - 1) * limit;
+      const take: number = limit;
 
-        createdAt: true,
-        updatedAt: true,
-        news: {
-          select: {
-            id: true,
-            title: true,
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-          },
-        },
-      };
-      const tip = await this.tipsDatabaseService.findUniqueTips(
+      const tip = await this.tipsDatabaseService.findMany(
         {
           id: id,
         },
-        select
+        skip,
+        take
       );
 
       if (!tip) {
         throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
       }
 
+      console.log('tip', tip);
+
       const total = await this.newsDatabaseService.count({ tipsId: id });
       return {
-        data: { ...tip, total },
+        data: { ...(Array.isArray(tip) ? tip[0] : tip), total },
         message: 'Tips fetched successfully',
         success: true,
       };

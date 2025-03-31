@@ -131,7 +131,13 @@ export class AdminController {
     @Query('page') page?: string,
     @Query('limit') limit?: string
   ): Promise<ResponseTipsDetails> {
-    return await this.adminService.getTipsById(parseInt(id, 10), page, limit);
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    return await this.adminService.getTipsById(
+      parseInt(id, 10),
+      pageNumber,
+      limitNumber
+    );
   }
 
   @Post('news/add')
