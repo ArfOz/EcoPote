@@ -9,17 +9,20 @@ export class TipsDatabaseService {
   async createTips(data: Prisma.TipsCreateInput): Promise<Tips> {
     return this.prisma.tips.create({ data });
   }
-  async findMany(
-    where?: Prisma.TipsWhereInput,
-    take?: number,
-    skip?: number,
-    orderBy?: Prisma.TipsOrderByWithRelationInput
-  ): Promise<Tips[]> {
+  async findMany(params: {
+    where?: Prisma.TipsWhereInput;
+    take?: number;
+    skip?: number;
+    orderBy?: Prisma.TipsOrderByWithRelationInput;
+    select?: Prisma.TipsSelect;
+  }): Promise<Tips[]> {
+    const { where, orderBy, take, skip, select } = params;
     return this.prisma.tips.findMany({
       where,
       orderBy,
       take,
       skip,
+      select,
     });
   }
 

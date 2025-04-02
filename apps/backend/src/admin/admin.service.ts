@@ -273,8 +273,9 @@ export class AdminService {
   ): Promise<{ message: string; success: boolean }> {
     try {
       const tips = await this.tipsDatabaseService.findMany({
-        title: tipsData.title,
+        where: { title: tipsData.title },
       });
+
       console.log('tips', tips);
 
       if (tips.length > 0) {
@@ -313,7 +314,7 @@ export class AdminService {
   }
   async getTips(): Promise<ResponseTips> {
     try {
-      const tips = await this.tipsDatabaseService.findMany();
+      const tips = await this.tipsDatabaseService.findMany({});
       return {
         data: {
           tips: tips,
@@ -412,22 +413,45 @@ export class AdminService {
     page?: number,
     limit?: number
   ): Promise<ResponseTipsDetails> {
+    const select: Prisma.TipsSelect = {
+      id: true,
+      title: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      news: {
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+    };
     try {
       if (!page || !limit) {
-        const tips = await this.tipsDatabaseService.findMany({ id });
+        const tips = await this.tipsDatabaseService.findMany({
+          where: {
+            id: id,
+          },
+          select,
+        });
+
+        console.log('tips', tips);
         const total = await this.newsDatabaseService.count({ tipsId: id });
         return { success: true, message: '', data: { ...tips[0], total } };
       }
       const skip: number = (page - 1) * limit;
       const take: number = limit;
 
-      const tip = await this.tipsDatabaseService.findMany(
-        {
+      const tip = await this.tipsDatabaseService.findMany({
+        where: {
           id: id,
         },
         skip,
-        take
-      );
+        take,
+      });
 
       if (!tip) {
         throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
