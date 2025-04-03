@@ -196,8 +196,8 @@ export class AdminService {
       const take: number = limit;
       const [users, total] = await Promise.all([
         this.userDatabaseService.findMany({
-          skip,
           take,
+          skip,
         }),
         this.userDatabaseService.count({}),
       ]);
@@ -275,8 +275,6 @@ export class AdminService {
       const tips = await this.tipsDatabaseService.findMany({
         where: { title: tipsData.title },
       });
-
-      console.log('tips', tips);
 
       if (tips.length > 0) {
         // Tips already exist
@@ -357,7 +355,7 @@ export class AdminService {
   }
   async getNews() {
     try {
-      const news = await this.newsDatabaseService.findAllNews();
+      const news = await this.newsDatabaseService.findMany({});
       return {
         data: news,
         message: 'News fetched successfully',
@@ -438,19 +436,23 @@ export class AdminService {
           select,
         });
 
-        console.log('tips', tips);
         const total = await this.newsDatabaseService.count({ tipsId: id });
         return { success: true, message: '', data: { ...tips[0], total } };
       }
-      const skip: number = (page - 1) * limit;
-      const take: number = limit;
 
+      if (page || limit) {
+        const skip: number = (page - 1) * limit;
+        const take: number = limit;
+        select.news = {
+          take,
+          skip,
+        };
+      }
       const tip = await this.tipsDatabaseService.findMany({
         where: {
           id: id,
         },
-        skip,
-        take,
+        select,
       });
 
       if (!tip) {

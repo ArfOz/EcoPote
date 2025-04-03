@@ -12,8 +12,18 @@ export class NewsDatabaseService {
     });
   }
 
-  async findAllNews(): Promise<News[]> {
-    return this.prisma.news.findMany();
+  async findMany(params: {
+    where?: Prisma.NewsWhereInput;
+    skip?: number;
+    take?: number;
+    orderBy?: Prisma.NewsOrderByWithRelationInput;
+  }): Promise<News[]> {
+    return this.prisma.news.findMany({
+      where: params.where,
+      skip: params.skip,
+      take: params.take,
+      orderBy: params.orderBy,
+    });
   }
 
   async findNewsById(id: number): Promise<News | null> {

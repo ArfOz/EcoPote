@@ -4,23 +4,28 @@ import Navbar from '../components/Navbar';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
 import { ResponseTips, ResponseTipsDetails, Tips } from '@shared/dtos';
+import { SelectedTips } from './components';
 
 const TipsPage: React.FC = () => {
   const [tips, setTips] = React.useState<Tips[]>([]);
   const [total, setTotal] = React.useState<number>(0);
-  const [filteredUsers, setFilteredUsers] = React.useState<any[]>([]);
-  const [search, setSearch] = React.useState<string>('');
   const [error, setError] = React.useState<string | null>(null);
   const [selectedTip, setSelectedTip] = React.useState<
     ResponseTipsDetails['data'] | null
+  >(null);
+  const [selectedTipNews, setSelectedTipNews] = React.useState<
+    ResponseTipsDetails['data']['news'] | null
   >(null);
   const [showNewsForm, setShowNewsForm] = React.useState<boolean>(false);
   const [newsTitle, setNewsTitle] = React.useState<string>('');
   const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
+  const [page, setPage] = useState<number>(1);
+
+  const limit = 5;
 
   useEffect(() => {
-    const fetchAllUsers = async () => {
+    const fetchAllTips = async () => {
       try {
         const res: ResponseTips = await fetchWithAuth(`admin/tips`, {}, false); // Fetch all users
         console.log('res filter', res);
@@ -28,10 +33,6 @@ const TipsPage: React.FC = () => {
         if (data && Array.isArray(data.tips)) {
           setTips(data.tips);
           setTotal(data.total);
-          const filtered = data.tips.filter((tip) =>
-            tip.title.toLowerCase().includes(search.toLowerCase())
-          );
-          setFilteredUsers(filtered);
         } else {
           throw new Error('Invalid data format');
         }
@@ -51,13 +52,13 @@ const TipsPage: React.FC = () => {
       }
     };
 
-    fetchAllUsers();
-  }, [search]);
+    fetchAllTips();
+  }, []);
 
   const handleTipClick = async (id: number) => {
     try {
       const res: ResponseTipsDetails = await fetchWithAuth(
-        `admin/tips/${id}`,
+        `admin/tips/${id}?page=${page}&limit=${limit}`,
         {},
         false
       );
@@ -65,6 +66,8 @@ const TipsPage: React.FC = () => {
       console.log('res tip', res);
       if (data) {
         setSelectedTip(data);
+        setTotal(data.total);
+        data?.news && setSelectedTipNews(data.news);
       } else {
         throw new Error('Invalid data format');
       }
@@ -223,6 +226,7 @@ const TipsPage: React.FC = () => {
         </table>
       </div>
       {error && <p>{error}</p>}
+
       {selectedTip && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 relative">
@@ -277,46 +281,34 @@ const TipsPage: React.FC = () => {
               </div>
               <div className="w-full md:w-1/2 mb-2">
                 <p className="font-medium">News:</p>
-                {selectedTip.news && selectedTip.news.length > 0 ? (
-                  <ul className="space-y-2">
-                    {selectedTip.news.map((newsItem, index) => (
-                      <li key={index} className="text-sm text-gray-500">
-                        <p>News Name: {newsItem.title}</p>
-                        <button
-                          className="text-blue-500 hover:underline"
-                          onClick={() => {
-                            const newWindow = window.open();
-                            if (newWindow) {
-                              newWindow.document.write(newsItem.content);
-                              newWindow.document.close();
-                            }
-                          }}
-                        >
-                          <span className="text-blue-500 hover:underline">
-                            View Content
-                          </span>
-                        </button>
-                        <button
-                          className="text-red-500 hover:underline ml-2"
-                          onClick={async () => {
-                            handleDeleteNews(newsItem.id);
-                          }}
-                        >
-                          Delete
-                        </button>
-                        <p className="text-xs text-gray-400">
-                          Created At:{' '}
-                          {new Date(newsItem.createdAt).toLocaleString()}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          Updated At:{' '}
-                          {new Date(newsItem.updatedAt).toLocaleString()}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
+                {selectedTipNews && selectedTipNews.length > 0 ? (
+                  <SelectedTips
+                    selectedTipNews={selectedTipNews?.map((news) => ({
+                      ...news,
+                      id: news.id.toString(),
+                    }))}
+                    handleDeleteNews={() =>
+                      handleDeleteNews(selectedTipNews[0].id)
+                    }
+                  />
                 ) : (
                   <p className="text-sm text-gray-500">No news available</p>
+                )}
+                {Array.from(
+                  { length: Math.ceil(total / limit) },
+                  (_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setPage(index + 1)}
+                      className={`px-3 py-1 rounded ${
+                        page === index + 1
+                          ? 'bg-indigo-600 text-white'
+                          : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  )
                 )}
               </div>
             </div>
