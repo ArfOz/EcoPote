@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
 import { ResponseTips, ResponseTipsDetails, Tips } from '@shared/dtos';
-import { SelectedTips } from './components';
+import { SelectedTips, TipsComponent } from './components';
 
 const TipsPage: React.FC = () => {
   const [tips, setTips] = React.useState<Tips[]>([]);
@@ -192,39 +192,14 @@ const TipsPage: React.FC = () => {
   return (
     <div>
       <Navbar />
-      <h1>Tips</h1>
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="py-2 px-4 border-b">ID</th>
-              <th className="py-2 px-4 border-b">Title</th>
-              <th className="py-2 px-4 border-b">Description</th>
-              <th className="py-2 px-4 border-b">Created At</th>
-              <th className="py-2 px-4 border-b">Updated At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tips.map((tip, index) => (
-              <tr
-                key={index}
-                onClick={() => handleTipClick(tip.id)}
-                className="hover:bg-gray-50 cursor-pointer"
-              >
-                <td className="py-2 px-4 border-b">{tip.id}</td>
-                <td className="py-2 px-4 border-b">{tip.title}</td>
-                <td className="py-2 px-4 border-b">{tip.description}</td>
-                <td className="py-2 px-4 border-b">
-                  {tip.createdAt.toString()}
-                </td>
-                <td className="py-2 px-4 border-b">
-                  {tip.updatedAt.toString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <TipsComponent
+        tips={tips.map((tip) => ({
+          ...tip,
+          id: tip.id.toString(),
+        }))}
+        handleTipClick={handleTipClick}
+        page={page}
+      />
       {error && <p>{error}</p>}
 
       {selectedTip && (
