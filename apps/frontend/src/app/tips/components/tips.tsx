@@ -1,14 +1,52 @@
+import { Tips } from '@prisma/client';
+import { ResponseTipsDetails, ResponseTipNews } from '@shared/dtos';
+import { fetchWithAuth } from '@utils';
 import React from 'react';
 
 export const TipsComponent = ({
   tips,
-  handleTipClick,
-  page,
+  setSelectedTip,
+  setError,
+  setSelectedTipNews,
 }: {
-  tips: any[];
-  handleTipClick: (id: number) => void;
-  page: number;
+  tips: Tips[];
+  setSelectedTip: (tip: ResponseTipsDetails['data']) => void;
+  setError: (error: string) => void;
+  setSelectedTipNews: (news: ResponseTipNews['data'] | null) => void;
 }) => {
+  const handleTipClick = async (id: number) => {
+    try {
+      const tipData: ResponseTipsDetails = await fetchWithAuth(
+        `admin/tips/${id}`,
+        {},
+        false
+      );
+
+      const page = 1; // Set the page number you want to fetch
+      const limit = 5; // Set the limit for the number of news items to fetch
+
+      const tipNews: ResponseTipNews = await fetchWithAuth(
+        `admin/tips/news/${id}?page=${page}&limit=${limit}`,
+        {},
+        false
+      );
+
+      const news = tipNews.data;
+      setSelectedTipNews(news);
+      const data = tipData.data;
+      if (data) {
+        setSelectedTip(data);
+      } else {
+        throw new Error('Invalid data format');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white border border-gray-200">

@@ -13,7 +13,7 @@ interface SelectedTipsProps {
   handleDeleteNews: (id: string) => Promise<void>;
 }
 
-export const SelectedTips: React.FC<SelectedTipsProps> = ({
+export const TipsDetail: React.FC<SelectedTipsProps> = ({
   selectedTipNews,
   handleDeleteNews,
 }) => {
