@@ -31,6 +31,7 @@ import {
   ResponseTipsDetails,
   ResponseTipNews,
   ResponseToggleSubscription,
+  ResponseAddNews,
 } from '@shared/dtos';
 
 @Controller('admin')
@@ -147,7 +148,7 @@ export class AdminController {
   async addNews(
     @UploadedFile() file: Express.Multer.File,
     @Body() newsData: CreateAddNewsDto
-  ) {
+  ): Promise<ResponseAddNews> {
     if (!file) {
       console.error('File not provided');
       throw new Error('File not provided');

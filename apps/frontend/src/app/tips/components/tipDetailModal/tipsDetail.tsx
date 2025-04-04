@@ -1,21 +1,12 @@
+import { News } from '@prisma/client';
 import React from 'react';
 
-interface NewsItem {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string | Date;
-  updatedAt: string | Date;
-}
-
-interface SelectedTipsProps {
-  selectedTipNews: NewsItem[];
-  handleDeleteNews: (id: string) => Promise<void>;
-}
-
-export const TipsDetail: React.FC<SelectedTipsProps> = ({
+export const TipsDetail = ({
   selectedTipNews,
   handleDeleteNews,
+}: {
+  selectedTipNews: News[];
+  handleDeleteNews: (id: number) => Promise<void>;
 }) => {
   return (
     <div>

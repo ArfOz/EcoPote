@@ -60,6 +60,7 @@ const TipsPage: React.FC = () => {
 
   const closeModal = () => {
     setSelectedTip(null);
+    setShowNewsForm(false);
   };
 
   return (

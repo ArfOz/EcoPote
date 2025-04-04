@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { TipDetail } from '../addNews';
+import React, { use, useEffect, useState } from 'react';
+import { AddNews } from '../addNews';
 import { TipsDetail } from './tipsDetail';
 import { fetchWithAuth } from '@utils';
-import { ResponseTipNews } from '@shared/dtos';
+import {
+  ResponseAddNews,
+  ResponseTipNews,
+  ResponseTipsDetails,
+} from '@shared/dtos';
 
 type SelectedTipType = {
   id?: number;
@@ -24,7 +28,7 @@ export const SelectedTip = ({
   setSelectedTipNews,
 }: {
   setSelectedTip: any;
-  selectedTip: any;
+  selectedTip: ResponseTipsDetails['data'];
   closeModal: () => void;
   selectedTipNews: ResponseTipNews['data'] | null;
   showNewsForm: boolean;
@@ -34,10 +38,35 @@ export const SelectedTip = ({
   setError: (error: string) => void;
   setSelectedTipNews: (news: any) => void;
 }) => {
+  const [totalNews, setTotalNews] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = React.useState<number>(0);
   const [file, setFile] = useState<File | null>(null);
 
+  useEffect(() => {
+    const fetchTipNews = async () => {
+      if (selectedTip) {
+        const page = 1; // Set the page number you want to fetch
+        const limit = 5; // Set the limit for the number of news items to fetch
+
+        try {
+          const tipNews: ResponseTipNews = await fetchWithAuth(
+            `admin/tips/news/${selectedTip.id}?page=${page}&limit=${limit}`,
+            {},
+            false
+          );
+
+          const news = tipNews.data;
+          setSelectedTipNews(news);
+          setTotalNews(tipNews.data.total); // Set the total number of news items
+        } catch (error) {
+          console.error('Error fetching tip news:', error);
+        }
+      }
+    };
+
+    fetchTipNews();
+  }, [selectedTip, page]);
   const addNewsBackend = async (id: number) => {
     if (!newsTitle || !file) {
       alert('Please fill in all fields');
@@ -54,7 +83,7 @@ export const SelectedTip = ({
         formData.append('tipsId', selectedTip.id.toString());
       }
 
-      const res = await fetchWithAuth(
+      const res: ResponseAddNews = await fetchWithAuth(
         'admin/news/add',
         {
           method: 'POST',
@@ -64,8 +93,7 @@ export const SelectedTip = ({
       );
       const data = res.data;
 
-      console.log('res add news', res);
-      if (res.status === 200) {
+      if (res.success) {
         setSelectedTip((prevTip: SelectedTipType | null) => {
           if (prevTip) {
             return {
@@ -149,11 +177,11 @@ export const SelectedTip = ({
         >
           &times;
         </button>
-        <h2 className="text-2xl font-semibold mb-4">{selectedTip.title}</h2>
+        <h2 className="text-2xl font-semibold mb-4">{selectedTip?.title}</h2>
         <div className="flex flex-row">
           <div className="w-full md:w-1/2 mb-2">
             <p className="font-medium">Description:</p>
-            <p>{selectedTip.description}</p>
+            <p>{selectedTip?.description}</p>
             <button
               className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
               onClick={() => {
@@ -163,7 +191,7 @@ export const SelectedTip = ({
               Add News
             </button>
             {showNewsForm && (
-              <TipDetail
+              <AddNews
                 newsTitle={newsTitle}
                 setNewsTitle={setNewsTitle}
                 setFile={setFile}
@@ -174,13 +202,15 @@ export const SelectedTip = ({
           </div>
           <div className="w-full md:w-1/2 mb-2">
             <p className="font-medium">News:</p>
-            {selectedTipNews && selectedTipNews.length > 0 ? (
+            {selectedTipNews && selectedTipNews.news.length > 0 ? (
               <TipsDetail
-                selectedTipNews={selectedTipNews?.map((news) => ({
+                selectedTipNews={selectedTipNews?.news.map((news) => ({
                   ...news,
-                  id: news.id.toString(),
+                  id: news.id,
                 }))}
-                handleDeleteNews={() => handleDeleteNews(selectedTipNews[0].id)}
+                handleDeleteNews={() =>
+                  handleDeleteNews(selectedTipNews.news[0].id)
+                }
               />
             ) : (
               <p className="text-sm text-gray-500">No news available</p>

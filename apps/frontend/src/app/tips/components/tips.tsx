@@ -21,18 +21,6 @@ export const TipsComponent = ({
         {},
         false
       );
-
-      const page = 1; // Set the page number you want to fetch
-      const limit = 5; // Set the limit for the number of news items to fetch
-
-      const tipNews: ResponseTipNews = await fetchWithAuth(
-        `admin/tips/news/${id}?page=${page}&limit=${limit}`,
-        {},
-        false
-      );
-
-      const news = tipNews.data;
-      setSelectedTipNews(news);
       const data = tipData.data;
       if (data) {
         setSelectedTip(data);

@@ -336,7 +336,7 @@ export class AdminService {
         throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
       }
 
-      await this.newsDatabaseService.createNews({
+      const data = await this.newsDatabaseService.createNews({
         title: newsData.title,
         content: html,
         tips: {
@@ -346,7 +346,7 @@ export class AdminService {
         },
       });
 
-      return { message: 'News added successfully', success: true };
+      return { message: 'News added successfully', success: true, data };
     } catch (error) {
       // Handle error
       console.error('Error adding news:', error);
@@ -360,8 +360,9 @@ export class AdminService {
         take: limit,
         skip: (page - 1) * limit,
       });
+      const total = await this.newsDatabaseService.count({ tipsId: id });
       return {
-        data: news,
+        data: { news, total },
         message: 'News fetched successfully',
         success: true,
       };

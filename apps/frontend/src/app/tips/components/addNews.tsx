@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const TipDetail = ({
+export const AddNews = ({
   newsTitle,
   setNewsTitle,
   addNewsBackend,

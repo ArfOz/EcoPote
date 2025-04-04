@@ -164,13 +164,30 @@ export interface ResponseDeleteNews {
 
 export interface ResponseTipNews {
   data: {
+    total: number;
+    news: {
+      id: number;
+      createdAt: Date;
+      updatedAt: Date;
+      title: string;
+      content: string;
+      tipsId: number;
+    }[];
+  };
+
+  message: string;
+  success: boolean;
+}
+
+export interface ResponseAddNews {
+  message: string;
+  success: boolean;
+  data: {
     id: number;
     createdAt: Date;
     updatedAt: Date;
     title: string;
     content: string;
     tipsId: number;
-  }[];
-  message: string;
-  success: boolean;
+  };
 }
