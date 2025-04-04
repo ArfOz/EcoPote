@@ -148,3 +148,29 @@ export interface ResponseTipsDetails {
     }[];
   };
 }
+
+export interface ResponseDeleteNews {
+  data: {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    title: string;
+    content: string;
+    tipsId: number;
+  };
+  message: string;
+  success: boolean;
+}
+
+export interface ResponseTipNews {
+  data: {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    title: string;
+    content: string;
+    tipsId: number;
+  }[];
+  message: string;
+  success: boolean;
+}

@@ -21,6 +21,7 @@ import { CreateAddNewsDto, CreateAdminDto } from './dto';
 import {
   CreateUserDto,
   ResponseCreateUser,
+  ResponseDeleteNews,
   ResponseDeleteUser,
   ResponseGetAllusers,
   ResponseLogin,
@@ -28,6 +29,7 @@ import {
   ResponseMessageEmail,
   ResponseTips,
   ResponseTipsDetails,
+  ResponseTipNews,
   ResponseToggleSubscription,
 } from '@shared/dtos';
 
@@ -156,9 +158,19 @@ export class AdminController {
     return await this.adminService.addNews(newsData, htmlContent);
   }
 
-  @Get('news')
-  async getNews() {
-    return await this.adminService.getNews();
+  @Get('tips/news/:id')
+  async getNews(
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ): Promise<ResponseTipNews> {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    return await this.adminService.getNews(
+      parseInt(id, 10),
+      pageNumber,
+      limitNumber
+    );
   }
 
   @Get('news/:id')
@@ -167,18 +179,7 @@ export class AdminController {
   }
   // @UseGuards(JwtAuthGuard)
   @Delete('news/:id')
-  async deleteNews(@Param('id') id: string): Promise<{
-    data: {
-      id: number;
-      createdAt: Date;
-      updatedAt: Date;
-      title: string;
-      content: string;
-      tipsId: number;
-    };
-    message: string;
-    success: boolean;
-  }> {
+  async deleteNews(@Param('id') id: string): Promise<ResponseDeleteNews> {
     return await this.adminService.deleteNews(parseInt(id, 10));
   }
 }

@@ -353,9 +353,13 @@ export class AdminService {
       throw new HttpException('Failed to add news', HttpStatus.BAD_REQUEST);
     }
   }
-  async getNews() {
+  async getNews(id: number, page?: number, limit?: number) {
     try {
-      const news = await this.newsDatabaseService.findMany({});
+      const news = await this.newsDatabaseService.findMany({
+        where: { tipsId: id },
+        take: limit,
+        skip: (page - 1) * limit,
+      });
       return {
         data: news,
         message: 'News fetched successfully',
