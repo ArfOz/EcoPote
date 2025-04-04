@@ -97,14 +97,15 @@ export const SelectedTip = ({
 
       if (res.success) {
         setTotalNews((prevTotal) => prevTotal + 1);
-        setSelectedTip((prevTip: SelectedTipType | null) => {
-          if (prevTip) {
+
+        setSelectedTipNews((prevNews: ResponseTipNews['data'] | null) => {
+          if (prevNews && prevNews.news) {
             return {
-              ...prevTip,
-              news: prevTip.news ? [...prevTip.news, data] : [data],
+              ...prevNews,
+              news: [...prevNews.news, data],
             };
           }
-          return prevTip;
+          return prevNews;
         });
         setShowNewsForm(false);
       } else {
