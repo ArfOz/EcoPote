@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
@@ -70,7 +70,6 @@ const TipsPage: React.FC = () => {
         tips={tips}
         setSelectedTip={setSelectedTip}
         setError={setError}
-        setSelectedTipNews={setSelectedTipNews}
       />
       {error && <p>{error}</p>}
       {selectedTip && (

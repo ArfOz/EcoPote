@@ -1,5 +1,5 @@
 import { Tips } from '@prisma/client';
-import { ResponseTipsDetails, ResponseTipNews } from '@shared/dtos';
+import { ResponseTipsDetails } from '@shared/dtos';
 import { fetchWithAuth } from '@utils';
 import React from 'react';
 
@@ -7,12 +7,10 @@ export const TipsComponent = ({
   tips,
   setSelectedTip,
   setError,
-  setSelectedTipNews,
 }: {
   tips: Tips[];
   setSelectedTip: (tip: ResponseTipsDetails['data']) => void;
   setError: (error: string) => void;
-  setSelectedTipNews: (news: ResponseTipNews['data'] | null) => void;
 }) => {
   const handleTipClick = async (id: number) => {
     try {

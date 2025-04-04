@@ -4,6 +4,7 @@ import { TipsDetail } from './tipsDetail';
 import { fetchWithAuth } from '@utils';
 import {
   ResponseAddNews,
+  ResponseDeleteNews,
   ResponseTipNews,
   ResponseTipsDetails,
 } from '@shared/dtos';
@@ -40,13 +41,12 @@ export const SelectedTip = ({
 }) => {
   const [totalNews, setTotalNews] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
-  const [total, setTotal] = React.useState<number>(0);
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchTipNews = async () => {
       if (selectedTip) {
-        const page = 1; // Set the page number you want to fetch
+        // Set the page number you want to fetch
         const limit = 5; // Set the limit for the number of news items to fetch
 
         try {
@@ -57,6 +57,8 @@ export const SelectedTip = ({
           );
 
           const news = tipNews.data;
+          console.log('Fetched news:', news);
+
           setSelectedTipNews(news);
           setTotalNews(tipNews.data.total); // Set the total number of news items
         } catch (error) {
@@ -66,7 +68,7 @@ export const SelectedTip = ({
     };
 
     fetchTipNews();
-  }, [selectedTip, page]);
+  }, [page]);
   const addNewsBackend = async (id: number) => {
     if (!newsTitle || !file) {
       alert('Please fill in all fields');
@@ -94,6 +96,7 @@ export const SelectedTip = ({
       const data = res.data;
 
       if (res.success) {
+        setTotalNews((prevTotal) => prevTotal + 1);
         setSelectedTip((prevTip: SelectedTipType | null) => {
           if (prevTip) {
             return {
@@ -135,27 +138,31 @@ export const SelectedTip = ({
 
   const handleDeleteNews = async (newsId: number) => {
     try {
-      const res = await fetchWithAuth(
+      const res: ResponseDeleteNews = await fetchWithAuth(
         `admin/news/${newsId}`,
         {
           method: 'DELETE',
         },
         false
       );
-      const data = res.data;
-      console.log('res delete news', res);
 
-      if (data) {
-        setSelectedTip((prevTip: SelectedTipType | null) => {
-          if (prevTip) {
+      if (res.success) {
+        setTotalNews((prevTotal) => {
+          const updatedTotal = prevTotal - 1;
+          // Adjust the page if the current page becomes empty
+          if (updatedTotal <= (page - 1) * limit && page > 1) {
+            setPage(page - 1);
+          }
+          return updatedTotal;
+        });
+        setSelectedTipNews((prevNews: ResponseTipNews['data'] | null) => {
+          if (prevNews && prevNews.news) {
             return {
-              ...prevTip,
-              news: prevTip.news
-                ? prevTip.news.filter((news) => news.id !== newsId)
-                : [],
+              ...prevNews,
+              news: prevNews.news.filter((news) => news.id !== newsId),
             };
           }
-          return prevTip;
+          return prevNews;
         });
       } else {
         throw new Error('Invalid data format');
@@ -215,19 +222,22 @@ export const SelectedTip = ({
             ) : (
               <p className="text-sm text-gray-500">No news available</p>
             )}
-            {Array.from({ length: Math.ceil(total / limit) }, (_, index) => (
-              <button
-                key={index}
-                onClick={() => setPage(index + 1)}
-                className={`px-3 py-1 rounded ${
-                  page === index + 1
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
+            {Array.from(
+              { length: Math.ceil(totalNews / limit) },
+              (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setPage(index + 1)}
+                  className={`px-3 py-1 rounded ${
+                    page === index + 1
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              )
+            )}
           </div>
         </div>
       </div>
