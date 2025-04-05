@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const AddNews = ({
+export const AddNewsForm = ({
   newsTitle,
   setNewsTitle,
   addNewsBackend,

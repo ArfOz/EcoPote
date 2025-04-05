@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState } from 'react';
-import { AddNews } from '../addNews';
-import { TipsDetail } from './tipsDetail';
+import { AddNewsForm } from './addNewsForm';
+import { TipDetailComplete } from './tipsDetail';
 import { fetchWithAuth } from '@utils';
 import {
   ResponseAddNews,
@@ -8,6 +8,8 @@ import {
   ResponseTipNews,
   ResponseTipsDetails,
 } from '@shared/dtos';
+import { NewsPageButton } from './newsPageButton';
+import { Tipdetail } from './tipdetail';
 
 type SelectedTipType = {
   id?: number;
@@ -150,21 +152,31 @@ export const SelectedTip = ({
       if (res.success) {
         setTotalNews((prevTotal) => {
           const updatedTotal = prevTotal - 1;
+
           // Adjust the page if the current page becomes empty
           if (updatedTotal <= (page - 1) * limit && page > 1) {
             setPage(page - 1);
           }
+
           return updatedTotal;
         });
-        setSelectedTipNews((prevNews: ResponseTipNews['data'] | null) => {
-          if (prevNews && prevNews.news) {
-            return {
-              ...prevNews,
-              news: prevNews.news.filter((news) => news.id !== newsId),
-            };
+
+        // Refetch the news for the current page
+        const fetchUpdatedNews = async () => {
+          try {
+            const tipNews: ResponseTipNews = await fetchWithAuth(
+              `admin/tips/news/${selectedTip?.id}?page=${page}&limit=${limit}`,
+              {},
+              false
+            );
+
+            setSelectedTipNews(tipNews.data);
+          } catch (error) {
+            console.error('Error fetching updated news:', error);
           }
-          return prevNews;
-        });
+        };
+
+        await fetchUpdatedNews();
       } else {
         throw new Error('Invalid data format');
       }
@@ -188,18 +200,9 @@ export const SelectedTip = ({
         <h2 className="text-2xl font-semibold mb-4">{selectedTip?.title}</h2>
         <div className="flex flex-row">
           <div className="w-full md:w-1/2 mb-2">
-            <p className="font-medium">Description:</p>
-            <p>{selectedTip?.description}</p>
-            <button
-              className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
-              onClick={() => {
-                addNews();
-              }}
-            >
-              Add News
-            </button>
+            <Tipdetail selectedTip={selectedTip} addNews={addNews} />
             {showNewsForm && (
-              <AddNews
+              <AddNewsForm
                 newsTitle={newsTitle}
                 setNewsTitle={setNewsTitle}
                 setFile={setFile}
@@ -211,7 +214,7 @@ export const SelectedTip = ({
           <div className="w-full md:w-1/2 mb-2">
             <p className="font-medium">News:</p>
             {selectedTipNews && selectedTipNews.news.length > 0 ? (
-              <TipsDetail
+              <TipDetailComplete
                 selectedTipNews={selectedTipNews?.news.map((news) => ({
                   ...news,
                   id: news.id,
@@ -223,22 +226,12 @@ export const SelectedTip = ({
             ) : (
               <p className="text-sm text-gray-500">No news available</p>
             )}
-            {Array.from(
-              { length: Math.ceil(totalNews / limit) },
-              (_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setPage(index + 1)}
-                  className={`px-3 py-1 rounded ${
-                    page === index + 1
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              )
-            )}
+            <NewsPageButton
+              totalNews={totalNews}
+              limit={limit}
+              page={page}
+              setPage={setPage}
+            />
           </div>
         </div>
       </div>

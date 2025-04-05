@@ -1,7 +1,7 @@
 import { News } from '@prisma/client';
 import React from 'react';
 
-export const TipsDetail = ({
+export const TipDetailComplete = ({
   selectedTipNews,
   handleDeleteNews,
 }: {

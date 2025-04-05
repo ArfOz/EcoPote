@@ -1,3 +1,3 @@
 export * from './tipDetailModal/tipsDetail';
-export * from './addNews';
+export * from './tipDetailModal/addNewsForm';
 export * from './tips';
