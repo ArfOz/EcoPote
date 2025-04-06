@@ -35,6 +35,7 @@ model News {
   updatedAt DateTime @updatedAt
   tipsId    Int
   tips      Tips     @relation(fields: [tipsId], references: [id], onDelete: Cascade)
+  status    Boolean  @default(false)
 }
 
 model Cron {
