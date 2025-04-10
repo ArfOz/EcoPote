@@ -21,7 +21,8 @@
       "@database/*": ["libs/database/src/*"],
       "@shared/*": ["libs/shared/*"],
       "@utils": ["libs/utils/index.ts"]
-    }
+    },
+    "resolveJsonModule": true
   },
   "exclude": ["node_modules", "tmp"]
 }
