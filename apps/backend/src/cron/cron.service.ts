@@ -1,10 +1,9 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { CronStartDto } from './dto';
+import { Injectable } from '@nestjs/common';
 import { CronDatabaseService, UserDatabaseService } from '@database';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
 import * as cron from 'node-cron';
-import { ResponseCronUpdateDto } from '@shared/dtos';
+import { ResponseCreateCron, ResponseCronUpdateDto } from '@shared/dtos';
 
 @Injectable()
 export class CronService {
@@ -20,7 +19,7 @@ export class CronService {
     startTime: Date,
     cronTime: string,
     schedule: string
-  ) {
+  ): Promise<ResponseCreateCron> {
     const dateNow = new Date();
 
     // Parse the startTime to a Date object
@@ -43,11 +42,22 @@ export class CronService {
       updatedAt: dateNow,
     };
 
-    await this.cronDatabaseService.createCron(savedCron).catch((error) => {
-      console.error('Error saving to database:', error);
-    });
+    const res = await this.cronDatabaseService
+      .createCron(savedCron)
+      .catch((error) => {
+        console.error('Error saving to database:', error);
+        return null;
+      });
 
-    return { success: true, message: 'Cron job started successfully' };
+    if (!res) {
+      throw new Error('Failed to save cron job to the database.');
+    }
+
+    return {
+      success: true,
+      message: 'Cron job started successfully',
+      data: res,
+    };
   }
 
   async getCronJobs() {

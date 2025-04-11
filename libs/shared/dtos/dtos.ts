@@ -1,7 +1,10 @@
 import { User } from '@prisma/client';
 import {
   IsBoolean,
+  IsDate,
+  IsDateString,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -190,4 +193,38 @@ export interface ResponseAddNews {
     content: string;
     tipsId: number;
   };
+}
+
+export interface ResponseCreateCron {
+  message: string;
+  success: boolean;
+  data: {
+    name: string;
+    id: number;
+    cronTime: string;
+    startTime: Date;
+    schedule: string;
+    createdAt: Date;
+    updatedAt: Date;
+    status: boolean;
+    lastRun: Date | null;
+  };
+}
+
+export class CronCreateDto {
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
+
+  @IsString()
+  @IsNotEmpty()
+  cronTime!: string;
+
+  @IsDateString()
+  @IsNotEmpty()
+  startTime!: Date;
+
+  @IsNotEmpty()
+  @IsEnum(ScheduleEnum)
+  schedule!: ScheduleEnum;
 }

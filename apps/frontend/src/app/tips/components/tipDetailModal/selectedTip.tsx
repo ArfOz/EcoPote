@@ -218,6 +218,7 @@ export const SelectedTip = ({
                 selectedTipNews={selectedTipNews?.news.map((news) => ({
                   ...news,
                   id: news.id,
+                  status: true, // Add a default or appropriate value for 'status'
                 }))}
                 handleDeleteNews={() =>
                   handleDeleteNews(selectedTipNews.news[0].id)

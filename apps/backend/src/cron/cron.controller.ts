@@ -1,6 +1,5 @@
 import {
   Controller,
-  Put,
   Body,
   HttpException,
   HttpStatus,
@@ -8,23 +7,30 @@ import {
   Get,
 } from '@nestjs/common';
 import { CronService } from './cron.service';
-import { CronStartDto, CronUpdateDto } from './dto';
-import { ResponseCron, ResponseCronUpdateDto } from '@shared/dtos';
+import { CronUpdateDto } from './dto';
+import {
+  ResponseCreateCron,
+  ResponseCron,
+  ResponseCronUpdateDto,
+  CronCreateDto,
+} from '@shared/dtos';
 
 @Controller('cron')
 export class CronController {
   constructor(private readonly cronService: CronService) {}
 
   @Post('create-job')
-  async createCronJobs(@Body() cronData: CronStartDto) {
+  async createCronJobs(
+    @Body() cronData: CronCreateDto
+  ): Promise<ResponseCreateCron> {
     try {
-      await this.cronService.saveDatabase(
+      const res = await this.cronService.saveDatabase(
         cronData.name,
         cronData.startTime,
         cronData.cronTime,
         cronData.schedule
       );
-      return { success: true, message: 'Cron job started successfully' };
+      return res;
     } catch (error) {
       console.error('Error starting cron job:', error);
       throw new HttpException(

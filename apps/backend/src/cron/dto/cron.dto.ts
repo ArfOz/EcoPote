@@ -9,24 +9,6 @@ import {
   IsBoolean,
 } from 'class-validator';
 
-export class CronStartDto {
-  @IsString()
-  @IsNotEmpty()
-  name: string;
-
-  @IsString()
-  @IsNotEmpty()
-  cronTime: string;
-
-  @IsString()
-  @IsNotEmpty()
-  startTime: Date;
-
-  @IsNotEmpty()
-  @IsEnum(ScheduleEnum)
-  schedule: ScheduleEnum;
-}
-
 export class CronUpdateDto {
   @IsNumber()
   @IsNotEmpty()
