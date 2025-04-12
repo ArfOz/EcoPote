@@ -8,18 +8,18 @@ import {
 import { fetchWithAuth } from '@utils';
 import React from 'react';
 
-export const CronCreator: React.FC = () => {
+export const CronCreator = ({
+  setData,
+}: {
+  setData: React.Dispatch<React.SetStateAction<ResponseCron['data']>>;
+}) => {
   const [cronJobs, setCronJobs] = React.useState<ResponseCron[]>([]);
-  const [status, setStatus] = React.useState<string | null>(null);
+  const [status, setStatus] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [cronTime, setCronTime] = React.useState<string>('');
-  const [cronSchedule, setCronSchedule] = React.useState<string>('');
-  const [cronCommand, setCronCommand] = React.useState<string>('');
 
   const handleCreateCron = async (event: React.FormEvent<HTMLFormElement>) => {
-    console.log('Create Cron Job button clickedssssssssssssss');
-
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
 
@@ -28,6 +28,7 @@ export const CronCreator: React.FC = () => {
       cronTime: '0 0 * * *',
       schedule: formData.get('schedule') as ScheduleEnum,
       startTime: new Date('2025-04-15T10:00:00Z'),
+      status,
     };
     const res: ResponseCreateCron = await fetchWithAuth(
       'cron/create-job',
@@ -43,7 +44,16 @@ export const CronCreator: React.FC = () => {
 
     console.log('Cron job created:', res);
     if (res.success) {
-      setStatus('Cron job created successfully!');
+      // setCronJobs((prevCronJobs) => [...prevCronJobs, res.data]);
+      setError(null); // Clear error message on success
+      setShowModal(false); // Close the modal on success
+      setData((prevData) => [
+        ...prevData,
+        {
+          ...res.data,
+          lastRun: res.data.lastRun ? new Date(res.data.lastRun) : new Date(),
+        },
+      ]); // Update the data state with the new cron job
     }
     if (res.message) {
       setError(res.message);
@@ -134,6 +144,38 @@ export const CronCreator: React.FC = () => {
                     value={cronTime}
                     onChange={(e) => setCronTime(e.target.value)}
                   />
+                </div>
+                <div>
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Status
+                  </label>
+                  <div className="flex items-center space-x-4 mt-2">
+                    <button
+                      type="button"
+                      className={`px-4 py-2 rounded-md shadow-sm ${
+                        status === true
+                          ? 'bg-green-600 text-white'
+                          : 'bg-gray-300 text-gray-700'
+                      }`}
+                      onClick={() => setStatus(true)}
+                    >
+                      Active
+                    </button>
+                    <button
+                      type="button"
+                      className={`px-4 py-2 rounded-md shadow-sm ${
+                        status === false
+                          ? 'bg-red-600 text-white'
+                          : 'bg-gray-300 text-gray-700'
+                      }`}
+                      onClick={() => setStatus(false)}
+                    >
+                      Inactive
+                    </button>
+                  </div>
                 </div>
                 <div className="mt-6 flex justify-end">
                   <button

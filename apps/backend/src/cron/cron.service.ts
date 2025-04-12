@@ -3,22 +3,25 @@ import { CronDatabaseService, UserDatabaseService } from '@database';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
 import * as cron from 'node-cron';
-import { ResponseCreateCron, ResponseCronUpdateDto } from '@shared/dtos';
+import {
+  ResponseCreateCron,
+  ResponseCronUpdateDto,
+  ResponseDeleteCron,
+} from '@shared/dtos';
 
 @Injectable()
 export class CronService {
-  private cronJobs: Map<string, cron.ScheduledTask> = new Map();
-
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
     private readonly userDatabaseService: UserDatabaseService
   ) {}
 
-  async saveDatabase(
+  async createCronJob(
     name: string,
     startTime: Date,
     cronTime: string,
-    schedule: string
+    schedule: string,
+    status: boolean
   ): Promise<ResponseCreateCron> {
     const dateNow = new Date();
 
@@ -40,6 +43,7 @@ export class CronService {
       startTime: startDateTime,
       createdAt: dateNow,
       updatedAt: dateNow,
+      status,
     };
 
     const res = await this.cronDatabaseService
@@ -124,14 +128,14 @@ export class CronService {
     };
   }
 
-  async deleteCronJob(cronName: string) {
-    const job = this.cronJobs.get(cronName);
+  async deleteCronJob(id: string): Promise<ResponseDeleteCron> {
+    const idNum = parseInt(id, 10);
+    const job = await this.cronDatabaseService.findUniqueCron({ id: idNum });
     if (job) {
-      job.stop();
-      this.cronJobs.delete(cronName);
-      console.log(`Cron job ${cronName} stopped`);
+      await this.cronDatabaseService.deleteCron({ id: idNum });
+      return { success: true, message: 'Cron job stopped successfully' };
     } else {
-      console.error(`Cron job ${cronName} not found`);
+      return { success: false, message: 'Cron job not found' };
     }
   }
 
@@ -160,24 +164,24 @@ export class CronService {
     }
   }
 
-  async restartCronJobs() {
-    try {
-      const cronJobs = await this.cronDatabaseService.findManyCron();
-      for (const cronJob of cronJobs) {
-        const { name, cronTime, startTime, schedule } = cronJob;
-        const job = cron.schedule(cronTime, () => {
-          this.sendScheduledEmails({
-            subject: 'Scheduled Email',
-            html: '<p>This is a scheduled email.</p>',
-          });
-        });
+  // async restartCronJobs() {
+  //   try {
+  //     const cronJobs = await this.cronDatabaseService.findManyCron();
+  //     for (const cronJob of cronJobs) {
+  //       const { name, cronTime, startTime, schedule } = cronJob;
+  //       const job = cron.schedule(cronTime, () => {
+  //         this.sendScheduledEmails({
+  //           subject: 'Scheduled Email',
+  //           html: '<p>This is a scheduled email.</p>',
+  //         });
+  //       });
 
-        job.start();
-        this.cronJobs.set(name, job);
-        console.log(`Cron job ${name} restarted`);
-      }
-    } catch (error) {
-      console.error('Failed to restart cron jobs', error);
-    }
-  }
+  //       job.start();
+  //       this.cronJobs.set(name, job);
+  //       console.log(`Cron job ${name} restarted`);
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to restart cron jobs', error);
+  //   }
+  // }
 }

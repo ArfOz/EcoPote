@@ -227,4 +227,13 @@ export class CronCreateDto {
   @IsNotEmpty()
   @IsEnum(ScheduleEnum)
   schedule!: ScheduleEnum;
+
+  @IsBoolean()
+  @IsNotEmpty()
+  status!: boolean;
+}
+
+export interface ResponseDeleteCron {
+  message: string;
+  success: boolean;
 }

@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Post,
   Get,
+  Param,
 } from '@nestjs/common';
 import { CronService } from './cron.service';
 import { CronUpdateDto } from './dto';
@@ -13,6 +14,7 @@ import {
   ResponseCron,
   ResponseCronUpdateDto,
   CronCreateDto,
+  ResponseDeleteCron,
 } from '@shared/dtos';
 
 @Controller('cron')
@@ -24,11 +26,12 @@ export class CronController {
     @Body() cronData: CronCreateDto
   ): Promise<ResponseCreateCron> {
     try {
-      const res = await this.cronService.saveDatabase(
+      const res = await this.cronService.createCronJob(
         cronData.name,
         cronData.startTime,
         cronData.cronTime,
-        cronData.schedule
+        cronData.schedule,
+        cronData.status
       );
       return res;
     } catch (error) {
@@ -77,11 +80,10 @@ export class CronController {
     }
   }
 
-  @Post('delete-job')
-  async deleteCronJob(@Body('cronName') cronName: string) {
+  @Post('delete-job/:id')
+  async deleteCronJob(@Param('id') id: string): Promise<ResponseDeleteCron> {
     try {
-      await this.cronService.deleteCronJob(cronName);
-      return { success: true, message: 'Cron job stopped successfully' };
+      return await this.cronService.deleteCronJob(id);
     } catch (error) {
       throw new HttpException(
         'Failed to stop cron job',
@@ -90,18 +92,18 @@ export class CronController {
     }
   }
 
-  @Get('restart')
-  async restartCronJobs() {
-    try {
-      await this.cronService.restartCronJobs();
-      return { success: true, message: 'Cron jobs restarted successfully' };
-    } catch (error) {
-      throw new HttpException(
-        'Failed to restart cron jobs',
-        HttpStatus.BAD_REQUEST
-      );
-    }
-  }
+  // @Get('restart')
+  // async restartCronJobs() {
+  //   try {
+  //     await this.cronService.restartCronJobs();
+  //     return { success: true, message: 'Cron jobs restarted successfully' };
+  //   } catch (error) {
+  //     throw new HttpException(
+  //       'Failed to restart cron jobs',
+  //       HttpStatus.BAD_REQUEST
+  //     );
+  //   }
+  // }
 
   // @Put('update-time')
   // async updateCronTime(

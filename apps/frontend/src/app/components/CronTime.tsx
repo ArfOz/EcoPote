@@ -6,7 +6,7 @@ import {
   ResponseCronUpdateDto,
   ScheduleEnum,
 } from '@shared/dtos';
-import { CronJobStartTime, CronName } from './croncomponents';
+import { CronCreator, CronJobStartTime, CronName } from './croncomponents';
 
 export const CronTime = () => {
   const [data, setData] = useState<ResponseCron['data']>([]);
@@ -27,6 +27,8 @@ export const CronTime = () => {
           false
         );
         setData(res.data);
+
+        console.log('Cron jobs fetched:', res.data);
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message);
@@ -93,6 +95,22 @@ export const CronTime = () => {
     }
   };
 
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetchWithAuth(`cron/delete-job/${id}`, {
+        method: 'POST',
+      });
+
+      if (response.success) {
+        setData((prevData) => prevData.filter((job) => job.id !== id));
+      } else {
+        console.error('Failed to delete cron job', response.message);
+      }
+    } catch (error) {
+      console.error('Failed to delete cron job', error);
+    }
+  };
+
   return (
     <div className="bg-gray-100 p-4 rounded shadow-md overflow-x-auto w-full">
       <h2 className="text-lg font-semibold mb-4">Cron Jobs</h2>
@@ -109,6 +127,7 @@ export const CronTime = () => {
             <th className="py-2 px-2 border-b">Status</th>
             <th className="py-2 px-2 border-b">Last Run</th>
             <th className="py-2 px-2 border-b">Next Run</th>
+            <th className="py-2 px-2 border-b">Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -189,10 +208,21 @@ export const CronTime = () => {
                   : 'N/A'}
               </td>
               <td className="py-2 px-2 border-b">N/A</td>
+              <td className="py-2 px-2 border-b">
+                <button
+                  className="px-2 py-1 bg-red-500 text-white rounded"
+                  onClick={async () => {
+                    handleDelete(cronJob.id);
+                  }}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <CronCreator setData={setData} />
     </div>
   );
 };
