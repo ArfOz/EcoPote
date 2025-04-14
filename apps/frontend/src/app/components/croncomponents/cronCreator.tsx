@@ -25,10 +25,9 @@ export const CronCreator = ({
 
     const cronData: CronCreateDto = {
       name: formData.get('name') as string,
-      cronTime: '0 0 * * *',
       schedule: formData.get('schedule') as ScheduleEnum,
-      startTime: new Date('2025-04-15T10:00:00Z'),
-      status,
+      startTime: new Date(event.currentTarget.startTime.value),
+      status: status ? true : false,
     };
     const res: ResponseCreateCron = await fetchWithAuth(
       'cron/create-job',

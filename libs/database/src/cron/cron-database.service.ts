@@ -13,7 +13,6 @@ export class CronDatabaseService {
       select: {
         name: true,
         id: true,
-        cronTime: true,
         startTime: true,
         schedule: true,
         createdAt: true,

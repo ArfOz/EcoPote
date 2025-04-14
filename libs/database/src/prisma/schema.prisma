@@ -41,7 +41,6 @@ model News {
 model Cron {
   id        Int       @id @default(autoincrement())
   name      String
-  cronTime  String
   startTime DateTime
   schedule  String
   createdAt DateTime  @default(now())

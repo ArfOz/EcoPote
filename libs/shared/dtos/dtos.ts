@@ -75,7 +75,6 @@ export interface ResponseCron {
   data: {
     name: string;
     id: number;
-    cronTime: string;
     startTime: Date;
     schedule: string;
     createdAt: Date;
@@ -215,10 +214,6 @@ export class CronCreateDto {
   @IsString()
   @IsNotEmpty()
   name!: string;
-
-  @IsString()
-  @IsNotEmpty()
-  cronTime!: string;
 
   @IsDateString()
   @IsNotEmpty()

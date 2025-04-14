@@ -19,7 +19,7 @@ export class CronService {
   async createCronJob(
     name: string,
     startTime: Date,
-    cronTime: string,
+
     schedule: string,
     status: boolean
   ): Promise<ResponseCreateCron> {
@@ -38,7 +38,6 @@ export class CronService {
 
     const savedCron: Prisma.CronCreateInput = {
       name,
-      cronTime,
       schedule,
       startTime: startDateTime,
       createdAt: dateNow,
@@ -73,7 +72,6 @@ export class CronService {
     id: number,
     cronName?: string,
     startTime?: Date,
-    cronTime?: string,
     schedule?: string,
     status?: boolean
   ): Promise<ResponseCronUpdateDto> {
@@ -101,7 +99,6 @@ export class CronService {
     }
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
-      cronTime,
       schedule,
       startTime: startDateTime,
       updatedAt: dateNow,

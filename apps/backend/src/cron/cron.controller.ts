@@ -29,7 +29,6 @@ export class CronController {
       const res = await this.cronService.createCronJob(
         cronData.name,
         cronData.startTime,
-        cronData.cronTime,
         cronData.schedule,
         cronData.status
       );
@@ -66,7 +65,6 @@ export class CronController {
         cronData.id,
         cronData.name,
         cronData.startTime,
-        cronData.cronTime,
         cronData.schedule,
         cronData.status
       );
