@@ -49,7 +49,7 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/backend-e2e/**/*"]
+      "exclude": ["apps/backend-e2e/**/*", "functions-e2e/**/*"]
     },
     {
       "plugin": "@nx/webpack/plugin",

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CronDatabaseService, UserDatabaseService } from '@database';
+import {
+  CronDatabaseService,
+  NewsDatabaseService,
+  UserDatabaseService,
+} from '@database';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
 import * as cron from 'node-cron';
@@ -13,7 +17,8 @@ import {
 export class CronService {
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
-    private readonly userDatabaseService: UserDatabaseService
+    private readonly userDatabaseService: UserDatabaseService,
+    private readonly newsDatabaseService: NewsDatabaseService
   ) {}
 
   async createCronJob(
@@ -159,6 +164,38 @@ export class CronService {
     } catch (error) {
       console.error('Failed to send scheduled emails', error);
     }
+  }
+
+  async sendEmail() {
+    const email = await this.newsDatabaseService.findFirst(
+      { status: true },
+      { createdAt: 'desc' }
+    );
+    if (!email) {
+      throw new Error('No email found to send');
+    }
+    console.log('email', email);
+    const { title, content } = email;
+    const users: User[] = await this.userDatabaseService.findAll({
+      where: { subscription: true },
+    });
+
+    console.log('users', users);
+    if (users.length === 0) {
+      throw new Error('No users to send email to');
+    }
+    const { sentUsers, errorUsers } = await sendEmailAzure(
+      users,
+      title,
+      content
+    );
+
+    console.log('Scheduled emails sent successfully', sentUsers, errorUsers);
+    return {
+      success: true,
+      message: 'Scheduled emails sent successfully',
+      data: { sentUsers, errorUsers },
+    };
   }
 
   // async restartCronJobs() {

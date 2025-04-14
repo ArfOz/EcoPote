@@ -1,24 +1,38 @@
 {
   "name": "functions",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/functions/src",
   "projectType": "application",
-  "tags": [""],
   "targets": {
     "build": {
-      "executor": "@nxazure/func:build"
-    },
-    "start": {
-      "executor": "@nxazure/func:start",
+      "executor": "nx:run-commands",
       "options": {
-        "port": 7071
+        "command": "webpack-cli build",
+        "args": ["node-env=production"]
+      },
+      "configurations": {
+        "development": {
+          "args": ["node-env=development"]
+        }
       }
     },
-    "publish": {
-      "executor": "@nxazure/func:publish"
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"]
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "functions:build",
+        "runBuildTargetDependencies": false
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "functions:build:development"
+        },
+        "production": {
+          "buildTarget": "functions:build:production"
+        }
+      }
     }
-  }
+  },
+  "tags": []
 }

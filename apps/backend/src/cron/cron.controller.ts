@@ -15,6 +15,7 @@ import {
   ResponseCronUpdateDto,
   CronCreateDto,
   ResponseDeleteCron,
+  ResponseCronSendEmailDto,
 } from '@shared/dtos';
 
 @Controller('cron')
@@ -85,6 +86,26 @@ export class CronController {
     } catch (error) {
       throw new HttpException(
         'Failed to stop cron job',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+  }
+
+  @Get('send-email')
+  async sendEmail(): Promise<ResponseCronSendEmailDto> {
+    try {
+      console.log('Sending email...');
+      const response = await this.cronService.sendEmail();
+      if (!response) {
+        throw new HttpException(
+          'Failed to send email',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+      return response;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to send email',
         HttpStatus.BAD_REQUEST
       );
     }

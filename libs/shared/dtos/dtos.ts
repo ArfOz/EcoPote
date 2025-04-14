@@ -232,3 +232,7 @@ export interface ResponseDeleteCron {
   message: string;
   success: boolean;
 }
+export interface ResponseCronSendEmailDto {
+  message: string;
+  success: boolean;
+}

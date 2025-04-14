@@ -47,4 +47,12 @@ export class NewsDatabaseService {
       where: { id },
     });
   }
+  async findFirst(
+    where?: Prisma.NewsWhereInput,
+    orderBy?: Prisma.NewsOrderByWithRelationInput
+  ): Promise<News | null> {
+    return this.prisma.news.findFirst({
+      where,
+    });
+  }
 }
