@@ -80,7 +80,7 @@ export interface ResponseCron {
     createdAt: Date;
     updatedAt: Date;
     status: boolean;
-    lastRun: Date;
+    lastRun: Date | null;
   }[];
   success: boolean;
 }

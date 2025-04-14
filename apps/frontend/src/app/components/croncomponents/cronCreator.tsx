@@ -50,7 +50,6 @@ export const CronCreator = ({
         ...prevData,
         {
           ...res.data,
-          lastRun: res.data.lastRun ? new Date(res.data.lastRun) : new Date(),
         },
       ]); // Update the data state with the new cron job
     }
