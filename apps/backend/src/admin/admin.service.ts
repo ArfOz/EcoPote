@@ -25,6 +25,7 @@ import {
   ResponseMessageEmail,
   ResponseTips,
   ResponseTipsDetails,
+  ResponseUpdateNews,
 } from '@shared/dtos';
 import { CreateAddNewsDto } from './dto';
 
@@ -384,19 +385,39 @@ export class AdminService {
       throw new HttpException('Failed to fetch news', HttpStatus.BAD_REQUEST);
     }
   }
-  async updateNews(id: number, newsData: { title: string }, html: string) {
+  async updateNews(
+    newsData: { title: string },
+    id: number
+  ): Promise<ResponseUpdateNews> {
     try {
-      await this.newsDatabaseService.updateNews(id, {
+      const news = await this.newsDatabaseService.findNewsById(id);
+      if (!news) {
+        throw new HttpException('News not found', HttpStatus.NOT_FOUND);
+      }
+      const data = {
         title: newsData.title,
-        content: html,
-      });
+        status: news.status,
+      };
 
-      return { message: 'News updated successfully', success: true };
+      const updatedNews = await this.newsDatabaseService.updateNews(id, data);
+      if (!updatedNews) {
+        throw new HttpException(
+          'Failed to update news',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      return {
+        message: 'News updated successfully',
+        success: true,
+        data: updatedNews,
+      };
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to update news', HttpStatus.BAD_REQUEST);
     }
   }
+
   async deleteNews(id: number) {
     try {
       const news = await this.newsDatabaseService.deleteNews(id);
@@ -429,6 +450,7 @@ export class AdminService {
           content: true,
           createdAt: true,
           updatedAt: true,
+          status: true,
         },
       },
     };

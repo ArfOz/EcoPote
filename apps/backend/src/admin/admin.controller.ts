@@ -32,6 +32,7 @@ import {
   ResponseTipNews,
   ResponseToggleSubscription,
   ResponseAddNews,
+  ResponseUpdateNews,
 } from '@shared/dtos';
 
 @Controller('admin')
@@ -178,6 +179,15 @@ export class AdminController {
   async getNewsById(@Param('id') id: string) {
     return await this.adminService.getNewsById(parseInt(id, 10));
   }
+
+  @Post('news/update/:id')
+  async updateNews(
+    @Body() newsData: { title: string; content: string; status: boolean },
+    @Param('id') id: string
+  ): Promise<ResponseUpdateNews> {
+    return await this.adminService.updateNews(newsData, parseInt(id, 10));
+  }
+
   // @UseGuards(JwtAuthGuard)
   @Delete('news/:id')
   async deleteNews(@Param('id') id: string): Promise<ResponseDeleteNews> {
