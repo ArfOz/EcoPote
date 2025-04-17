@@ -147,6 +147,7 @@ export interface ResponseTipsDetails {
       content: string;
       createdAt: Date;
       updatedAt: Date;
+      status: boolean;
     }[];
   };
 }
@@ -174,11 +175,26 @@ export interface ResponseTipNews {
       title: string;
       content: string;
       tipsId: number;
+      status: boolean;
     }[];
   };
 
   message: string;
   success: boolean;
+}
+
+export interface ResponseUpdateNews {
+  message: string;
+  success: boolean;
+  data: {
+    id: number;
+    createdAt: Date;
+    updatedAt: Date;
+    title: string;
+    content: string;
+    tipsId: number;
+    status: boolean;
+  };
 }
 
 export interface ResponseAddNews {
