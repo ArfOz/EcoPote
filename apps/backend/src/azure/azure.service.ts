@@ -10,8 +10,11 @@ export class AzureService {
     this.azureFunctionUrl = process.env.AZURE_FUNCTION_URL || '';
   }
 
-  async triggerFunction(functionName: string, payload: any): Promise<any> {
+  async updateFunction(functionName: string, payload: any): Promise<any> {
     try {
+      // Construct the URL for the Azure Function
+      // Ensure the function name is URL-encoded if necessary
+      // const encodedFunctionName = encodeURIComponent(functionName);
       const url = `${this.azureFunctionUrl}/${functionName}`;
       const response = await axios.post(url, payload, {
         headers: {
