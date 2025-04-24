@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
@@ -31,10 +31,14 @@ const SendEmail = () => {
     }
 
     try {
-      const response: ResponseMessageEmail = await fetchWithAuth('admin/sendemail', {
-        method: 'POST',
-        body: formData,
-      }, true) as ResponseStatus;
+      const response: ResponseMessageEmail = (await fetchWithAuth(
+        'email/sendemail',
+        {
+          method: 'POST',
+          body: formData,
+        },
+        true
+      )) as ResponseStatus;
 
       if (!response) {
         throw new Error('Failed to send emails');
@@ -43,21 +47,25 @@ const SendEmail = () => {
         setStatus({
           sentUsers: response.data.sentUsers ?? [],
           errorUsers: response.data.errorUsers ?? [],
-          message: "Emails sent successfully"
+          message: 'Emails sent successfully',
         });
       }
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      const fileInput = document.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement;
       if (fileInput) {
         fileInput.value = '';
       }
       setSubject('');
       setFile(null);
       setFileName(null); // Reset file name
-
     } catch (error) {
       if (error instanceof Error) {
         setStatus(`Error: ${error.message}`);
-        if (error.message === 'Token is expired' || error.message === 'Unauthorized access') {
+        if (
+          error.message === 'Token is expired' ||
+          error.message === 'Unauthorized access'
+        ) {
           localStorage.removeItem('token');
           router.push('/login');
         }
@@ -70,8 +78,16 @@ const SendEmail = () => {
   const handleDownload = () => {
     if (status && typeof status !== 'string') {
       const data = `
-        Sent Users: ${status.sentUsers && status.sentUsers.length > 0 ? status.sentUsers.join(', ') : 'None'}
-        Error Users: ${status.errorUsers && status.errorUsers.length > 0 ? status.errorUsers.join(', ') : 'None'}
+        Sent Users: ${
+          status.sentUsers && status.sentUsers.length > 0
+            ? status.sentUsers.join(', ')
+            : 'None'
+        }
+        Error Users: ${
+          status.errorUsers && status.errorUsers.length > 0
+            ? status.errorUsers.join(', ')
+            : 'None'
+        }
         Message: ${status.message}
       `;
       const blob = new Blob([data], { type: 'application/msword' });
@@ -111,7 +127,9 @@ const SendEmail = () => {
                   type="file"
                   accept=".htm,.html"
                   onChange={(e) => {
-                    const selectedFile = e.target.files ? e.target.files[0] : null;
+                    const selectedFile = e.target.files
+                      ? e.target.files[0]
+                      : null;
                     setFile(selectedFile);
                     setFileName(selectedFile ? selectedFile.name : null); // Update file name
                   }}
@@ -120,7 +138,9 @@ const SendEmail = () => {
                 />
               </label>
               {fileName && (
-                <p className="mt-2 text-sm text-gray-600">Selected file: {fileName}</p>
+                <p className="mt-2 text-sm text-gray-600">
+                  Selected file: {fileName}
+                </p>
               )}
             </div>
             <button
@@ -136,8 +156,18 @@ const SendEmail = () => {
                 status
               ) : (
                 <>
-                  <p>Sent Users: {status.sentUsers && status.sentUsers.length > 0 ? status.sentUsers.join(', ') : 'None'}</p>
-                  <p>Error Users: {status.errorUsers && status.errorUsers.length > 0 ? status.errorUsers.join(', ') : 'None'}</p>
+                  <p>
+                    Sent Users:{' '}
+                    {status.sentUsers && status.sentUsers.length > 0
+                      ? status.sentUsers.join(', ')
+                      : 'None'}
+                  </p>
+                  <p>
+                    Error Users:{' '}
+                    {status.errorUsers && status.errorUsers.length > 0
+                      ? status.errorUsers.join(', ')
+                      : 'None'}
+                  </p>
                   <p>{status.message}</p>
                   <button
                     onClick={handleDownload}

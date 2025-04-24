@@ -24,7 +24,7 @@ export const CronTime = () => {
         const res: ResponseCron = await fetchWithAuth(
           'cron/get-jobs',
           {},
-          false
+          true
         );
         setData(res.data);
 
@@ -78,7 +78,8 @@ export const CronTime = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(body),
-        }
+        },
+        true
       );
 
       if (response.success) {

@@ -210,41 +210,6 @@ export class AdminService {
     }
   }
 
-  async sendEmail(emailData: {
-    to: string;
-    subject: string;
-    html: string;
-  }): Promise<ResponseMessageEmail> {
-    try {
-      const users: User[] = await this.userDatabaseService.findAll({
-        where: { subscription: true },
-      });
-
-      if (users.length === 0) {
-        throw new HttpException(
-          'No users to send email to',
-          HttpStatus.NOT_FOUND
-        );
-      }
-
-      const { sentUsers, errorUsers } = await sendEmailAzure(
-        users,
-        emailData.subject,
-        emailData.html
-      );
-      return {
-        data: { sentUsers, errorUsers },
-        success: true,
-        message: 'Email sent successfully',
-      };
-
-      // return { data: res, success: true, message: 'Email sent successfully' };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
-    }
-  }
-
   async toggleSubscription(
     userId: number
   ): Promise<{ data: User; message: string; success: boolean }> {

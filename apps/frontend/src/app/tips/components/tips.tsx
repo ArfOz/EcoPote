@@ -17,7 +17,7 @@ export const TipsComponent = ({
       const tipData: ResponseTipsDetails = await fetchWithAuth(
         `admin/tips/${id}`,
         {},
-        false
+        true
       );
       const data = tipData.data;
       if (data) {

@@ -1,3 +1,5 @@
+import { EmailModule } from './email/email.module';
+import { AzureModule } from './azure/azure.module';
 import { Module } from '@nestjs/common';
 
 import generalConfig from '@shared/config/general.config';
@@ -23,6 +25,8 @@ import { CronModule } from './cron/cron.module';
     AuthModule,
     ScheduleModule.forRoot(),
     CronModule,
+    AzureModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [],

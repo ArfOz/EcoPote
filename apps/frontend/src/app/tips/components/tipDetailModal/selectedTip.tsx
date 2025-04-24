@@ -55,7 +55,7 @@ export const SelectedTip = ({
           const tipNews: ResponseTipNews = await fetchWithAuth(
             `admin/tips/news/${selectedTip.id}?page=${page}&limit=${limit}`,
             {},
-            false
+            true
           );
 
           const news = tipNews.data;
@@ -93,7 +93,7 @@ export const SelectedTip = ({
           method: 'POST',
           body: formData,
         },
-        false
+        true
       );
       const data = res.data;
 
@@ -146,7 +146,7 @@ export const SelectedTip = ({
         {
           method: 'DELETE',
         },
-        false
+        true
       );
 
       if (res.success) {
@@ -167,7 +167,7 @@ export const SelectedTip = ({
             const tipNews: ResponseTipNews = await fetchWithAuth(
               `admin/tips/news/${selectedTip?.id}?page=${page}&limit=${limit}`,
               {},
-              false
+              true
             );
 
             setSelectedTipNews(tipNews.data);
