@@ -77,5 +77,13 @@
         "linter": "eslint"
       }
     }
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "useNxCloud": false
+      }
+    }
   }
 }

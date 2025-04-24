@@ -1,0 +1,46 @@
+{
+  "name": "azure",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/azure/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/azure",
+        "main": "apps/azure/src/main.ts",
+        "tsConfig": "apps/azure/tsconfig.app.json",
+        "assets": ["apps/azure/src/assets"],
+        "isolatedConfig": true,
+        "webpackConfig": "apps/azure/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "dependsOn": ["build"],
+      "options": {
+        "buildTarget": "azure:build",
+        "runBuildTargetDependencies": false,
+        "cache": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "azure:build:development"
+        },
+        "production": {
+          "buildTarget": "azure:build:production"
+        }
+      }
+    }
+  },
+  "tags": []
+}
