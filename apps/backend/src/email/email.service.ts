@@ -1,10 +1,10 @@
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { News, User } from '@prisma/client';
 
 import generalConfig from '@shared/config/general.config';
 import authConfig from '@auth/config/auth.config';
 import { ConfigType } from '@nestjs/config';
-import { ResponseMessageEmail } from '@shared/dtos';
+import { ResponseEmailOrderDto, ResponseMessageEmail } from '@shared/dtos';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { NewsDatabaseService, UserDatabaseService } from '@database';
 
@@ -88,5 +88,18 @@ export class EmailService {
   catch(error) {
     // Handle error
     throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
+  }
+
+  async getEmailsOrder(): Promise<ResponseEmailOrderDto> {
+    const data: News[] = await this.newsDatabaseService.findMany({
+      where: { status: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    return {
+      data,
+      success: true,
+      message: 'Email sent successfully',
+    };
   }
 }

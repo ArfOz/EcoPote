@@ -50,6 +50,13 @@ const Navbar = () => {
           >
             Logout
           </button>
+
+          <button
+            onClick={() => router.push('/cron-email-order')}
+            className="text-white hover:text-gray-300"
+          >
+            Cron Emails Order
+          </button>
         </div>
       </div>
     </nav>

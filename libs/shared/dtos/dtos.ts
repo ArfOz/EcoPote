@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { News, User } from '@prisma/client';
 import {
   IsBoolean,
   IsDate,
@@ -251,4 +251,10 @@ export interface ResponseDeleteCron {
 export interface ResponseCronSendEmailDto {
   message: string;
   success: boolean;
+}
+
+export interface ResponseEmailOrderDto {
+  data: News[];
+  success: boolean;
+  message: string;
 }

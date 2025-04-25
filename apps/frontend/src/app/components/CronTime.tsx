@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+'use client';
+import React, { useEffect, useState, useRef } from 'react';
 import { fetchWithAuth } from '@utils';
 import { useRouter } from 'next/navigation';
 import {

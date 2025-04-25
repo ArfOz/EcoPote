@@ -18,7 +18,7 @@ import * as fs from 'fs';
 import { Multer } from 'multer';
 import { JwtAuthGuard } from '@auth';
 import { EmailService } from './email.service';
-import { ResponseMessageEmail } from '@shared/dtos';
+import { ResponseEmailOrderDto, ResponseMessageEmail } from '@shared/dtos';
 
 @Controller('email')
 export class EmailController {
@@ -52,5 +52,11 @@ export class EmailController {
   @Post('automatedemail')
   async automatedEmail() {
     return await this.emailService.automatedEmail();
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Get('emailsorder')
+  async getEmailsOrder(): Promise<ResponseEmailOrderDto> {
+    return await this.emailService.getEmailsOrder();
   }
 }
