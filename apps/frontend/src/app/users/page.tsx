@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/navbar/Navbar';
 import { User } from '@prisma/client';
 import { fetchWithAuth } from '@utils';
 

@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/navbar/Navbar';
 import { fetchWithAuth } from '@utils';
-import { ResponseStatus, Status } from '../components/dtos';
+import { ResponseStatus, Status } from '../components/dtos/dtos';
 import { ResponseMessageEmail } from '@shared/dtos';
 
 const SendEmail = () => {

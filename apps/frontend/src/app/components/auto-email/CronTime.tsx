@@ -7,7 +7,7 @@ import {
   ResponseCronUpdateDto,
   ScheduleEnum,
 } from '@shared/dtos';
-import { CronCreator, CronJobStartTime, CronName } from './croncomponents';
+import { CronCreator, CronJobStartTime, CronName } from '.';
 
 export const CronTime = () => {
   const [data, setData] = useState<ResponseCron['data']>([]);

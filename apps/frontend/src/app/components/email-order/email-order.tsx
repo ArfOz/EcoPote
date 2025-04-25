@@ -2,10 +2,8 @@
 import { ResponseEmailOrderDto } from '@shared/dtos';
 import { fetchWithAuth } from '@utils';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export const Emailorder = () => {
-  const router = useRouter();
   const [data, setData] = useState<ResponseEmailOrderDto['data'] | null>(null);
 
   useEffect(() => {
