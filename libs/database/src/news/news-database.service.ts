@@ -17,20 +17,16 @@ export class NewsDatabaseService {
     skip?: number;
     take?: number;
     orderBy?: Prisma.NewsOrderByWithRelationInput;
-  }): Promise<News[]> {
-    return this.prisma.news.findMany({
+    include?: Prisma.NewsInclude;
+  }) {
+    const result = await this.prisma.news.findMany({
       where: params.where,
       skip: params.skip,
       take: params.take,
       orderBy: params.orderBy,
-      include: {
-        tips: {
-          select: {
-            title: true,
-          },
-        },
-      },
+      include: params.include,
     });
+    return result;
   }
 
   async findNewsById(id: number): Promise<News | null> {

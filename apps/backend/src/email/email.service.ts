@@ -91,15 +91,22 @@ export class EmailService {
   }
 
   async getEmailsOrder(): Promise<ResponseEmailOrderDto> {
-    const data: News[] = await this.newsDatabaseService.findMany({
+    const data = await this.newsDatabaseService.findMany({
       where: { status: true },
       orderBy: { createdAt: 'asc' },
+      include: {
+        tips: {
+          select: {
+            title: true,
+          },
+        },
+      },
     });
 
     return {
       data,
       success: true,
-      message: 'Email sent successfully',
+      message: 'Emails retrieved successfully',
     };
   }
 }

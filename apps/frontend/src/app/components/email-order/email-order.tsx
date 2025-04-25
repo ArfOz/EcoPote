@@ -2,9 +2,10 @@
 import { ResponseEmailOrderDto } from '@shared/dtos';
 import { fetchWithAuth } from '@utils';
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export const Emailorder = () => {
+  const router = useRouter();
   const [data, setData] = useState<ResponseEmailOrderDto['data'] | null>(null);
 
   useEffect(() => {
@@ -43,17 +44,19 @@ export const Emailorder = () => {
             {data?.map((item, index) => (
               <tr
                 key={item.id}
-                className={`${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-200`}
+                onClick={() => {
+                  const newWindow = window.open();
+                  if (newWindow) {
+                    newWindow.document.write(item.content);
+                    newWindow.document.close();
+                  }
+                }}
+                className={`${
+                  index % 2 === 0 ? 'bg-gray-100' : 'bg-white'
+                } hover:bg-gray-200 cursor-pointer`}
               >
                 <td className="py-3 px-6">{item.id}</td>
-                <td className="py-3 px-6">
-                  <Link
-                    href={`/email-order/${item.id}`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    {item.title}
-                  </Link>
-                </td>
+                <td className="py-3 px-6">{item.title}</td>
                 <td className="py-3 px-6">
                   <span
                     className={`px-2 py-1 rounded-full text-sm ${

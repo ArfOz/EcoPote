@@ -253,14 +253,12 @@ export interface ResponseCronSendEmailDto {
   success: boolean;
 }
 
+export interface NewsOrder extends News {
+  tips: { title: string };
+}
+
 export interface ResponseEmailOrderDto {
-  data: [
-    News & {
-      tips: {
-        title: string;
-      };
-    }
-  ];
+  data: NewsOrder[];
   success: boolean;
   message: string;
 }
