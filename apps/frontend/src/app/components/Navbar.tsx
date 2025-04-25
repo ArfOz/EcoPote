@@ -45,17 +45,16 @@ const Navbar = () => {
             Auto-Email
           </button>
           <button
-            onClick={handleLogout}
-            className="text-white hover:text-gray-300"
-          >
-            Logout
-          </button>
-
-          <button
             onClick={() => router.push('/cron-email-order')}
             className="text-white hover:text-gray-300"
           >
             Cron Emails Order
+          </button>
+          <button
+            onClick={handleLogout}
+            className="text-white hover:text-gray-300"
+          >
+            Logout
           </button>
         </div>
       </div>

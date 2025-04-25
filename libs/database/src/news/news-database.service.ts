@@ -23,6 +23,13 @@ export class NewsDatabaseService {
       skip: params.skip,
       take: params.take,
       orderBy: params.orderBy,
+      include: {
+        tips: {
+          select: {
+            title: true,
+          },
+        },
+      },
     });
   }
 

@@ -254,7 +254,13 @@ export interface ResponseCronSendEmailDto {
 }
 
 export interface ResponseEmailOrderDto {
-  data: News[];
+  data: [
+    News & {
+      tips: {
+        title: string;
+      };
+    }
+  ];
   success: boolean;
   message: string;
 }

@@ -2,6 +2,7 @@
 import { ResponseEmailOrderDto } from '@shared/dtos';
 import { fetchWithAuth } from '@utils';
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export const Emailorder = () => {
   const [data, setData] = useState<ResponseEmailOrderDto['data'] | null>(null);
@@ -35,18 +36,24 @@ export const Emailorder = () => {
               <th className="py-3 px-6 text-left">Status</th>
               <th className="py-3 px-6 text-left">Created At</th>
               <th className="py-3 px-6 text-left">Updated At</th>
+              <th className="py-3 px-6 text-left">Tips</th>
             </tr>
           </thead>
           <tbody>
             {data?.map((item, index) => (
               <tr
                 key={item.id}
-                className={`${
-                  index % 2 === 0 ? 'bg-gray-100' : 'bg-white'
-                } hover:bg-gray-200`}
+                className={`${index % 2 === 0 ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-200`}
               >
                 <td className="py-3 px-6">{item.id}</td>
-                <td className="py-3 px-6">{item.title}</td>
+                <td className="py-3 px-6">
+                  <Link
+                    href={`/email-order/${item.id}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {item.title}
+                  </Link>
+                </td>
                 <td className="py-3 px-6">
                   <span
                     className={`px-2 py-1 rounded-full text-sm ${
@@ -64,6 +71,7 @@ export const Emailorder = () => {
                 <td className="py-3 px-6">
                   {new Date(item.updatedAt).toLocaleString()}
                 </td>
+                <td className="py-3 px-6">{item.tips.title}</td>
               </tr>
             ))}
           </tbody>
