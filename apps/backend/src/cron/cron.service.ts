@@ -1,4 +1,6 @@
+import { TimeCalculator } from '@utils';
 import { Injectable } from '@nestjs/common';
+import { ScheduleEnum } from '@shared/dtos'; // Adjust the path based on your project structure
 import {
   CronDatabaseService,
   NewsDatabaseService,
@@ -6,7 +8,6 @@ import {
 } from '@database';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
-import * as cron from 'node-cron';
 import {
   ResponseCreateCron,
   ResponseCronUpdateDto,
@@ -24,8 +25,7 @@ export class CronService {
   async createCronJob(
     name: string,
     startTime: Date,
-
-    schedule: string,
+    schedule: ScheduleEnum,
     status: boolean
   ): Promise<ResponseCreateCron> {
     const dateNow = new Date();
@@ -41,6 +41,9 @@ export class CronService {
       );
     }
 
+    // Convert the schedule (datetime string) to a Date object
+    const nextRun = TimeCalculator(schedule, startDateTime);
+
     const savedCron: Prisma.CronCreateInput = {
       name,
       schedule,
@@ -48,6 +51,7 @@ export class CronService {
       createdAt: dateNow,
       updatedAt: dateNow,
       status,
+      nextRun,
     };
 
     const res = await this.cronDatabaseService

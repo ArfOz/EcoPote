@@ -126,6 +126,7 @@ export enum ScheduleEnum {
   EVERY_DAY = 'every-day',
   EVERY_YEAR = 'every-year',
 }
+
 export enum CronTimeSetEnum {
   EVERY_WEEK = '0 0 * * 0',
   EVERY_DAY = '0 0 * * *',
