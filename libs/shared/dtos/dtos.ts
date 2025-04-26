@@ -81,6 +81,7 @@ export interface ResponseCron {
     updatedAt: Date;
     status: boolean;
     lastRun: Date | null;
+    nextRun: Date | null;
   }[];
   success: boolean;
 }
@@ -98,6 +99,7 @@ export interface ResponseCronUpdateDto {
     updatedAt: Date;
     status: boolean;
     lastRun: Date;
+    nextRun: Date | null;
   };
 }
 

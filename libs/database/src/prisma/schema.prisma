@@ -47,6 +47,7 @@ model Cron {
   updatedAt DateTime  @updatedAt
   status    Boolean   @default(false)
   lastRun   DateTime?
+  nextRun   DateTime?
 }
 
 model Tips {

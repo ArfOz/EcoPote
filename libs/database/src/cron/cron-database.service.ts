@@ -19,6 +19,7 @@ export class CronDatabaseService {
         updatedAt: true,
         status: true,
         lastRun: true,
+        nextRun: true,
       },
     });
   }
