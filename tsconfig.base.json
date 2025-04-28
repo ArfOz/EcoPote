@@ -19,6 +19,7 @@
       "@auth/*": ["libs/auth/src/*"],
       "@database": ["libs/database/src"],
       "@database/*": ["libs/database/src/*"],
+      "@shared": ["libs/shared/index.ts"],
       "@shared/*": ["libs/shared/*"],
       "@utils": ["libs/utils/index.ts"]
     },

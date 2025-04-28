@@ -1,9 +1,9 @@
+import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { EmailModule } from './email/email.module';
 import { AzureModule } from './azure/azure.module';
-import { Module } from '@nestjs/common';
-
-import generalConfig from '@shared/config/general.config';
 import { ConfigModule } from '@nestjs/config';
+import generalConfig from '@shared/config/general.config';
 import { UserModule } from './user/user.module';
 import { DatabaseModule } from '@database';
 import { AdminModule } from './admin/admin.module';

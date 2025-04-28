@@ -81,7 +81,7 @@ export class CronService {
     id: number,
     cronName?: string,
     startTime?: Date,
-    schedule?: string,
+    schedule?: ScheduleEnum,
     status?: boolean
   ): Promise<ResponseCronUpdateDto> {
     const dateNow = new Date();
@@ -92,26 +92,25 @@ export class CronService {
 
     const startDateTime = startTime ? new Date(startTime) : data.startTime;
 
-    // Check if startTime is at least one hour after dateNow
-    // const oneHourInMillis = 60 * 60 * 1000;
-    // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
-    //   throw new Error(
-    //     'Start time must be at least one hour after the current time.'
-    //   );
-    // }
-
     const oneHourInMillis = 60 * 60 * 1000;
     if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
       throw new Error(
         'Start time must be at least one hour after the current time.'
       );
     }
+
+    let nextRun: Date | undefined = data.nextRun;
+    if (startTime && schedule) {
+      nextRun = TimeCalculator(schedule, startDateTime);
+    }
+
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
       schedule,
       startTime: startDateTime,
       updatedAt: dateNow,
       status,
+      nextRun,
     };
 
     const where: Prisma.CronWhereUniqueInput = { id };

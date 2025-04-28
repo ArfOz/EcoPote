@@ -6,6 +6,7 @@ import {
   Post,
   Get,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { CronService } from './cron.service';
 import { CronUpdateDto } from './dto';
@@ -17,6 +18,9 @@ import {
   ResponseDeleteCron,
   ResponseCronSendEmailDto,
 } from '@shared/dtos';
+
+import { StaticTokenRequired } from '@shared';
+import { JwtAuthGuard } from '@auth';
 
 @Controller('cron')
 export class CronController {
@@ -91,6 +95,8 @@ export class CronController {
     }
   }
 
+  @StaticTokenRequired()
+  @UseGuards(JwtAuthGuard)
   @Get('send-email')
   async sendEmail(): Promise<ResponseCronSendEmailDto> {
     try {
