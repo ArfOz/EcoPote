@@ -98,23 +98,22 @@ export class CronController {
   @AuthMode('static')
   @Get('send-email')
   async sendEmail() {
-    return 'arif';
-    // try {
-    //   console.log('Sending email...');
-    //   const response = await this.cronService.sendEmail();
-    //   if (!response) {
-    //     throw new HttpException(
-    //       'Failed to send email',
-    //       HttpStatus.INTERNAL_SERVER_ERROR
-    //     );
-    //   }
-    //   return response;
-    // } catch (error) {
-    //   throw new HttpException(
-    //     error.message || 'Failed to send email',
-    //     HttpStatus.BAD_REQUEST
-    //   );
-    // }
+    try {
+      console.log('Sending email...');
+      const response = await this.cronService.sendEmail();
+      if (!response) {
+        throw new HttpException(
+          'Failed to send email',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+      return response;
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Failed to send email',
+        HttpStatus.BAD_REQUEST
+      );
+    }
   }
 
   // @Get('restart')
