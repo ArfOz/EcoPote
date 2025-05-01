@@ -35,18 +35,19 @@ model News {
   updatedAt DateTime @updatedAt
   tipsId    Int
   tips      Tips     @relation(fields: [tipsId], references: [id], onDelete: Cascade)
+  status    Boolean  @default(false)
 }
 
 model Cron {
   id        Int       @id @default(autoincrement())
   name      String
-  cronTime  String
   startTime DateTime
   schedule  String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   status    Boolean   @default(false)
   lastRun   DateTime?
+  nextRun   DateTime?
 }
 
 model Tips {

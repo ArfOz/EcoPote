@@ -1,5 +1,5 @@
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Admin, User } from '@prisma/client';
+import { Admin, Tips, User } from '@prisma/client';
 import {
   AdminDatabaseService,
   UserDatabaseService,
@@ -23,7 +23,11 @@ import {
   ResponseLogin,
   ResponseLogout,
   ResponseMessageEmail,
+  ResponseTips,
+  ResponseTipsDetails,
+  ResponseUpdateNews,
 } from '@shared/dtos';
+import { CreateAddNewsDto } from './dto';
 
 @Injectable()
 export class AdminService {
@@ -193,8 +197,8 @@ export class AdminService {
       const take: number = limit;
       const [users, total] = await Promise.all([
         this.userDatabaseService.findMany({
-          skip,
           take,
+          skip,
         }),
         this.userDatabaseService.count({}),
       ]);
@@ -203,41 +207,6 @@ export class AdminService {
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to list users', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async sendEmail(emailData: {
-    to: string;
-    subject: string;
-    html: string;
-  }): Promise<ResponseMessageEmail> {
-    try {
-      const users: User[] = await this.userDatabaseService.findAll({
-        where: { subscription: true },
-      });
-
-      if (users.length === 0) {
-        throw new HttpException(
-          'No users to send email to',
-          HttpStatus.NOT_FOUND
-        );
-      }
-
-      const { sentUsers, errorUsers } = await sendEmailAzure(
-        users,
-        emailData.subject,
-        emailData.html
-      );
-      return {
-        data: { sentUsers, errorUsers },
-        success: true,
-        message: 'Email sent successfully',
-      };
-
-      // return { data: res, success: true, message: 'Email sent successfully' };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -269,10 +238,9 @@ export class AdminService {
     html?: string
   ): Promise<{ message: string; success: boolean }> {
     try {
-      const tips = await this.tipsDatabaseService.findManyTips({
-        title: tipsData.title,
+      const tips = await this.tipsDatabaseService.findMany({
+        where: { title: tipsData.title },
       });
-      console.log('tips', tips);
 
       if (tips.length > 0) {
         // Tips already exist
@@ -293,9 +261,8 @@ export class AdminService {
         };
       }
 
-      console.log('tipsData', data);
       const response = await this.tipsDatabaseService.createTips(data);
-      console.log('response', response);
+
       if (!response) {
         throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
       }
@@ -309,11 +276,14 @@ export class AdminService {
       throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
     }
   }
-  async getTips() {
+  async getTips(): Promise<ResponseTips> {
     try {
-      const tips = await this.tipsDatabaseService.findManyTips();
+      const tips = await this.tipsDatabaseService.findMany({});
       return {
-        data: tips,
+        data: {
+          tips: tips,
+          total: tips.length,
+        },
         message: 'Tips fetched successfully',
         success: true,
       };
@@ -323,16 +293,16 @@ export class AdminService {
     }
   }
 
-  async addNews(newsData: { title: string; tipsId: string }, html: string) {
+  async addNews(newsData: CreateAddNewsDto, html: string) {
     try {
-      const tips = await this.tipsDatabaseService.findUniqueTips({
-        id: parseInt(newsData.tipsId, 10),
+      const tips = await this.tipsDatabaseService.findUnique({
+        where: { id: parseInt(newsData.tipsId) },
       });
       if (!tips) {
         throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
       }
 
-      await this.newsDatabaseService.createNews({
+      const data = await this.newsDatabaseService.createNews({
         title: newsData.title,
         content: html,
         tips: {
@@ -342,17 +312,23 @@ export class AdminService {
         },
       });
 
-      return { message: 'News added successfully', success: true };
+      return { message: 'News added successfully', success: true, data };
     } catch (error) {
       // Handle error
+      console.error('Error adding news:', error);
       throw new HttpException('Failed to add news', HttpStatus.BAD_REQUEST);
     }
   }
-  async getNews() {
+  async getNews(id: number, page?: number, limit?: number) {
     try {
-      const news = await this.newsDatabaseService.findAllNews();
+      const news = await this.newsDatabaseService.findMany({
+        where: { tipsId: id },
+        take: limit,
+        skip: (page - 1) * limit,
+      });
+      const total = await this.newsDatabaseService.count({ tipsId: id });
       return {
-        data: news,
+        data: { news, total },
         message: 'News fetched successfully',
         success: true,
       };
@@ -374,19 +350,39 @@ export class AdminService {
       throw new HttpException('Failed to fetch news', HttpStatus.BAD_REQUEST);
     }
   }
-  async updateNews(id: number, newsData: { title: string }, html: string) {
+  async updateNews(
+    newsData: { title: string },
+    id: number
+  ): Promise<ResponseUpdateNews> {
     try {
-      await this.newsDatabaseService.updateNews(id, {
+      const news = await this.newsDatabaseService.findNewsById(id);
+      if (!news) {
+        throw new HttpException('News not found', HttpStatus.NOT_FOUND);
+      }
+      const data = {
         title: newsData.title,
-        content: html,
-      });
+        status: news.status,
+      };
 
-      return { message: 'News updated successfully', success: true };
+      const updatedNews = await this.newsDatabaseService.updateNews(id, data);
+      if (!updatedNews) {
+        throw new HttpException(
+          'Failed to update news',
+          HttpStatus.BAD_REQUEST
+        );
+      }
+
+      return {
+        message: 'News updated successfully',
+        success: true,
+        data: updatedNews,
+      };
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to update news', HttpStatus.BAD_REQUEST);
     }
   }
+
   async deleteNews(id: number) {
     try {
       const news = await this.newsDatabaseService.deleteNews(id);
@@ -398,6 +394,74 @@ export class AdminService {
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to delete news', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  async getTipsById(
+    id: number,
+    page?: number,
+    limit?: number
+  ): Promise<ResponseTipsDetails> {
+    const select: Prisma.TipsSelect = {
+      id: true,
+      title: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      news: {
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          status: true,
+        },
+      },
+    };
+    try {
+      if (!page || !limit) {
+        const tips = await this.tipsDatabaseService.findMany({
+          where: {
+            id: id,
+          },
+          select,
+        });
+
+        const total = await this.newsDatabaseService.count({ tipsId: id });
+        return { success: true, message: '', data: { ...tips[0], total } };
+      }
+
+      if (page || limit) {
+        const skip: number = (page - 1) * limit;
+        const take: number = limit;
+        select.news = {
+          take,
+          skip,
+        };
+      }
+      const tip = await this.tipsDatabaseService.findMany({
+        where: {
+          id: id,
+        },
+        select,
+      });
+
+      if (!tip) {
+        throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
+      }
+
+      console.log('tip', tip);
+
+      const total = await this.newsDatabaseService.count({ tipsId: id });
+      return {
+        data: { ...(Array.isArray(tip) ? tip[0] : tip), total },
+        message: 'Tips fetched successfully',
+        success: true,
+      };
+    } catch (error) {
+      // Handle error
+      throw new HttpException('Failed to fetch tips', HttpStatus.BAD_REQUEST);
     }
   }
 }

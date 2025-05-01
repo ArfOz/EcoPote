@@ -1,26 +1,33 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { CronStartDto } from './dto';
-import { CronDatabaseService, UserDatabaseService } from '@database';
+import { TimeCalculator } from '@utils';
+import { Injectable } from '@nestjs/common';
+import { ScheduleEnum } from '@shared/dtos'; // Adjust the path based on your project structure
+import {
+  CronDatabaseService,
+  NewsDatabaseService,
+  UserDatabaseService,
+} from '@database';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
-import * as cron from 'node-cron';
-import { ResponseCronUpdateDto } from '@shared/dtos';
+import {
+  ResponseCreateCron,
+  ResponseCronUpdateDto,
+  ResponseDeleteCron,
+} from '@shared/dtos';
 
 @Injectable()
 export class CronService {
-  private cronJobs: Map<string, cron.ScheduledTask> = new Map();
-
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
-    private readonly userDatabaseService: UserDatabaseService
+    private readonly userDatabaseService: UserDatabaseService,
+    private readonly newsDatabaseService: NewsDatabaseService
   ) {}
 
-  async saveDatabase(
+  async createCronJob(
     name: string,
     startTime: Date,
-    cronTime: string,
-    schedule: string
-  ) {
+    schedule: ScheduleEnum,
+    status: boolean
+  ): Promise<ResponseCreateCron> {
     const dateNow = new Date();
 
     // Parse the startTime to a Date object
@@ -34,20 +41,35 @@ export class CronService {
       );
     }
 
+    // Convert the schedule (datetime string) to a Date object
+    const nextRun = TimeCalculator(schedule, startDateTime);
+
     const savedCron: Prisma.CronCreateInput = {
       name,
-      cronTime,
       schedule,
       startTime: startDateTime,
       createdAt: dateNow,
       updatedAt: dateNow,
+      status,
+      nextRun,
     };
 
-    await this.cronDatabaseService.createCron(savedCron).catch((error) => {
-      console.error('Error saving to database:', error);
-    });
+    const res = await this.cronDatabaseService
+      .createCron(savedCron)
+      .catch((error) => {
+        console.error('Error saving to database:', error);
+        return null;
+      });
 
-    return { success: true, message: 'Cron job started successfully' };
+    if (!res) {
+      throw new Error('Failed to save cron job to the database.');
+    }
+
+    return {
+      success: true,
+      message: 'Cron job started successfully',
+      data: res,
+    };
   }
 
   async getCronJobs() {
@@ -59,8 +81,7 @@ export class CronService {
     id: number,
     cronName?: string,
     startTime?: Date,
-    cronTime?: string,
-    schedule?: string,
+    schedule?: ScheduleEnum,
     status?: boolean
   ): Promise<ResponseCronUpdateDto> {
     const dateNow = new Date();
@@ -71,27 +92,25 @@ export class CronService {
 
     const startDateTime = startTime ? new Date(startTime) : data.startTime;
 
-    // Check if startTime is at least one hour after dateNow
-    // const oneHourInMillis = 60 * 60 * 1000;
-    // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
-    //   throw new Error(
-    //     'Start time must be at least one hour after the current time.'
-    //   );
-    // }
-
     const oneHourInMillis = 60 * 60 * 1000;
     if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
       throw new Error(
         'Start time must be at least one hour after the current time.'
       );
     }
+
+    let nextRun: Date | undefined = data.nextRun;
+    if (startTime && schedule) {
+      nextRun = TimeCalculator(schedule, startDateTime);
+    }
+
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
-      cronTime,
       schedule,
       startTime: startDateTime,
       updatedAt: dateNow,
       status,
+      nextRun,
     };
 
     const where: Prisma.CronWhereUniqueInput = { id };
@@ -114,14 +133,14 @@ export class CronService {
     };
   }
 
-  async deleteCronJob(cronName: string) {
-    const job = this.cronJobs.get(cronName);
+  async deleteCronJob(id: string): Promise<ResponseDeleteCron> {
+    const idNum = parseInt(id, 10);
+    const job = await this.cronDatabaseService.findUniqueCron({ id: idNum });
     if (job) {
-      job.stop();
-      this.cronJobs.delete(cronName);
-      console.log(`Cron job ${cronName} stopped`);
+      await this.cronDatabaseService.deleteCron({ id: idNum });
+      return { success: true, message: 'Cron job stopped successfully' };
     } else {
-      console.error(`Cron job ${cronName} not found`);
+      return { success: false, message: 'Cron job not found' };
     }
   }
 
@@ -150,24 +169,56 @@ export class CronService {
     }
   }
 
-  async restartCronJobs() {
-    try {
-      const cronJobs = await this.cronDatabaseService.findManyCron();
-      for (const cronJob of cronJobs) {
-        const { name, cronTime, startTime, schedule } = cronJob;
-        const job = cron.schedule(cronTime, () => {
-          this.sendScheduledEmails({
-            subject: 'Scheduled Email',
-            html: '<p>This is a scheduled email.</p>',
-          });
-        });
-
-        job.start();
-        this.cronJobs.set(name, job);
-        console.log(`Cron job ${name} restarted`);
-      }
-    } catch (error) {
-      console.error('Failed to restart cron jobs', error);
+  async sendEmail() {
+    const email = await this.newsDatabaseService.findFirst(
+      { status: true },
+      { createdAt: 'desc' }
+    );
+    if (!email) {
+      throw new Error('No email found to send');
     }
+    console.log('email', email);
+    const { title, content } = email;
+    const users: User[] = await this.userDatabaseService.findAll({
+      where: { subscription: true },
+    });
+
+    console.log('users', users);
+    if (users.length === 0) {
+      throw new Error('No users to send email to');
+    }
+    const { sentUsers, errorUsers } = await sendEmailAzure(
+      users,
+      title,
+      content
+    );
+
+    console.log('Scheduled emails sent successfully', sentUsers, errorUsers);
+    return {
+      success: true,
+      message: 'Scheduled emails sent successfully',
+      data: { sentUsers, errorUsers },
+    };
   }
+
+  // async restartCronJobs() {
+  //   try {
+  //     const cronJobs = await this.cronDatabaseService.findManyCron();
+  //     for (const cronJob of cronJobs) {
+  //       const { name, cronTime, startTime, schedule } = cronJob;
+  //       const job = cron.schedule(cronTime, () => {
+  //         this.sendScheduledEmails({
+  //           subject: 'Scheduled Email',
+  //           html: '<p>This is a scheduled email.</p>',
+  //         });
+  //       });
+
+  //       job.start();
+  //       this.cronJobs.set(name, job);
+  //       console.log(`Cron job ${name} restarted`);
+  //     }
+  //   } catch (error) {
+  //     console.error('Failed to restart cron jobs', error);
+  //   }
+  // }
 }

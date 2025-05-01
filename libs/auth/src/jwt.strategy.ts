@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService, ConfigType } from '@nestjs/config';
@@ -19,6 +19,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    if (!payload) {
+      throw new UnauthorizedException('JWT payload is missing');
+    }
+    if (!payload.sub) {
+      throw new UnauthorizedException('JWT payload is missing the "sub" field');
+    }
+    if (!payload.email) {
+      throw new UnauthorizedException(
+        'JWT payload is missing the "email" field'
+      );
+    }
     return { userId: payload.sub, email: payload.email };
   }
 }

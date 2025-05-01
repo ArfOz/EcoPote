@@ -12,14 +12,30 @@ export class NewsDatabaseService {
     });
   }
 
-  async findAllNews(): Promise<News[]> {
-    return this.prisma.news.findMany();
+  async findMany(params: {
+    where?: Prisma.NewsWhereInput;
+    skip?: number;
+    take?: number;
+    orderBy?: Prisma.NewsOrderByWithRelationInput;
+    include?: Prisma.NewsInclude;
+  }) {
+    const result = await this.prisma.news.findMany({
+      where: params.where,
+      skip: params.skip,
+      take: params.take,
+      orderBy: params.orderBy,
+      include: params.include,
+    });
+    return result;
   }
 
   async findNewsById(id: number): Promise<News | null> {
     return this.prisma.news.findUnique({
       where: { id },
     });
+  }
+  async count(where?: Prisma.NewsWhereInput): Promise<number> {
+    return this.prisma.news.count({ where });
   }
 
   async updateNews(id: number, data: Prisma.NewsUpdateInput): Promise<News> {
@@ -32,6 +48,14 @@ export class NewsDatabaseService {
   async deleteNews(id: number): Promise<News> {
     return this.prisma.news.delete({
       where: { id },
+    });
+  }
+  async findFirst(
+    where?: Prisma.NewsWhereInput,
+    orderBy?: Prisma.NewsOrderByWithRelationInput
+  ): Promise<News | null> {
+    return this.prisma.news.findFirst({
+      where,
     });
   }
 }

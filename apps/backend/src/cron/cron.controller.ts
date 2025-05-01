@@ -1,30 +1,43 @@
 import {
   Controller,
-  Put,
   Body,
   HttpException,
   HttpStatus,
   Post,
   Get,
+  Param,
+  UseGuards,
 } from '@nestjs/common';
 import { CronService } from './cron.service';
-import { CronStartDto, CronUpdateDto } from './dto';
-import { ResponseCron, ResponseCronUpdateDto } from '@shared/dtos';
+import { CronUpdateDto } from './dto';
+import {
+  ResponseCreateCron,
+  ResponseCron,
+  ResponseCronUpdateDto,
+  CronCreateDto,
+  ResponseDeleteCron,
+  ResponseCronSendEmailDto,
+} from '@shared/dtos';
+
+import { STATIC_TOKEN_REQUIRED, StaticTokenRequired } from '@shared';
+import { AuthMode, JwtAuthGuard } from '@auth';
 
 @Controller('cron')
 export class CronController {
   constructor(private readonly cronService: CronService) {}
 
   @Post('create-job')
-  async createCronJobs(@Body() cronData: CronStartDto) {
+  async createCronJobs(
+    @Body() cronData: CronCreateDto
+  ): Promise<ResponseCreateCron> {
     try {
-      await this.cronService.saveDatabase(
+      const res = await this.cronService.createCronJob(
         cronData.name,
         cronData.startTime,
-        cronData.cronTime,
-        cronData.schedule
+        cronData.schedule,
+        cronData.status
       );
-      return { success: true, message: 'Cron job started successfully' };
+      return res;
     } catch (error) {
       console.error('Error starting cron job:', error);
       throw new HttpException(
@@ -57,7 +70,6 @@ export class CronController {
         cronData.id,
         cronData.name,
         cronData.startTime,
-        cronData.cronTime,
         cronData.schedule,
         cronData.status
       );
@@ -71,11 +83,10 @@ export class CronController {
     }
   }
 
-  @Post('delete-job')
-  async deleteCronJob(@Body('cronName') cronName: string) {
+  @Post('delete-job/:id')
+  async deleteCronJob(@Param('id') id: string): Promise<ResponseDeleteCron> {
     try {
-      await this.cronService.deleteCronJob(cronName);
-      return { success: true, message: 'Cron job stopped successfully' };
+      return await this.cronService.deleteCronJob(id);
     } catch (error) {
       throw new HttpException(
         'Failed to stop cron job',
@@ -83,19 +94,40 @@ export class CronController {
       );
     }
   }
-
-  @Get('restart')
-  async restartCronJobs() {
+  @UseGuards(JwtAuthGuard)
+  @AuthMode('static')
+  @Get('send-email')
+  async sendEmail() {
     try {
-      await this.cronService.restartCronJobs();
-      return { success: true, message: 'Cron jobs restarted successfully' };
+      console.log('Sending email...');
+      const response = await this.cronService.sendEmail();
+      if (!response) {
+        throw new HttpException(
+          'Failed to send email',
+          HttpStatus.INTERNAL_SERVER_ERROR
+        );
+      }
+      return response;
     } catch (error) {
       throw new HttpException(
-        'Failed to restart cron jobs',
+        error.message || 'Failed to send email',
         HttpStatus.BAD_REQUEST
       );
     }
   }
+
+  // @Get('restart')
+  // async restartCronJobs() {
+  //   try {
+  //     await this.cronService.restartCronJobs();
+  //     return { success: true, message: 'Cron jobs restarted successfully' };
+  //   } catch (error) {
+  //     throw new HttpException(
+  //       'Failed to restart cron jobs',
+  //       HttpStatus.BAD_REQUEST
+  //     );
+  //   }
+  // }
 
   // @Put('update-time')
   // async updateCronTime(

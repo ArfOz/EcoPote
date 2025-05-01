@@ -17,16 +17,22 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { Multer } from 'multer';
 import { JwtAuthGuard } from '@auth';
-import { CreateAdminDto } from './dto';
+import { CreateAddNewsDto, CreateAdminDto } from './dto';
 import {
   CreateUserDto,
   ResponseCreateUser,
+  ResponseDeleteNews,
   ResponseDeleteUser,
   ResponseGetAllusers,
   ResponseLogin,
   ResponseLogout,
   ResponseMessageEmail,
+  ResponseTips,
+  ResponseTipsDetails,
+  ResponseTipNews,
   ResponseToggleSubscription,
+  ResponseAddNews,
+  ResponseUpdateNews,
 } from '@shared/dtos';
 
 @Controller('admin')
@@ -79,25 +85,6 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('sendemail')
-  @UseInterceptors(FileInterceptor('file'))
-  async sendEmail(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: { subject: string }
-  ): Promise<ResponseMessageEmail> {
-    if (!file) {
-      throw new Error('File not provided');
-    }
-    const htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
-
-    return await this.adminService.sendEmail({
-      to: 'all',
-      subject: body.subject,
-      html: htmlContent,
-    });
-  }
-
-  @UseGuards(JwtAuthGuard)
   @Post('users/:id/toggle-subscription')
   async toggleSubscription(
     @Param('id') id: string
@@ -105,6 +92,7 @@ export class AdminController {
     return await this.adminService.toggleSubscription(parseInt(id, 10));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('tips-add')
   @UseInterceptors(FileInterceptor('file'))
   async addTips(
@@ -118,26 +106,79 @@ export class AdminController {
     return await this.adminService.addTips(tipsData, htmlContent);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('tips')
-  async getTips() {
+  async getTips(): Promise<ResponseTips> {
     return await this.adminService.getTips();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('tips/:id')
+  async getTipsById(
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ): Promise<ResponseTipsDetails> {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    return await this.adminService.getTipsById(
+      parseInt(id, 10),
+      pageNumber,
+      limitNumber
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('news/add')
   @UseInterceptors(FileInterceptor('file'))
   async addNews(
     @UploadedFile() file: Express.Multer.File,
-    @Body() newsData: { title: string; tipsId: string }
-  ) {
+    @Body() newsData: CreateAddNewsDto
+  ): Promise<ResponseAddNews> {
     if (!file) {
+      console.error('File not provided');
       throw new Error('File not provided');
     }
+
     const htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
+
     return await this.adminService.addNews(newsData, htmlContent);
   }
 
-  @Get('news')
-  async getNews() {
-    return await this.adminService.getNews();
+  @UseGuards(JwtAuthGuard)
+  @Get('tips/news/:id')
+  async getNews(
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string
+  ): Promise<ResponseTipNews> {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    return await this.adminService.getNews(
+      parseInt(id, 10),
+      pageNumber,
+      limitNumber
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('news/:id')
+  async getNewsById(@Param('id') id: string) {
+    return await this.adminService.getNewsById(parseInt(id, 10));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('news/update/:id')
+  async updateNews(
+    @Body() newsData: { title: string; content: string; status: boolean },
+    @Param('id') id: string
+  ): Promise<ResponseUpdateNews> {
+    return await this.adminService.updateNews(newsData, parseInt(id, 10));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('news/:id')
+  async deleteNews(@Param('id') id: string): Promise<ResponseDeleteNews> {
+    return await this.adminService.deleteNews(parseInt(id, 10));
   }
 }

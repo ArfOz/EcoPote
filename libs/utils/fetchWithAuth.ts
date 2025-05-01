@@ -9,14 +9,39 @@ export async function fetchWithAuth(
       throw new Error('No token found');
     }
 
-    const headers = {
-      ...options.headers,
-      ...(includeToken && { Authorization: `Bearer ${token}` }),
-    };
+    const headers = new Headers(options.headers);
+
+    if (includeToken && token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    if (!(options.body instanceof FormData)) {
+      headers.set('Content-Type', 'application/json');
+    }
 
     url = `${process.env.BACKEND_URL}${url}`;
+    options = {
+      ...options,
+      headers,
+      mode: 'cors',
+    };
+    console.log("fetchWithAuth' request:", {
+      url,
+      headers,
+      options,
+    });
 
-    const response = await fetch(url, { ...options, headers });
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      console.error('Request failed:', {
+        url,
+        headers,
+        body: options.body,
+        status: response.status,
+        statusText: response.statusText,
+      });
+    }
 
     if (response.status === 401) {
       localStorage.removeItem('token');
