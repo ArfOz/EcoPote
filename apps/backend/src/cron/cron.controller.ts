@@ -19,8 +19,8 @@ import {
   ResponseCronSendEmailDto,
 } from '@shared/dtos';
 
-import { StaticTokenRequired } from '@shared';
-import { JwtAuthGuard } from '@auth';
+import { STATIC_TOKEN_REQUIRED, StaticTokenRequired } from '@shared';
+import { AuthMode, JwtAuthGuard } from '@auth';
 
 @Controller('cron')
 export class CronController {
@@ -94,27 +94,27 @@ export class CronController {
       );
     }
   }
-
-  @StaticTokenRequired()
   @UseGuards(JwtAuthGuard)
+  @AuthMode('static')
   @Get('send-email')
-  async sendEmail(): Promise<ResponseCronSendEmailDto> {
-    try {
-      console.log('Sending email...');
-      const response = await this.cronService.sendEmail();
-      if (!response) {
-        throw new HttpException(
-          'Failed to send email',
-          HttpStatus.INTERNAL_SERVER_ERROR
-        );
-      }
-      return response;
-    } catch (error) {
-      throw new HttpException(
-        error.message || 'Failed to send email',
-        HttpStatus.BAD_REQUEST
-      );
-    }
+  async sendEmail() {
+    return 'arif';
+    // try {
+    //   console.log('Sending email...');
+    //   const response = await this.cronService.sendEmail();
+    //   if (!response) {
+    //     throw new HttpException(
+    //       'Failed to send email',
+    //       HttpStatus.INTERNAL_SERVER_ERROR
+    //     );
+    //   }
+    //   return response;
+    // } catch (error) {
+    //   throw new HttpException(
+    //     error.message || 'Failed to send email',
+    //     HttpStatus.BAD_REQUEST
+    //   );
+    // }
   }
 
   // @Get('restart')
