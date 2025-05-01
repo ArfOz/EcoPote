@@ -8,15 +8,13 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
-  Query,
-  Headers,
 } from '@nestjs/common';
 
 import { Admin } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { Multer } from 'multer';
-import { JwtAuthGuard } from '@auth';
+import { AuthMode, JwtAuthGuard } from '@auth';
 import { EmailService } from './email.service';
 import { ResponseEmailOrderDto, ResponseMessageEmail } from '@shared/dtos';
 
@@ -29,6 +27,7 @@ export class EmailController {
     return this.emailService.getStatus();
   }
 
+  @AuthMode('static')
   @UseGuards(JwtAuthGuard)
   @Post('sendemail')
   @UseInterceptors(FileInterceptor('file'))
@@ -48,13 +47,14 @@ export class EmailController {
     });
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @AuthMode('static')
+  @UseGuards(JwtAuthGuard)
   @Post('automatedemail')
   async automatedEmail() {
     return await this.emailService.automatedEmail();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('emailsorder')
   async getEmailsOrder(): Promise<ResponseEmailOrderDto> {
     return await this.emailService.getEmailsOrder();
