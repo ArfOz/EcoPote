@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { EmailModule } from './email/email.module';
-import { AzureModule } from './azure/azure.module';
+// import { AzureModule } from './azure/azure.module';
 import { ConfigModule } from '@nestjs/config';
 import generalConfig from '@shared/config/general.config';
 import { UserModule } from './user/user.module';
@@ -25,7 +25,7 @@ import { CronModule } from './cron/cron.module';
     AuthModule,
     ScheduleModule.forRoot(),
     CronModule,
-    AzureModule,
+    // AzureModule,
     EmailModule,
   ],
   controllers: [],
