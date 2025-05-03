@@ -29,3 +29,5 @@
 [2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
 [2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
 [2025-05-03T23:17:31.382Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-03T23:17:32.089Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-03T23:17:32.092Z] [info]: 🚀 Application is running on: http://localhost:3300/api
