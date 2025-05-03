@@ -27,7 +27,6 @@ export class EmailController {
     return this.emailService.getStatus();
   }
 
-  @AuthMode('static')
   @UseGuards(JwtAuthGuard)
   @Post('sendemail')
   @UseInterceptors(FileInterceptor('file'))

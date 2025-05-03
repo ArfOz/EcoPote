@@ -1,0 +1,31 @@
+[2025-05-03T23:17:31.372Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-03T23:17:31.375Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-03T23:17:31.376Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-03T23:17:31.377Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-03T23:17:31.377Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-03T23:17:31.377Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-03T23:17:31.377Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-03T23:17:31.378Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-03T23:17:31.378Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-03T23:17:31.378Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-03T23:17:31.379Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-03T23:17:31.379Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-03T23:17:31.379Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-03T23:17:31.379Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-03T23:17:31.381Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-03T23:17:31.381Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-03T23:17:31.382Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
