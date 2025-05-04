@@ -19,9 +19,6 @@ import {
   ResponseCronSendEmailDto,
 } from '@shared/dtos';
 
-import { STATIC_TOKEN_REQUIRED, StaticTokenRequired } from '@shared';
-import { AuthMode, JwtAuthGuard } from '@auth';
-
 @Controller('cron')
 export class CronController {
   constructor(private readonly cronService: CronService) {}

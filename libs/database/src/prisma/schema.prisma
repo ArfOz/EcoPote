@@ -60,3 +60,19 @@ model Tips {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  level     String // INFO, WARN, ERROR, etc.
+  message   String
+  context   String? // Service or class name
+  timestamp DateTime @default(now())
+  metadata  Json? // Additional structured data
+  service   String // Service name (e.g., "cron-service")
+  userId    String? // Optional user context
+  traceId   String? // For distributed tracing
+
+  @@index([level])
+  @@index([timestamp])
+  @@index([service])
+}

@@ -1,4 +1,3 @@
-import { News } from '@prisma/client';
 import { UserDatabaseModule } from './user/user-database.module';
 import { Global, Module } from '@nestjs/common';
 
@@ -7,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { CronDatabaseModule } from './cron';
 import { NewsDatabaseModule } from './news';
 import { TipsDatabaseModule } from './tips';
+import { LogsDatabaseModule } from './logs';
 
 @Global()
 @Module({
@@ -17,6 +17,7 @@ import { TipsDatabaseModule } from './tips';
     CronDatabaseModule,
     NewsDatabaseModule,
     TipsDatabaseModule,
+    LogsDatabaseModule,
   ],
   providers: [PrismaModule],
   exports: [
@@ -26,6 +27,7 @@ import { TipsDatabaseModule } from './tips';
     CronDatabaseModule,
     NewsDatabaseModule,
     TipsDatabaseModule,
+    LogsDatabaseModule,
   ],
 })
 export class DatabaseModule {}

@@ -1,5 +1,5 @@
 import { TimeCalculator } from '@utils';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ScheduleEnum } from '@shared/dtos'; // Adjust the path based on your project structure
 import {
   CronDatabaseService,
@@ -16,6 +16,7 @@ import {
 
 @Injectable()
 export class CronService {
+  private readonly logger = new Logger(CronService.name);
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
     private readonly userDatabaseService: UserDatabaseService,
@@ -64,6 +65,8 @@ export class CronService {
     if (!res) {
       throw new Error('Failed to save cron job to the database.');
     }
+
+    this.logger.log(`Successfully created cron job with ID: ${res.id}`);
 
     return {
       success: true,

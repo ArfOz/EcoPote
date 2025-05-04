@@ -1,33 +1,264 @@
-[2025-05-03T23:17:31.372Z] [info] [RoutesResolver]: UserController {/api/users}:
-[2025-05-03T23:17:31.375Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
-[2025-05-03T23:17:31.376Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
-[2025-05-03T23:17:31.377Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
-[2025-05-03T23:17:31.377Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
-[2025-05-03T23:17:31.377Z] [info] [RoutesResolver]: AdminController {/api/admin}:
-[2025-05-03T23:17:31.377Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
-[2025-05-03T23:17:31.378Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
-[2025-05-03T23:17:31.378Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
-[2025-05-03T23:17:31.378Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
-[2025-05-03T23:17:31.379Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
-[2025-05-03T23:17:31.379Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
-[2025-05-03T23:17:31.379Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
-[2025-05-03T23:17:31.379Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
-[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
-[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
-[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
-[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
-[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
-[2025-05-03T23:17:31.380Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
-[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
-[2025-05-03T23:17:31.381Z] [info] [RoutesResolver]: CronController {/api/cron}:
-[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
-[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
-[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
-[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
-[2025-05-03T23:17:31.381Z] [info] [RoutesResolver]: EmailController {/api/email}:
-[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
-[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
-[2025-05-03T23:17:31.381Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
-[2025-05-03T23:17:31.382Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
-[2025-05-03T23:17:32.089Z] [info] [NestApplication]: Nest application successfully started
-[2025-05-03T23:17:32.092Z] [info]: 🚀 Application is running on: http://localhost:3300/api
+[2025-05-04T21:52:29.631Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-04T21:52:29.634Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-04T21:52:29.634Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-04T21:52:29.635Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-04T21:52:29.635Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-04T21:52:29.635Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-04T21:52:29.636Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-04T21:52:29.636Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-04T21:52:29.636Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-04T21:52:29.637Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-04T21:52:29.637Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-04T21:52:29.637Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-04T21:52:29.637Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-04T21:52:29.638Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-04T21:52:29.638Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-04T21:52:29.638Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-04T21:52:29.638Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-04T21:52:29.638Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-04T21:52:29.638Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-04T21:52:29.638Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-04T21:52:29.638Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-04T21:52:29.638Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-04T21:52:29.639Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-04T21:52:29.639Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-04T21:52:29.639Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-04T21:52:29.639Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-04T21:52:29.639Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-04T21:52:29.639Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-04T21:52:29.639Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-04T21:52:29.639Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-04T21:52:29.639Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-04T21:52:30.120Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-04T21:52:30.122Z] [info]: 🚀 Application is running on: http://localhost:3300/api
+[2025-05-04T21:59:26.398Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-04T21:59:26.401Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-04T21:59:26.402Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-04T21:59:26.402Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-04T21:59:26.402Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-04T21:59:26.403Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-04T21:59:26.403Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-04T21:59:26.403Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-04T21:59:26.403Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-04T21:59:26.404Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-04T21:59:26.404Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-04T21:59:26.405Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-04T21:59:26.405Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-04T21:59:26.405Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-04T21:59:26.405Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-04T21:59:26.405Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-04T21:59:26.406Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-04T21:59:26.406Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-04T21:59:26.406Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-04T21:59:26.406Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-04T21:59:26.406Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-04T21:59:26.407Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-04T21:59:26.407Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-04T21:59:26.407Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-04T21:59:26.407Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-04T21:59:26.407Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-04T21:59:26.407Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-04T21:59:26.407Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-04T21:59:26.407Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-04T21:59:26.407Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-04T21:59:26.407Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-04T21:59:26.963Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-04T21:59:26.965Z] [info]: 🚀 Application is running on: http://localhost:3300/api
+[2025-05-04T21:59:52.954Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-04T21:59:52.957Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-04T21:59:52.957Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-04T21:59:52.958Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-04T21:59:52.958Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-04T21:59:52.958Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-04T21:59:52.958Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-04T21:59:52.959Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-04T21:59:52.959Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-04T21:59:52.959Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-04T21:59:52.960Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-04T21:59:52.960Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-04T21:59:52.960Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-04T21:59:52.961Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-04T21:59:52.961Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-04T21:59:52.961Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-04T21:59:52.961Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-04T21:59:52.961Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-04T21:59:52.961Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-04T21:59:52.961Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-04T21:59:52.961Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-04T21:59:52.961Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-04T21:59:52.962Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-04T21:59:52.962Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-04T21:59:52.962Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-04T21:59:52.962Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-04T21:59:52.962Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-04T21:59:52.962Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-04T21:59:52.962Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-04T21:59:52.962Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-04T21:59:52.962Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-04T21:59:53.529Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-04T21:59:53.531Z] [info]: 🚀 Application is running on: http://localhost:3300/api
+[2025-05-04T22:14:50.480Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-04T22:14:50.485Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-04T22:14:50.487Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-04T22:14:50.488Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-04T22:14:50.489Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-04T22:14:50.489Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-04T22:14:50.490Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-04T22:14:50.491Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-04T22:14:50.491Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-04T22:14:50.492Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-04T22:14:50.492Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-04T22:14:50.492Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-04T22:14:50.493Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-04T22:14:50.493Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-04T22:14:50.493Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-04T22:14:50.494Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-04T22:14:50.494Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-04T22:14:50.494Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-04T22:14:50.494Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-04T22:14:50.494Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-04T22:14:50.495Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-04T22:14:50.495Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-04T22:14:50.495Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-04T22:14:50.495Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-04T22:14:50.495Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-04T22:14:50.495Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-04T22:14:50.495Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-04T22:14:50.495Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-04T22:14:50.496Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-04T22:14:50.496Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-04T22:14:50.496Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-04T22:14:51.036Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-04T22:14:51.038Z] [info]: 🚀 Application is running on: http://localhost:3300/api
+[2025-05-04T22:15:07.227Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-04T22:15:07.230Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-04T22:15:07.230Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-04T22:15:07.231Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-04T22:15:07.231Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-04T22:15:07.232Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-04T22:15:07.232Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-04T22:15:07.232Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-04T22:15:07.232Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-04T22:15:07.233Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-04T22:15:07.233Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-04T22:15:07.233Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-04T22:15:07.234Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-04T22:15:07.234Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-04T22:15:07.234Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-04T22:15:07.234Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-04T22:15:07.234Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-04T22:15:07.234Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-04T22:15:07.234Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-04T22:15:07.235Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-04T22:15:07.235Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-04T22:15:07.235Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-04T22:15:07.236Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-04T22:15:07.797Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-04T22:15:07.799Z] [info]: 🚀 Application is running on: http://localhost:3300/api
+[2025-05-04T22:15:09.567Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-04T22:15:09.570Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-04T22:15:09.571Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-04T22:15:09.571Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-04T22:15:09.572Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-04T22:15:09.572Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-04T22:15:09.572Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-04T22:15:09.574Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-04T22:15:09.575Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-04T22:15:09.575Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-04T22:15:09.575Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-04T22:15:09.576Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-04T22:15:09.576Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-04T22:15:09.576Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-04T22:15:09.576Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-04T22:15:09.576Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-04T22:15:09.577Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-04T22:15:09.577Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-04T22:15:09.577Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-04T22:15:09.577Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-04T22:15:09.577Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-04T22:15:09.577Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-04T22:15:09.577Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-04T22:15:09.577Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-04T22:15:09.578Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-04T22:15:09.578Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-04T22:15:09.578Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-04T22:15:09.578Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-04T22:15:09.578Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-04T22:15:09.578Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-04T22:15:09.578Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-04T22:15:10.377Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-04T22:15:10.379Z] [info]: 🚀 Application is running on: http://localhost:3300/api
+[2025-05-04T22:15:32.181Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-04T22:15:32.185Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-04T22:15:32.186Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-04T22:15:32.186Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-04T22:15:32.187Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-04T22:15:32.187Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-04T22:15:32.187Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-04T22:15:32.188Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-04T22:15:32.188Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-04T22:15:32.188Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-04T22:15:32.189Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-04T22:15:32.189Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-04T22:15:32.189Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-04T22:15:32.189Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-04T22:15:32.190Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-04T22:15:32.190Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-04T22:15:32.190Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-04T22:15:32.190Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-04T22:15:32.190Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-04T22:15:32.190Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-04T22:15:32.190Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-04T22:15:32.190Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-04T22:15:32.191Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-04T22:15:32.191Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-04T22:15:32.191Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-04T22:15:32.191Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-04T22:15:32.192Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-04T22:15:32.192Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-04T22:15:32.192Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-04T22:15:32.193Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-04T22:15:32.193Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-04T22:15:32.748Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-04T22:15:32.750Z] [info]: 🚀 Application is running on: http://localhost:3300/api
+[2025-05-04T22:16:16.441Z] [info] [RoutesResolver]: UserController {/api/users}:
+[2025-05-04T22:16:16.445Z] [info] [RouterExplorer]: Mapped {/api/users/register, POST} route
+[2025-05-04T22:16:16.445Z] [info] [RouterExplorer]: Mapped {/api/users/unregister, POST} route
+[2025-05-04T22:16:16.446Z] [info] [RouterExplorer]: Mapped {/api/users/:id, PUT} route
+[2025-05-04T22:16:16.446Z] [info] [RouterExplorer]: Mapped {/api/users/:id, DELETE} route
+[2025-05-04T22:16:16.446Z] [info] [RoutesResolver]: AdminController {/api/admin}:
+[2025-05-04T22:16:16.446Z] [info] [RouterExplorer]: Mapped {/api/admin/create, POST} route
+[2025-05-04T22:16:16.447Z] [info] [RouterExplorer]: Mapped {/api/admin/login, POST} route
+[2025-05-04T22:16:16.447Z] [info] [RouterExplorer]: Mapped {/api/admin/logout, GET} route
+[2025-05-04T22:16:16.447Z] [info] [RouterExplorer]: Mapped {/api/admin/create-user, POST} route
+[2025-05-04T22:16:16.448Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id, DELETE} route
+[2025-05-04T22:16:16.448Z] [info] [RouterExplorer]: Mapped {/api/admin/users, GET} route
+[2025-05-04T22:16:16.448Z] [info] [RouterExplorer]: Mapped {/api/admin/users/:id/toggle-subscription, POST} route
+[2025-05-04T22:16:16.449Z] [info] [RouterExplorer]: Mapped {/api/admin/tips-add, POST} route
+[2025-05-04T22:16:16.449Z] [info] [RouterExplorer]: Mapped {/api/admin/tips, GET} route
+[2025-05-04T22:16:16.449Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/:id, GET} route
+[2025-05-04T22:16:16.449Z] [info] [RouterExplorer]: Mapped {/api/admin/news/add, POST} route
+[2025-05-04T22:16:16.449Z] [info] [RouterExplorer]: Mapped {/api/admin/tips/news/:id, GET} route
+[2025-05-04T22:16:16.449Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, GET} route
+[2025-05-04T22:16:16.449Z] [info] [RouterExplorer]: Mapped {/api/admin/news/update/:id, POST} route
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/admin/news/:id, DELETE} route
+[2025-05-04T22:16:16.450Z] [info] [RoutesResolver]: CronController {/api/cron}:
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/cron/create-job, POST} route
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/cron/get-jobs, GET} route
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/cron/update-job, POST} route
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/cron/delete-job/:id, POST} route
+[2025-05-04T22:16:16.450Z] [info] [RoutesResolver]: EmailController {/api/email}:
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/email/status, GET} route
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/email/sendemail, POST} route
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/email/automatedemail, POST} route
+[2025-05-04T22:16:16.450Z] [info] [RouterExplorer]: Mapped {/api/email/emailsorder, GET} route
+[2025-05-04T22:16:16.994Z] [info] [NestApplication]: Nest application successfully started
+[2025-05-04T22:16:16.996Z] [info]: 🚀 Application is running on: http://localhost:3300/api

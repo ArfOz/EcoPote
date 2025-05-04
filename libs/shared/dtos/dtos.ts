@@ -265,3 +265,5 @@ export interface ResponseEmailOrderDto {
   success: boolean;
   message: string;
 }
+
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
