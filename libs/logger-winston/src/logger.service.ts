@@ -3,11 +3,13 @@ import * as winston from 'winston';
 import { winstonConfig } from './winston.config';
 
 @Injectable()
-export class WinstonLogger implements LoggerService {
+export class WinstonLoggerService implements LoggerService {
   private readonly logger: winston.Logger;
-
-  constructor() {
-    this.logger = winston.createLogger(winstonConfig);
+  constructor(private readonly serviceName: string) {
+    this.logger = winston.createLogger({
+      ...winstonConfig,
+      defaultMeta: { service: serviceName },
+    });
   }
 
   log(message: string, context?: string) {

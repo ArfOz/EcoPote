@@ -7,12 +7,12 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
-import { WinstonLogger } from '@logger-winston';
+import { WinstonLoggerService } from '@logger-winston';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const logger = app.get(WinstonLogger); // Retrieve the logger
+  const logger = app.get(WinstonLoggerService); // Retrieve the logger
   app.useLogger(logger);
 
   app.use(helmet());

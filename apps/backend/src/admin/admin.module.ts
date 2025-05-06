@@ -12,6 +12,8 @@ import { ConfigModule } from '@nestjs/config';
 import generalConfig from '@shared/config/general.config';
 import authConfig from '@auth/config/auth.config';
 import { AuthModule, AuthService } from '@auth';
+import { LogsDatabaseService } from '@database/logs';
+import { WinstonLoggerService } from '@logger-winston';
 
 @Module({
   imports: [
@@ -26,6 +28,11 @@ import { AuthModule, AuthService } from '@auth';
     AuthModule,
   ],
   controllers: [AdminController],
-  providers: [AdminService, UserDatabaseService, AdminDatabaseModule],
+  providers: [
+    AdminService,
+    UserDatabaseService,
+    AdminDatabaseModule,
+    WinstonLoggerService,
+  ],
 })
 export class AdminModule {}

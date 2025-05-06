@@ -7,13 +7,23 @@ import { ConfigType } from '@nestjs/config';
 import { ResponseEmailOrderDto, ResponseMessageEmail } from '@shared/dtos';
 import { sendEmailAzure } from '@shared/nodemailer';
 import { NewsDatabaseService, UserDatabaseService } from '@database';
+import { LogsDatabaseService } from '@database/logs';
 
 @Injectable()
 export class EmailService {
   constructor(
     private userDatabaseService: UserDatabaseService,
-    private newsDatabaseService: NewsDatabaseService
-  ) {}
+    private newsDatabaseService: NewsDatabaseService,
+    private readonly logger: LogsDatabaseService
+  ) {
+    if (process.env.NODE_ENV === 'production') {
+      logger.setLogLevel('error'); // Only log errors in production
+    } else {
+      logger.setLogLevel('debug'); // Log everything in development
+    }
+
+    logger.setServiceName('admin-service');
+  }
 
   async getStatus(): Promise<string> {
     return 'Email service is running!';

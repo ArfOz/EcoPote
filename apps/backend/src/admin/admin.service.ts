@@ -28,6 +28,7 @@ import {
   ResponseUpdateNews,
 } from '@shared/dtos';
 import { CreateAddNewsDto } from './dto';
+import { WinstonLoggerService } from '@logger-winston';
 
 @Injectable()
 export class AdminService {
@@ -40,8 +41,11 @@ export class AdminService {
     private readonly userDatabaseService: UserDatabaseService,
     private readonly authService: AuthService,
     private readonly newsDatabaseService: NewsDatabaseService,
-    private readonly tipsDatabaseService: TipsDatabaseService
-  ) {}
+    private readonly tipsDatabaseService: TipsDatabaseService,
+    private readonly logger: WinstonLoggerService
+  ) {
+    this.logger.serviceName('email-service');
+  }
 
   async addAdmin(adminData: {
     email: string;
