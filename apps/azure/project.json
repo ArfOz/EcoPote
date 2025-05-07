@@ -1,46 +1,24 @@
 {
   "name": "azure",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/azure/src",
   "projectType": "application",
+  "tags": [""],
   "targets": {
     "build": {
-      "executor": "@nx/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
+      "executor": "@nxazure/func:build"
+    },
+    "start": {
+      "executor": "@nxazure/func:start",
       "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/apps/azure",
-        "main": "apps/azure/src/main.ts",
-        "tsConfig": "apps/azure/tsconfig.app.json",
-        "assets": ["apps/azure/src/assets"],
-        "isolatedConfig": true,
-        "webpackConfig": "apps/azure/webpack.config.js"
-      },
-      "configurations": {
-        "development": {},
-        "production": {}
+        "port": 7071
       }
     },
-    "serve": {
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
-      "dependsOn": ["build"],
-      "options": {
-        "buildTarget": "azure:build",
-        "runBuildTargetDependencies": false,
-        "cache": true
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "azure:build:development"
-        },
-        "production": {
-          "buildTarget": "azure:build:production"
-        }
-      }
+    "publish": {
+      "executor": "@nxazure/func:publish"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
     }
-  },
-  "tags": []
+  }
 }
