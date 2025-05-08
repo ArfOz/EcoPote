@@ -41,10 +41,10 @@ export class AdminService {
     private readonly userDatabaseService: UserDatabaseService,
     private readonly authService: AuthService,
     private readonly newsDatabaseService: NewsDatabaseService,
-    private readonly tipsDatabaseService: TipsDatabaseService,
-    private readonly logger: WinstonLoggerService
-  ) {
-    this.logger.serviceName('email-service');
+    private readonly tipsDatabaseService: TipsDatabaseService
+  ) // private readonly logger: WinstonLoggerService
+  {
+    // this.logger.serviceName('admin-service');
   }
 
   async addAdmin(adminData: {

@@ -39,6 +39,12 @@ import {
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
+  @Post('test')
+  async test(): Promise<string> {
+    console.log('Test endpoint hit!');
+    return 'Test endpoint is working!';
+  }
+
   @Post('create')
   async createAdmin(@Body() createAdminData: CreateAdminDto): Promise<Admin> {
     return this.adminService.addAdmin(createAdminData);

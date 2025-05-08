@@ -12,8 +12,8 @@ import { WinstonLoggerService } from '@logger-winston';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const logger = app.get(WinstonLoggerService); // Retrieve the logger
-  app.useLogger(logger);
+  // const logger = app.get(WinstonLoggerService); // Retrieve the logger
+  // app.useLogger(logger);
 
   app.use(helmet());
   app.enableCors({
@@ -34,9 +34,9 @@ async function bootstrap() {
   app.setGlobalPrefix(globalPrefix);
   const port = process.env.BACKEND_PORT || 3000;
   await app.listen(port);
-  logger.log(
-    `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
-  );
+  // logger.log(
+  //   `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`
+  // );
 }
 
 bootstrap();

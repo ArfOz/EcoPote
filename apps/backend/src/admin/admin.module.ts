@@ -32,7 +32,7 @@ import { WinstonLoggerService } from '@logger-winston';
     AdminService,
     UserDatabaseService,
     AdminDatabaseModule,
-    WinstonLoggerService,
+    // WinstonLoggerService,
   ],
 })
 export class AdminModule {}

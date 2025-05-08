@@ -27,7 +27,7 @@ import { WinstonLoggerModule } from '@logger-winston';
     CronModule,
     // AzureModule,
     EmailModule,
-    WinstonLoggerModule,
+    // WinstonLoggerModule,
   ],
   controllers: [],
   providers: [],

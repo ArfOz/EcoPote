@@ -16,7 +16,7 @@ import {
 
 @Injectable()
 export class CronService {
-  private readonly logger = new Logger(CronService.name);
+  // private readonly logger = new Logger(CronService.name);
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
     private readonly userDatabaseService: UserDatabaseService,
@@ -66,7 +66,7 @@ export class CronService {
       throw new Error('Failed to save cron job to the database.');
     }
 
-    this.logger.log(`Successfully created cron job with ID: ${res.id}`);
+    // this.logger.log(`Successfully created cron job with ID: ${res.id}`);
 
     return {
       success: true,
