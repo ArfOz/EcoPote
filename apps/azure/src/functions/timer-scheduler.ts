@@ -8,36 +8,35 @@ import {
 import * as cronParser from 'cron-parser';
 
 // In-memory job store for demo only. Use persistent storage in production!
-
-let scheduleTime = '0 */1 * * * *';
-
+let scheduleTime = '0 */1 * * * *'; // Default: every minute
 let lastRun: string | null = null; // Tracks the last run time
 
-// HTTP trigger to schedule a recurring backend call
+// HTTP trigger to update the schedule time
 export async function scheduleJob(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   try {
-    const { schedule } = (await request.json()) as {
-      schedule: string;
-    };
+    const { schedule } = (await request.json()) as { schedule: string };
     if (!schedule) {
-      return { status: 400, jsonBody: { error: 'Missing schedule or url' } };
+      return { status: 400, jsonBody: { error: 'Missing schedule' } };
     }
-
-    scheduleTime = schedule; // Update the global schedule
-
-    const url = 'http://localhost:3300/api/admin/test'; // Replace with your backend URL
-    context.log(`Scheduled job with cron "${schedule}" to call ${url}`);
-    return { status: 200, jsonBody: { message: 'Recurring job scheduled' } };
+    scheduleTime = schedule; // Update the global schedule (will only take effect after restart)
+    context.log(`Schedule updated to "${scheduleTime}"`);
+    return {
+      status: 200,
+      jsonBody: {
+        message:
+          'Schedule updated. Please restart the function app for changes to take effect.',
+      },
+    };
   } catch (error) {
-    context.error('Failed to schedule job', error);
+    context.error('Failed to update schedule', error);
     return { status: 500, jsonBody: { error: 'Internal server error' } };
   }
 }
 
-// Timer trigger checks every minute for jobs to run
+// Timer trigger runs on the current scheduleTime (read at startup)
 export async function timerTrigger(
   myTimer: Timer,
   context: InvocationContext
@@ -75,6 +74,6 @@ app.http('scheduleJob', {
 });
 
 app.timer('timerTrigger', {
-  schedule: scheduleTime, // Default to every minute if no jobs are scheduled
+  schedule: scheduleTime, // This value is only read at startup!
   handler: timerTrigger,
 });

@@ -41,7 +41,7 @@ export class AdminController {
 
   @Post('test')
   async test(): Promise<string> {
-    console.log('Test endpoint hit!');
+    console.log('Test endpoint hit!', new Date().toISOString());
     return 'Test endpoint is working!';
   }
 
