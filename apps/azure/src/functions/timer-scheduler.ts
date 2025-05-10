@@ -7,27 +7,34 @@ import {
 } from '@azure/functions';
 import * as cronParser from 'cron-parser';
 
-// In-memory job store for demo only. Use persistent storage in production!
+// In-memory config for demo only. Use persistent storage in production!
 let scheduleTime = '0 */1 * * * *'; // Default: every minute
+let startTime: string | null = null; // ISO string, e.g. "2025-05-10T12:00:00Z"
 let lastRun: string | null = null; // Tracks the last run time
 
-// HTTP trigger to update the schedule time
+// HTTP trigger to update the schedule time and start time
 export async function scheduleJob(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   try {
-    const { schedule } = (await request.json()) as { schedule: string };
+    const { schedule, start } = (await request.json()) as {
+      schedule: string;
+      start?: string;
+    };
     if (!schedule) {
       return { status: 400, jsonBody: { error: 'Missing schedule' } };
     }
-    scheduleTime = schedule; // Update the global schedule (will only take effect after restart)
-    context.log(`Schedule updated to "${scheduleTime}"`);
+    scheduleTime = schedule;
+    startTime = start || null;
+    context.log(
+      `Schedule updated to "${scheduleTime}" with startTime "${startTime}"`
+    );
     return {
       status: 200,
       jsonBody: {
         message:
-          'Schedule updated. Please restart the function app for changes to take effect.',
+          'Schedule and start time updated. Please restart the function app for changes to take effect.',
       },
     };
   } catch (error) {
@@ -42,8 +49,15 @@ export async function timerTrigger(
   context: InvocationContext
 ): Promise<void> {
   const now = new Date();
-  context.log(`Timer trigger function executed at ${now}`);
+  context.log(`Timer trigger function executed at ${now.toISOString()}`);
   try {
+    // If startTime is set and now is before startTime, do nothing
+    if (startTime && now < new Date(startTime)) {
+      context.log(
+        `Current time is before startTime (${startTime}), skipping trigger.`
+      );
+      return;
+    }
     const interval = cronParser.parseExpression(scheduleTime, {
       currentDate: now,
     });
@@ -52,7 +66,7 @@ export async function timerTrigger(
     if (!lastRun || new Date(lastRun) < prev.toDate()) {
       const url = 'http://localhost:3300/api/admin/test'; // Replace with your backend URL
       context.log(
-        `Triggering backend service at ${url} (cron: ${scheduleTime})`
+        `Triggering backend service at ${url} (cron: ${scheduleTime}, startTime: ${startTime})`
       );
       try {
         await fetch(url, { method: 'POST' });
