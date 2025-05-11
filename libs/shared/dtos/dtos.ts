@@ -226,6 +226,7 @@ export interface ResponseCreateCron {
     updatedAt: Date;
     status: boolean;
     lastRun: Date | null;
+    nextRun: Date | null;
   };
 }
 

@@ -44,15 +44,8 @@ export const CronCreator = ({
     console.log('Cron job created:', res);
     if (res.success) {
       // setCronJobs((prevCronJobs) => [...prevCronJobs, res.data]);
-        {
-          ...(res.data as ExtendedResponseCronData),
-          nextRun: res.data.nextRun || null, // Ensure nextRun is included
-        },
-        {
-          ...res.data,
-          nextRun: res.data.nextRun || null, // Ensure nextRun is included
-        },
-      ]); // Update the data state with the new cron job
+      setData((prevData) => [...prevData, res.data]); // Update the data state with the new cron job
+      // Update the data state with the new cron job
     }
     if (res.message) {
       setError(res.message);
