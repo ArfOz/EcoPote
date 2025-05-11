@@ -4,6 +4,7 @@ import {
   ResponseCron,
   ScheduleEnum,
 } from '@shared/dtos';
+
 import { fetchWithAuth } from '@utils';
 import React from 'react';
 
@@ -43,12 +44,13 @@ export const CronCreator = ({
     console.log('Cron job created:', res);
     if (res.success) {
       // setCronJobs((prevCronJobs) => [...prevCronJobs, res.data]);
-      setError(null); // Clear error message on success
-      setShowModal(false); // Close the modal on success
-      setData((prevData) => [
-        ...prevData,
+        {
+          ...(res.data as ExtendedResponseCronData),
+          nextRun: res.data.nextRun || null, // Ensure nextRun is included
+        },
         {
           ...res.data,
+          nextRun: res.data.nextRun || null, // Ensure nextRun is included
         },
       ]); // Update the data state with the new cron job
     }

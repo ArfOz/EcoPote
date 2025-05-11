@@ -267,3 +267,16 @@ export interface ResponseEmailOrderDto {
 }
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+
+export interface ResponseUnregisterUserDto {
+  message: string;
+  success: boolean;
+  data: {
+    id: number;
+    email: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+    subscription: boolean;
+  };
+}
