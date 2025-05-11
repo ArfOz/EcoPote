@@ -5,7 +5,7 @@ import generalConfig from '@shared/config/general.config';
 import authConfig from '@auth/config/auth.config';
 import { ConfigType } from '@nestjs/config';
 import { ResponseEmailOrderDto, ResponseMessageEmail } from '@shared/dtos';
-import { sendEmailAzure } from '@shared/nodemailer';
+import { sendEmailAzure, sendEmail, sendEmailsGmail } from '@shared/nodemailer';
 import { NewsDatabaseService, UserDatabaseService } from '@database';
 import { LogsDatabaseService } from '@database/logs';
 
@@ -46,7 +46,13 @@ export class EmailService {
         );
       }
 
-      const { sentUsers, errorUsers } = await sendEmailAzure(
+      // const { sentUsers, errorUsers } = await sendEmailAzure(
+      //   users,
+      //   emailData.subject,
+      //   emailData.html
+      // );
+
+      const { sentUsers, errorUsers } = await sendEmailsGmail(
         users,
         emailData.subject,
         emailData.html
