@@ -1,3 +1,4 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import {
   app,
   HttpRequest,
@@ -7,8 +8,9 @@ import {
 } from '@azure/functions';
 import * as cronParser from 'cron-parser';
 
-// In-memory config for demo only. Use persistent storage in production!
-let scheduleTime = '0 */1 * * * *'; // Default: every minute
+import { CronTimeSetEnum } from '../dtos'; // Import the enum
+
+let scheduleTime: CronTimeSetEnum = CronTimeSetEnum.EVERY_MINUTE; // Default: every minute
 let startTime: string | null = null; // ISO string, e.g. "2025-05-10T12:00:00Z"
 let lastRun: string | null = null; // Tracks the last run time
 
@@ -19,7 +21,7 @@ export async function scheduleJob(
 ): Promise<HttpResponseInit> {
   try {
     const { schedule, start } = (await request.json()) as {
-      schedule: string;
+      schedule: CronTimeSetEnum;
       start?: string;
     };
     if (!schedule) {

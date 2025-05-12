@@ -34,13 +34,13 @@ export class CronService {
     // Parse the startTime to a Date object
     const startDateTime = startTime ? new Date(startTime) : undefined;
 
-    // Check if startTime is at least one hour after dateNow
-    const oneHourInMillis = 60 * 60 * 1000;
-    if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
-      throw new Error(
-        'Start time must be at least one hour after the current time.'
-      );
-    }
+    // // Check if startTime is at least one hour after dateNow
+    // const oneHourInMillis = 60 * 60 * 1000;
+    // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
+    //   throw new Error(
+    //     'Start time must be at least one hour after the current time.'
+    //   );
+    // }
 
     // Convert the schedule (datetime string) to a Date object
     const nextRun = TimeCalculator(schedule, startDateTime);
@@ -95,12 +95,14 @@ export class CronService {
 
     const startDateTime = startTime ? new Date(startTime) : data.startTime;
 
-    const oneHourInMillis = 60 * 60 * 1000;
-    if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
-      throw new Error(
-        'Start time must be at least one hour after the current time.'
-      );
-    }
+    console.log('startDateTime', startDateTime, 'now', dateNow);
+
+    // const oneHourInMillis = 60 * 60 * 1000;
+    // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
+    //   throw new Error(
+    //     'Start time must be at least one hour after the current time.'
+    //   );
+    // }
 
     let nextRun: Date | undefined = data.nextRun;
     if (startTime && schedule) {
@@ -127,6 +129,21 @@ export class CronService {
 
     if (!updatedData) {
       throw new Error('Failed to update cron job');
+    }
+
+    const updateCronFunctions = await fetch(
+      'http://localhost:7071/api/scheduleJob',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ start: startTime, schedule }),
+      }
+    );
+
+    if (!updateCronFunctions || updateCronFunctions.status !== 200) {
+      throw new Error('Failed to trigger scheduleJob function');
     }
 
     return {

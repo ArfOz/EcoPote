@@ -1,6 +1,12 @@
 import { ScheduleEnum } from './../shared/dtos/dtos';
 export const TimeCalculator = (schedule: ScheduleEnum, startDateTime: Date) => {
   switch (schedule) {
+    case 'every-5-minutes':
+      return new Date(startDateTime.getTime() + 5 * 60 * 1000); // Add 5 minutes to the start time
+    case 'every-10-minutes':
+      return new Date(startDateTime.getTime() + 10 * 60 * 1000); // Add 10 minutes to the start time
+    case 'every-minute':
+      return new Date(startDateTime.getTime() + 1 * 60 * 1000); // Add 1 minute to the start time
     case 'every-day':
       return new Date(startDateTime.getTime() + 24 * 60 * 60 * 1000); // Add one day to the start time
     case 'every-week':
