@@ -53,6 +53,10 @@ export async function timerTrigger(
   context: InvocationContext
 ): Promise<void> {
   const now = new Date();
+
+  const token = process.env.STATIC_TOKEN; //
+
+  const url: string = process.env.EMAIL_BACKEND_URL!;
   context.log(`Timer trigger function executed at ${now.toISOString()}`);
   try {
     // If startTime is set and now is before startTime, do nothing
@@ -68,13 +72,23 @@ export async function timerTrigger(
     const prev = interval.prev();
     // If the previous scheduled time is within the last minute, trigger
     if (!lastRun || new Date(lastRun) < prev.toDate()) {
-      const url = 'http://localhost:3300/api/admin/test';
       // const url = 'http://localhost:3300/api/email/automatedemail'; // Replace with your backend URL
       context.log(
         `Triggering backend service at ${url} (cron: ${scheduleTime}, startTime: ${startTime})`
       );
       try {
-        await fetch(url, { method: 'POST' });
+        if (!token) {
+          throw new Error(
+            'AUTH_TOKEN is not defined in the environment variables'
+          );
+        }
+        await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
         context.log(`Successfully triggered ${url}`);
         lastRun = prev.toISOString();
       } catch (err) {

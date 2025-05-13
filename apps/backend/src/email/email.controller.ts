@@ -22,6 +22,8 @@ import { ResponseEmailOrderDto, ResponseMessageEmail } from '@shared/dtos';
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
+  @AuthMode('static')
+  @UseGuards(JwtAuthGuard)
   @Get('status')
   async getStatus(): Promise<string> {
     return this.emailService.getStatus();
@@ -46,8 +48,8 @@ export class EmailController {
     });
   }
 
-  // @AuthMode('static')
-  // @UseGuards(JwtAuthGuard)
+  @AuthMode('static')
+  @UseGuards(JwtAuthGuard)
   @Post('automatedemail')
   async automatedEmail() {
     return await this.emailService.automatedEmail();

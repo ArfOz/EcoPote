@@ -26,6 +26,7 @@ export class EmailService {
   }
 
   async getStatus(): Promise<string> {
+    console.log('Email service is running!');
     return 'Email service is running!';
   }
 
