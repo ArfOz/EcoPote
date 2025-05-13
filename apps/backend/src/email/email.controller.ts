@@ -46,8 +46,8 @@ export class EmailController {
     });
   }
 
-  @AuthMode('static')
-  @UseGuards(JwtAuthGuard)
+  // @AuthMode('static')
+  // @UseGuards(JwtAuthGuard)
   @Post('automatedemail')
   async automatedEmail() {
     return await this.emailService.automatedEmail();

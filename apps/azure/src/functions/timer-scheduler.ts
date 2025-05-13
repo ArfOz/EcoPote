@@ -10,7 +10,7 @@ import * as cronParser from 'cron-parser';
 
 import { CronTimeSetEnum } from '../dtos'; // Import the enum
 
-let scheduleTime: CronTimeSetEnum = CronTimeSetEnum.EVERY_MINUTE; // Default: every minute
+let scheduleTime = '*/1 * * * *'; // Default: every minute
 let startTime: string | null = null; // ISO string, e.g. "2025-05-10T12:00:00Z"
 let lastRun: string | null = null; // Tracks the last run time
 
@@ -24,6 +24,8 @@ export async function scheduleJob(
       schedule: CronTimeSetEnum;
       start?: string;
     };
+
+    console.log('Received schedule:', schedule);
     if (!schedule) {
       return { status: 400, jsonBody: { error: 'Missing schedule' } };
     }
@@ -66,7 +68,8 @@ export async function timerTrigger(
     const prev = interval.prev();
     // If the previous scheduled time is within the last minute, trigger
     if (!lastRun || new Date(lastRun) < prev.toDate()) {
-      const url = 'http://localhost:3300/api/admin/test'; // Replace with your backend URL
+      const url = 'http://localhost:3300/api/admin/test';
+      // const url = 'http://localhost:3300/api/email/automatedemail'; // Replace with your backend URL
       context.log(
         `Triggering backend service at ${url} (cron: ${scheduleTime}, startTime: ${startTime})`
       );

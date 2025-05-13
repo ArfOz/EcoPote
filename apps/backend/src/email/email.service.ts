@@ -88,11 +88,28 @@ export class EmailService {
       throw new HttpException('No news to send email to', HttpStatus.NOT_FOUND);
     }
 
-    const { sentUsers, errorUsers } = await sendEmailAzure(
+    // const { sentUsers, errorUsers } = await sendEmailAzure(
+    //   users,
+    //   email.title,
+    //   email.content
+    // );
+
+    const { sentUsers, errorUsers } = await sendEmailsGmail(
       users,
       email.title,
       email.content
     );
+
+    const emailUpdate = await this.newsDatabaseService.updateNews(
+      email.id,
+      { status: false } // Update the status to false after sending
+    );
+    if (!emailUpdate) {
+      throw new HttpException(
+        'Failed to update email status',
+        HttpStatus.BAD_REQUEST
+      );
+    }
     return {
       data: { sentUsers, errorUsers },
       success: true,

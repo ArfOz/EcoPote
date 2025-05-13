@@ -16,7 +16,11 @@ export class UserService {
       where: { email: data.email },
     });
     if (user[0]) {
-      return { error: 'User already exists' };
+      await this.userDatabaseService.update(
+        { id: user[0].id },
+        { subscription: true }
+      );
+      return user[0];
     }
     return this.userDatabaseService.create(data);
   }
