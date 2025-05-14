@@ -289,3 +289,9 @@ export interface ResponseUnregisterUserDto {
     subscription: boolean;
   };
 }
+
+export interface ResponseEmailsAllDto {
+  data: [News[], total: number];
+  success: boolean;
+  message: string;
+}

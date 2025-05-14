@@ -1,10 +1,14 @@
 import { Inject, Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { News, User } from '@prisma/client';
+import { News, Prisma, User } from '@prisma/client';
 
 import generalConfig from '@shared/config/general.config';
 import authConfig from '@auth/config/auth.config';
 import { ConfigType } from '@nestjs/config';
-import { ResponseEmailOrderDto, ResponseMessageEmail } from '@shared/dtos';
+import {
+  ResponseEmailOrderDto,
+  ResponseEmailsAllDto,
+  ResponseMessageEmail,
+} from '@shared/dtos';
 import { sendEmailAzure, sendEmail, sendEmailsGmail } from '@shared/nodemailer';
 import { NewsDatabaseService, UserDatabaseService } from '@database';
 import { LogsDatabaseService } from '@database/logs';
@@ -63,8 +67,6 @@ export class EmailService {
         success: true,
         message: 'Email sent successfully',
       };
-
-      // return { data: res, success: true, message: 'Email sent successfully' };
     } catch (error) {
       // Handle error
       throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
@@ -143,4 +145,47 @@ export class EmailService {
       message: 'Emails retrieved successfully',
     };
   }
+
+  // async allEmails(
+  //   page: number,
+  //   limit: number,
+  //   order: string,
+  //   status: boolean
+  // ): Promise<ResponseEmailsAllDto> {
+  //   const where: Prisma.NewsWhereInput = {};
+  //   const skip: number = page * limit;
+  //   const take: number = limit;
+  //   if (status) {
+  //     where.status = status;
+  //   }
+
+  //   if (!page || !limit) {
+  //     const emails = await this.newsDatabaseService.findMany({
+  //       where,
+  //       orderBy: { createdAt: 'asc' },
+  //     });
+
+  //     const total = await this.newsDatabaseService.count();
+  //     return { success: true, message: '', emails, total };
+  //   }
+
+  //   // const orderBy: Prisma.NewsOrderByWithRelationInput;
+  //   const data = await this.newsDatabaseService.findMany({
+  //     orderBy: { createdAt: 'asc' },
+  //     include: {
+  //       tips: {
+  //         select: {
+  //           title: true,
+  //         },
+  //       },
+  //     },
+  //     where,
+  //   });
+
+  //   return {
+  //     data,
+  //     success: true,
+  //     message: 'Emails retrieved successfully',
+  //   };
+  // }
 }

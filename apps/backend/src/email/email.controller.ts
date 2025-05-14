@@ -8,6 +8,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 
 import { Admin } from '@prisma/client';
@@ -60,4 +61,22 @@ export class EmailController {
   async getEmailsOrder(): Promise<ResponseEmailOrderDto> {
     return await this.emailService.getEmailsOrder();
   }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Get('emails')
+  // async allEmails(
+  //   @Query('page') page?: string,
+  //   @Query('limit') limit?: string,
+  //   @Query('order') order?: string,
+  //   @Query('order') status?: boolean
+  // ): Promise<ResponseEmailOrderDto> {
+  //   const pageNumber = parseInt(page, 10);
+  //   const limitNumber = parseInt(limit, 10);
+  //   return await this.emailService.allEmails(
+  //     pageNumber,
+  //     limitNumber,
+  //     order,
+  //     status
+  //   );
+  // }
 }

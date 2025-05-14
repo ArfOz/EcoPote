@@ -2,11 +2,17 @@
 import { ResponseEmailOrderDto } from '@shared/dtos';
 import { fetchWithAuth } from '@utils';
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export const Emailorder = () => {
   const [data, setData] = useState<ResponseEmailOrderDto['data'] | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+    }
     const fetchEmailOrder = async () => {
       try {
         const res: ResponseEmailOrderDto = await fetchWithAuth(
@@ -21,7 +27,7 @@ export const Emailorder = () => {
     };
 
     fetchEmailOrder();
-  }, []);
+  }, [router]);
 
   return (
     <>
