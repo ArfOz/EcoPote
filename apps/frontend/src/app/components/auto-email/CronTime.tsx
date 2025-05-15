@@ -295,7 +295,7 @@ export const CronTime = () => {
           ))}
         </tbody>
       </table>
-      <CronCreator setData={setData} />
+      {data.length === 0 && <CronCreator setData={setData} />}
     </div>
   );
 };

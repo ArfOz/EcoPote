@@ -10,35 +10,45 @@ import * as cronParser from 'cron-parser';
 
 import { CronTimeSetEnum } from '../dtos'; // Import the enum
 
-let scheduleTime = '*/1 * * * *'; // Default: every minute
-let startTime: string | null = null; // ISO string, e.g. "2025-05-10T12:00:00Z"
-let lastRun: string | null = null; // Tracks the last run time
+let scheduleTime: CronTimeSetEnum = CronTimeSetEnum.EVERY_MINUTE; // Use enum for type safety
+let startTime: string | null = null;
+let lastRun: string | null = null;
+let isActive = true; // Track if the cron is active
 
-// HTTP trigger to update the schedule time and start time
+// HTTP trigger to update the schedule time, start time, or status
 export async function scheduleJob(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   try {
-    const { schedule, start } = (await request.json()) as {
-      schedule: CronTimeSetEnum;
+    const { schedule, start, status } = (await request.json()) as {
+      schedule?: CronTimeSetEnum;
       start?: string;
+      status?: boolean; // Changed from 'start' | 'stop' to boolean
     };
 
-    console.log('Received schedule:', schedule);
-    if (!schedule) {
-      return { status: 400, jsonBody: { error: 'Missing schedule' } };
+    if (typeof status === 'boolean') {
+      isActive = status;
+      context.log(
+        `Cron job status set to: ${isActive ? 'active' : 'inactive'}`
+      );
     }
-    scheduleTime = schedule;
-    startTime = start || null;
-    context.log(
-      `Schedule updated to "${scheduleTime}" with startTime "${startTime}"`
-    );
+
+    if (schedule) {
+      scheduleTime = schedule;
+      context.log(`Schedule updated to "${scheduleTime}"`);
+    }
+    if (start) {
+      startTime = start;
+      context.log(`Start time updated to "${startTime}"`);
+    }
+
     return {
       status: 200,
       jsonBody: {
-        message:
-          'Schedule and start time updated. Please restart the function app for changes to take effect.',
+        message: `Cron job ${
+          isActive ? 'started' : 'stopped'
+        }. Schedule: ${scheduleTime}, Start time: ${startTime}`,
       },
     };
   } catch (error) {
@@ -52,6 +62,11 @@ export async function timerTrigger(
   myTimer: Timer,
   context: InvocationContext
 ): Promise<void> {
+  if (!isActive) {
+    context.log('Cron job is inactive. Skipping execution.');
+    return;
+  }
+
   const now = new Date();
 
   const token = process.env.STATIC_TOKEN; //

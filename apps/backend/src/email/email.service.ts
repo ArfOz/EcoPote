@@ -30,7 +30,7 @@ export class EmailService {
   }
 
   async getStatus(): Promise<string> {
-    console.log('Email service is running!');
+    console.log('Email service is running!', new Date().toISOString());
     return 'Email service is running!';
   }
 
