@@ -10,7 +10,7 @@ import * as cronParser from 'cron-parser';
 
 import { CronTimeSetEnum } from '../dtos'; // Import the enum
 
-let scheduleTime: CronTimeSetEnum = CronTimeSetEnum.EVERY_MINUTE; // Use enum for type safety
+let scheduleTime: CronTimeSetEnum = CronTimeSetEnum['every-minute']; // Use enum for type safety
 let startTime: string | null = null;
 let lastRun: string | null = null;
 let isActive = true; // Track if the cron is active
@@ -22,10 +22,16 @@ export async function scheduleJob(
 ): Promise<HttpResponseInit> {
   try {
     const { schedule, start, status } = (await request.json()) as {
-      schedule?: CronTimeSetEnum;
+      schedule?: string;
       start?: string;
       status?: boolean; // Changed from 'start' | 'stop' to boolean
     };
+
+    console.log('Received request to update schedule:', {
+      schedule,
+      start,
+      status,
+    });
 
     if (typeof status === 'boolean') {
       isActive = status;
@@ -35,8 +41,18 @@ export async function scheduleJob(
     }
 
     if (schedule) {
-      scheduleTime = schedule;
-      context.log(`Schedule updated to "${scheduleTime}"`);
+      // Convert enum key (string) to value
+      if (
+        typeof schedule === 'string' &&
+        CronTimeSetEnum[schedule as keyof typeof CronTimeSetEnum]
+      ) {
+        scheduleTime =
+          CronTimeSetEnum[schedule as keyof typeof CronTimeSetEnum];
+        context.log(`Schedule updated to "${scheduleTime}"`);
+      } else {
+        context.error(`Invalid schedule key: ${schedule}`);
+        return { status: 400, jsonBody: { error: 'Invalid schedule key' } };
+      }
     }
     if (start) {
       startTime = start;

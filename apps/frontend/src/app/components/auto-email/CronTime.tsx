@@ -81,6 +81,8 @@ export const CronTime = () => {
         ...(startTime !== undefined && { startTime }),
       };
 
+      console.log('body', body);
+
       const response: ResponseCronUpdateDto = await fetchWithAuth(
         'cron/update-job',
         {

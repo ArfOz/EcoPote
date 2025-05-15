@@ -146,46 +146,40 @@ export class EmailService {
     };
   }
 
-  // async allEmails(
-  //   page: number,
-  //   limit: number,
-  //   order: string,
-  //   status: boolean
-  // ): Promise<ResponseEmailsAllDto> {
-  //   const where: Prisma.NewsWhereInput = {};
-  //   const skip: number = page * limit;
-  //   const take: number = limit;
-  //   if (status) {
-  //     where.status = status;
-  //   }
+  async allEmails(
+    page: number,
+    limit: number,
+    order: string,
+    status?: boolean
+  ): Promise<ResponseEmailsAllDto> {
+    const where: Prisma.NewsWhereInput = {};
+    const skip: number = page * limit;
+    const take: number = limit;
+    if (status !== undefined) {
+      where.status = status;
+    }
 
-  //   if (!page || !limit) {
-  //     const emails = await this.newsDatabaseService.findMany({
-  //       where,
-  //       orderBy: { createdAt: 'asc' },
-  //     });
+    if (!page || !limit) {
+      const emails = await this.newsDatabaseService.findMany({
+        where,
+        orderBy: { createdAt: 'asc' },
+      });
 
-  //     const total = await this.newsDatabaseService.count();
-  //     return { success: true, message: '', emails, total };
-  //   }
+      const total = await this.newsDatabaseService.count(where);
+      return { success: true, message: '', data: { emails, total } };
+    }
 
-  //   // const orderBy: Prisma.NewsOrderByWithRelationInput;
-  //   const data = await this.newsDatabaseService.findMany({
-  //     orderBy: { createdAt: 'asc' },
-  //     include: {
-  //       tips: {
-  //         select: {
-  //           title: true,
-  //         },
-  //       },
-  //     },
-  //     where,
-  //   });
+    // const orderBy: Prisma.NewsOrderByWithRelationInput;
+    const emails = await this.newsDatabaseService.findMany({
+      orderBy: { createdAt: 'asc' },
+      where,
+    });
+    const total = await this.newsDatabaseService.count(where);
 
-  //   return {
-  //     data,
-  //     success: true,
-  //     message: 'Emails retrieved successfully',
-  //   };
-  // }
+    return {
+      data: { emails, total },
+      success: true,
+      message: 'Emails retrieved successfully',
+    };
+  }
 }

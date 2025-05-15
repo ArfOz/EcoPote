@@ -13,6 +13,7 @@ import {
   ResponseCronUpdateDto,
   ResponseDeleteCron,
 } from '@shared/dtos';
+import { stat } from 'fs';
 
 @Injectable()
 export class CronService {
@@ -89,6 +90,8 @@ export class CronService {
   ): Promise<ResponseCronUpdateDto> {
     const dateNow = new Date();
 
+    console.log('schedule', schedule);
+
     const data = await this.cronDatabaseService.findUniqueCron({ id });
 
     // Parse the startTime to a Date object
@@ -111,12 +114,17 @@ export class CronService {
 
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
-      schedule,
       startTime: startDateTime,
       updatedAt: dateNow,
       status,
       nextRun,
     };
+
+    if (schedule) {
+      updatedCron.schedule = Object.keys(ScheduleEnum).find(
+        (x) => ScheduleEnum[x] === schedule
+      );
+    }
 
     const where: Prisma.CronWhereUniqueInput = { id };
 
@@ -131,6 +139,7 @@ export class CronService {
       throw new Error('Failed to update cron job');
     }
 
+    // add token to the body
     const updateCronFunctions = await fetch(
       'http://localhost:7071/api/scheduleJob',
       {
@@ -138,7 +147,11 @@ export class CronService {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ start: startTime, schedule }),
+        body: JSON.stringify({
+          start: startTime,
+          schedule,
+          status,
+        }),
       }
     );
 

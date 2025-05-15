@@ -17,7 +17,11 @@ import * as fs from 'fs';
 import { Multer } from 'multer';
 import { AuthMode, JwtAuthGuard } from '@auth';
 import { EmailService } from './email.service';
-import { ResponseEmailOrderDto, ResponseMessageEmail } from '@shared/dtos';
+import {
+  ResponseEmailOrderDto,
+  ResponseEmailsAllDto,
+  ResponseMessageEmail,
+} from '@shared/dtos';
 
 @Controller('email')
 export class EmailController {
@@ -63,20 +67,21 @@ export class EmailController {
   }
 
   // @UseGuards(JwtAuthGuard)
-  // @Get('emails')
-  // async allEmails(
-  //   @Query('page') page?: string,
-  //   @Query('limit') limit?: string,
-  //   @Query('order') order?: string,
-  //   @Query('order') status?: boolean
-  // ): Promise<ResponseEmailOrderDto> {
-  //   const pageNumber = parseInt(page, 10);
-  //   const limitNumber = parseInt(limit, 10);
-  //   return await this.emailService.allEmails(
-  //     pageNumber,
-  //     limitNumber,
-  //     order,
-  //     status
-  //   );
-  // }
+  @Get('allemails')
+  async allEmails(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('order') order?: string,
+    @Query('status') status?: boolean
+  ): Promise<ResponseEmailsAllDto> {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    console.log('status', status);
+    return await this.emailService.allEmails(
+      pageNumber,
+      limitNumber,
+      order,
+      status
+    );
+  }
 }
