@@ -1,4 +1,4 @@
-import { TimeCalculator } from '@utils';
+import { getCronExpression, TimeCalculator } from '@utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { ScheduleEnum } from '@shared/dtos'; // Adjust the path based on your project structure
 import {
@@ -13,7 +13,6 @@ import {
   ResponseCronUpdateDto,
   ResponseDeleteCron,
 } from '@shared/dtos';
-import { stat } from 'fs';
 
 @Injectable()
 export class CronService {
@@ -126,6 +125,10 @@ export class CronService {
       );
     }
 
+    const newCron = getCronExpression(schedule, startDateTime);
+    console.log('nextrun', nextRun);
+    console.log('newCron', newCron);
+
     const where: Prisma.CronWhereUniqueInput = { id };
 
     const updatedData = await this.cronDatabaseService
@@ -148,9 +151,8 @@ export class CronService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          start: startTime,
-          schedule,
           status,
+          newCron,
         }),
       }
     );

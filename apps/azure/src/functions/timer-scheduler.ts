@@ -8,30 +8,19 @@ import {
 } from '@azure/functions';
 import * as cronParser from 'cron-parser';
 
-import { CronTimeSetEnum } from '../dtos'; // Import the enum
-
-let scheduleTime: CronTimeSetEnum = CronTimeSetEnum['every-minute']; // Use enum for type safety
-let startTime: string | null = null;
-let lastRun: string | null = null;
+let cronTime = '*/1 * * * *'; // Default cron time (every minute)
 let isActive = true; // Track if the cron is active
 
-// HTTP trigger to update the schedule time, start time, or status
+// HTTP trigger to update the cron time or status
 export async function scheduleJob(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   try {
-    const { schedule, start, status } = (await request.json()) as {
-      schedule?: string;
-      start?: string;
-      status?: boolean; // Changed from 'start' | 'stop' to boolean
+    const { status, newCron } = (await request.json()) as {
+      status?: boolean;
+      newCron?: string;
     };
-
-    console.log('Received request to update schedule:', {
-      schedule,
-      start,
-      status,
-    });
 
     if (typeof status === 'boolean') {
       isActive = status;
@@ -40,23 +29,9 @@ export async function scheduleJob(
       );
     }
 
-    if (schedule) {
-      // Convert enum key (string) to value
-      if (
-        typeof schedule === 'string' &&
-        CronTimeSetEnum[schedule as keyof typeof CronTimeSetEnum]
-      ) {
-        scheduleTime =
-          CronTimeSetEnum[schedule as keyof typeof CronTimeSetEnum];
-        context.log(`Schedule updated to "${scheduleTime}"`);
-      } else {
-        context.error(`Invalid schedule key: ${schedule}`);
-        return { status: 400, jsonBody: { error: 'Invalid schedule key' } };
-      }
-    }
-    if (start) {
-      startTime = start;
-      context.log(`Start time updated to "${startTime}"`);
+    if (newCron) {
+      cronTime = newCron;
+      context.log(`Cron time updated to "${cronTime}"`);
     }
 
     return {
@@ -64,16 +39,16 @@ export async function scheduleJob(
       jsonBody: {
         message: `Cron job ${
           isActive ? 'started' : 'stopped'
-        }. Schedule: ${scheduleTime}, Start time: ${startTime}`,
+        }. Cron time: ${cronTime}`,
       },
     };
   } catch (error) {
-    context.error('Failed to update schedule', error);
+    context.error('Failed to update cron job', error);
     return { status: 500, jsonBody: { error: 'Internal server error' } };
   }
 }
 
-// Timer trigger runs on the current scheduleTime (read at startup)
+// Timer trigger runs on a fixed schedule, but checks cronTime and isActive
 export async function timerTrigger(
   myTimer: Timer,
   context: InvocationContext
@@ -84,50 +59,36 @@ export async function timerTrigger(
   }
 
   const now = new Date();
-
-  const token = process.env.STATIC_TOKEN; //
-
+  const token = process.env.STATIC_TOKEN;
   const url: string = process.env.EMAIL_BACKEND_URL!;
+
   context.log(`Timer trigger function executed at ${now.toISOString()}`);
+
+  // Check if now matches cronTime
   try {
-    // If startTime is set and now is before startTime, do nothing
-    if (startTime && now < new Date(startTime)) {
-      context.log(
-        `Current time is before startTime (${startTime}), skipping trigger.`
-      );
-      return;
-    }
-    const interval = cronParser.parseExpression(scheduleTime, {
-      currentDate: now,
-    });
+    const interval = cronParser.parseExpression(cronTime, { currentDate: now });
     const prev = interval.prev();
-    // If the previous scheduled time is within the last minute, trigger
-    if (!lastRun || new Date(lastRun) < prev.toDate()) {
-      // const url = 'http://localhost:3300/api/email/automatedemail'; // Replace with your backend URL
-      context.log(
-        `Triggering backend service at ${url} (cron: ${scheduleTime}, startTime: ${startTime})`
-      );
-      try {
-        if (!token) {
-          throw new Error(
-            'AUTH_TOKEN is not defined in the environment variables'
-          );
-        }
-        await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        context.log(`Successfully triggered ${url}`);
-        lastRun = prev.toISOString();
-      } catch (err) {
-        context.error(`Failed to trigger ${url}`, err);
+    // If the previous run is within the last minute, trigger the job
+    if (now.getTime() - prev.getTime() < 60000) {
+      context.log(`Triggering backend service at ${url} (cron: ${cronTime})`);
+      if (!token) {
+        throw new Error(
+          'AUTH_TOKEN is not defined in the environment variables'
+        );
       }
+      await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      context.log(`Successfully triggered ${url}`);
+    } else {
+      context.log(`Not time to run job (cron: ${cronTime})`);
     }
   } catch (err) {
-    context.error(`Invalid cron schedule: ${scheduleTime}`, err);
+    context.error(`Failed to parse cronTime or trigger job: ${err}`);
   }
 }
 
@@ -137,7 +98,8 @@ app.http('scheduleJob', {
   handler: scheduleJob,
 });
 
+// Always run every minute, check cronTime logic inside timerTrigger
 app.timer('timerTrigger', {
-  schedule: scheduleTime, // This value is only read at startup!
+  schedule: cronTime,
   handler: timerTrigger,
 });

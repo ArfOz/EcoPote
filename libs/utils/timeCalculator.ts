@@ -25,3 +25,39 @@ export const TimeCalculator = (schedule: ScheduleEnum, startDateTime: Date) => {
       throw new Error('Invalid schedule type');
   }
 };
+
+/**
+ * Generates a cron expression based on schedule key and startTime.
+ * For "every-day", "every-week", "every-month", "every-year", uses startTime's hour/minute.
+ * For interval-based (every-5-minutes, etc.), uses the enum value directly.
+ */
+export function getCronExpression(
+  schedule: ScheduleEnum,
+  startTime: Date
+): string {
+  switch (schedule) {
+    case 'every-day':
+      // Run every day at the hour/minute of startTime
+      return `${startTime.getMinutes()} ${startTime.getHours()} * * *`;
+    case 'every-week':
+      // Run every week at the hour/minute/day of week of startTime
+      return `${startTime.getMinutes()} ${startTime.getHours()} * * ${startTime.getDay()}`;
+    case 'every-month':
+      // Run every month at the hour/minute/day of month of startTime
+      return `${startTime.getMinutes()} ${startTime.getHours()} ${startTime.getDate()} * *`;
+    case 'every-year':
+      // Run every year at the hour/minute/day/month of startTime
+      return `${startTime.getMinutes()} ${startTime.getHours()} ${startTime.getDate()} ${
+        startTime.getMonth() + 1
+      } *`;
+    case 'every-5-minutes':
+      return '*/5 * * * *'; // Adjust as needed for your cron library
+    case 'every-10-minutes':
+      return '*/10 * * * *'; // Adjust as needed for your cron library
+    case 'every-minute':
+      return '*/1 * * * *'; // Adjust as needed for your cron library
+
+    default:
+      throw new Error(`Unsupported schedule key: ${schedule}`);
+  }
+}
