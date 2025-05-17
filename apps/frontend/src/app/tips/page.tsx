@@ -1,6 +1,5 @@
 'use client';
 import React, { useEffect } from 'react';
-import Navbar from '../components/navbar/Navbar';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
 import {
@@ -9,8 +8,7 @@ import {
   ResponseTipsDetails,
   Tips,
 } from '@shared/dtos';
-import { TipsComponent } from '../components/tips';
-import { SelectedTip } from '../components/tips/tipDetailModal';
+import { TipsComponent, Navbar, SelectedTip } from '../components';
 
 const TipsPage: React.FC = () => {
   const [tips, setTips] = React.useState<Tips[]>([]);

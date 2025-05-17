@@ -41,9 +41,8 @@ export class AdminService {
     private readonly userDatabaseService: UserDatabaseService,
     private readonly authService: AuthService,
     private readonly newsDatabaseService: NewsDatabaseService,
-    private readonly tipsDatabaseService: TipsDatabaseService
-  ) // private readonly logger: WinstonLoggerService
-  {
+    private readonly tipsDatabaseService: TipsDatabaseService // private readonly logger: WinstonLoggerService
+  ) {
     // this.logger.serviceName('admin-service');
   }
 
@@ -309,6 +308,7 @@ export class AdminService {
       const data = await this.newsDatabaseService.createNews({
         title: newsData.title,
         content: html,
+        status: newsData.status || false,
         tips: {
           connect: {
             id: parseInt(newsData.tipsId),

@@ -1,3 +1,4 @@
+'use client';
 import { News } from '@prisma/client';
 import React from 'react';
 

@@ -1,10 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Navbar from '../components/navbar/Navbar';
 import { fetchWithAuth } from '@utils';
-import { ResponseStatus, Status } from '../components/dtos/dtos';
 import { ResponseMessageEmail } from '@shared/dtos';
+import { Navbar, ResponseStatus, Status } from '../components';
 
 const SendEmail = () => {
   const [subject, setSubject] = useState<string>('');

@@ -2,9 +2,10 @@
 
 import { fetchWithAuth } from '@utils';
 import React, { useEffect } from 'react';
-import Navbar from '../components/navbar/Navbar';
+
 import { useRouter } from 'next/navigation';
 import { CreateUserDto, ResponseCreateUser } from '@shared/dtos';
+import { Navbar } from '../components';
 
 const AddUser = () => {
   const [status, setStatus] = React.useState<string | null>(null);

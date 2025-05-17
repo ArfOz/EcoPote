@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 
-const Navbar = () => {
+export const Navbar = () => {
   const router = useRouter();
 
   const handleLogout = () => {
@@ -50,6 +50,13 @@ const Navbar = () => {
           >
             Cron Emails Order
           </button>
+
+          <button
+            onClick={() => router.push('/emails')}
+            className="text-white hover:text-gray-300"
+          >
+            All Emails
+          </button>
           <button
             onClick={handleLogout}
             className="text-white hover:text-gray-300"
@@ -61,5 +68,3 @@ const Navbar = () => {
     </nav>
   );
 };
-
-export default Navbar;

@@ -1,6 +1,6 @@
 'use client';
 
-import Navbar from '../components/navbar/Navbar';
+import { Navbar } from '../components';
 import { CronTime } from '../components/auto-email/CronTime';
 const CronPage = () => {
   return (

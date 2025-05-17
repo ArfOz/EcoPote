@@ -28,16 +28,15 @@ model Admin {
 }
 
 model News {
-  id         Int       @id @default(autoincrement())
-  title      String
-  content    String    @db.Text
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  tipsId     Int
-  tips       Tips      @relation(fields: [tipsId], references: [id], onDelete: Cascade)
-  status     Boolean   @default(false)
-  sendTime   DateTime?
-  sendStatus Boolean   @default(false)
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  tipsId    Int
+  tips      Tips      @relation(fields: [tipsId], references: [id], onDelete: Cascade)
+  status    Boolean   @default(false)
+  sendTime  DateTime?
 }
 
 model Cron {
