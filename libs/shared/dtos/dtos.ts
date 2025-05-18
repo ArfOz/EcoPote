@@ -159,6 +159,8 @@ export interface ResponseTipsDetails {
       createdAt: Date;
       updatedAt: Date;
       status: boolean;
+      sendStatus: boolean;
+      sendTime: Date | null;
     }[];
   };
 }
@@ -187,6 +189,7 @@ export interface ResponseTipNews {
       content: string;
       tipsId: number;
       status: boolean;
+      sendTime: Date | null;
     }[];
   };
 

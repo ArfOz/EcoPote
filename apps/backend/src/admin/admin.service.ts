@@ -305,10 +305,12 @@ export class AdminService {
         throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
       }
 
+      const emailStatus = newsData.status === 'true' ? true : false;
+
       const data = await this.newsDatabaseService.createNews({
         title: newsData.title,
         content: html,
-        status: newsData.status || false,
+        status: emailStatus,
         tips: {
           connect: {
             id: parseInt(newsData.tipsId),

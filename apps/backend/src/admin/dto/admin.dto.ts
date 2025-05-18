@@ -58,6 +58,6 @@ export class CreateAddNewsDto {
   tipsId: string;
 
   @IsOptional()
-  @IsBoolean()
-  status: boolean;
+  @IsString()
+  status: 'true' | 'false';
 }

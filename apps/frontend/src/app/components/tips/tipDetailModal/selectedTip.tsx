@@ -45,6 +45,7 @@ export const SelectedTip = ({
   const [totalNews, setTotalNews] = useState<number>(0);
   const [page, setPage] = useState<number>(1);
   const [file, setFile] = useState<File | null>(null);
+  const [newsStatus, setNewsStatus] = useState<'true' | 'false'>('true');
 
   useEffect(() => {
     const fetchTipNews = async () => {
@@ -80,6 +81,7 @@ export const SelectedTip = ({
     try {
       const formData = new FormData();
       formData.append('title', newsTitle);
+      formData.append('status', newsStatus);
       if (file) {
         formData.append('file', file);
       }
@@ -209,6 +211,7 @@ export const SelectedTip = ({
                 setFile={setFile}
                 addNewsBackend={addNewsBackend}
                 selectedTip={selectedTip}
+                setNewsStatus={setNewsStatus}
               />
             )}
           </div>

@@ -6,11 +6,14 @@ export const AddNewsForm = ({
   addNewsBackend,
   setFile,
   selectedTip,
+  setNewsStatus,
 }: {
   newsTitle: string;
   setNewsTitle: (title: string) => void;
   addNewsBackend: (id: number) => Promise<void>;
   setFile: (file: File | null) => void;
+  setNewsStatus: (status: 'true' | 'false') => void;
+
   selectedTip: { id: number };
 }) => {
   return (
