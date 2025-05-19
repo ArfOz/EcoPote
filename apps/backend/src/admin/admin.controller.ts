@@ -176,7 +176,7 @@ export class AdminController {
   @UseGuards(JwtAuthGuard)
   @Post('news/update/:id')
   async updateNews(
-    @Body() newsData: { title: string; content: string; status: boolean },
+    @Body() newsData: { title: string; content: string; status: string },
     @Param('id') id: string
   ): Promise<ResponseUpdateNews> {
     return await this.adminService.updateNews(newsData, parseInt(id, 10));

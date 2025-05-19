@@ -11,6 +11,10 @@ export const Emails = () => {
   const router = useRouter();
   const [emails, setEmails] = useState<News[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editStatus, setEditStatus] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -60,6 +64,59 @@ export const Emails = () => {
   const handlePrevPage = () => setCurrentPage((p) => Math.max(1, p - 1));
   const handleNextPage = () =>
     setCurrentPage((p) => Math.min(totalPages, p + 1));
+
+  const handleUpdate = (id: number) => {
+    const email = emails.find((e) => e.id === id);
+    if (email) {
+      setEditingId(id);
+      setEditTitle(email.title);
+      setEditStatus(email.status);
+    }
+  };
+
+  const handleSave = async (id: number) => {
+    const token = localStorage.getItem('token');
+    // Prepare FormData for file upload and other fields
+    const formData = new FormData();
+    formData.append('title', editTitle);
+    formData.append('status', String(editStatus));
+    if (file) {
+      formData.append('content', file);
+    }
+
+    await fetchWithAuth(`admin/news/update/${id}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // Note: Do not set 'Content-Type' header when using FormData; browser will set it automatically
+      },
+      body: formData,
+    });
+
+    setEmails((prev) =>
+      prev.map((email) =>
+        email.id === id
+          ? {
+              ...email,
+              title: editTitle,
+              status: editStatus,
+            }
+          : email
+      )
+    );
+    setEditingId(null);
+  };
+
+  const handleDelete = async (id: number) => {
+    const token = localStorage.getItem('token');
+    if (window.confirm('Are you sure you want to delete this email?')) {
+      await fetchWithAuth(`email/delete/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEmails((prev) => prev.filter((email) => email.id !== id));
+    }
+  };
 
   return (
     <div>
@@ -115,13 +172,38 @@ export const Emails = () => {
             >
               Send Time
             </th>
+            <th
+              style={{
+                borderBottom: '1px solid #ddd',
+                padding: '8px',
+                textAlign: 'left',
+              }}
+            >
+              Content
+            </th>
+            <th
+              style={{
+                borderBottom: '1px solid #ddd',
+                padding: '8px',
+                textAlign: 'left',
+              }}
+            >
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
           {paginatedEmails.map((email) => (
             <tr key={email.id}>
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
-                {email.title}
+                {editingId === email.id ? (
+                  <input
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                  />
+                ) : (
+                  email.title
+                )}
               </td>
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                 {new Date(email.createdAt).toLocaleString()}
@@ -130,19 +212,85 @@ export const Emails = () => {
                 {new Date(email.updatedAt).toLocaleString()}
               </td>
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
-                <span
-                  style={{
-                    color: email.status ? 'green' : 'red',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {email.status ? 'Active' : 'Inactive'}
-                </span>
+                {editingId === email.id ? (
+                  <select
+                    value={editStatus ? 'active' : 'inactive'}
+                    onChange={(e) => setEditStatus(e.target.value === 'active')}
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                ) : (
+                  <span
+                    style={{
+                      color: email.status ? 'green' : 'red',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {email.status ? 'Active' : 'Inactive'}
+                  </span>
+                )}
               </td>
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                 {email.sendTime
                   ? new Date(email.sendTime).toLocaleString()
                   : ''}
+              </td>
+              <td>
+                {editingId === email.id ? (
+                  <input
+                    type="file"
+                    accept=".htm,.html"
+                    style={{ width: '100%' }}
+                    onChange={(e) => {
+                      const selectedFile = e.target.files
+                        ? e.target.files[0]
+                        : null;
+                      setFile(selectedFile);
+                    }}
+                  />
+                ) : (
+                  <button
+                    style={{ marginLeft: '8px' }}
+                    onClick={() => {
+                      const newWindow = window.open();
+                      if (newWindow) {
+                        newWindow.document.write(email.content);
+                        newWindow.document.close();
+                      }
+                    }}
+                  >
+                    Click to view content
+                  </button>
+                )}
+              </td>
+              <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
+                {editingId === email.id ? (
+                  <>
+                    <button
+                      style={{ marginRight: '8px' }}
+                      onClick={() => handleSave(email.id)}
+                    >
+                      Save
+                    </button>
+                    <button onClick={() => setEditingId(null)}>Cancel</button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      style={{ marginRight: '8px' }}
+                      onClick={() => handleUpdate(email.id)}
+                    >
+                      Update
+                    </button>
+                    <button
+                      style={{ color: 'red' }}
+                      onClick={() => handleDelete(email.id)}
+                    >
+                      Delete
+                    </button>
+                  </>
+                )}
               </td>
             </tr>
           ))}

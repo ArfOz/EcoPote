@@ -357,7 +357,8 @@ export class AdminService {
     }
   }
   async updateNews(
-    newsData: { title: string },
+    newsData: { title: string; status: string },
+    // file: Express.Multer.File,
     id: number
   ): Promise<ResponseUpdateNews> {
     try {
@@ -365,9 +366,20 @@ export class AdminService {
       if (!news) {
         throw new HttpException('News not found', HttpStatus.NOT_FOUND);
       }
+      if (newsData.status !== 'true' && newsData.status !== 'false') {
+        throw new HttpException('Invalid status', HttpStatus.BAD_REQUEST);
+      }
+      const emailStatus = newsData.status === 'true' ? true : false;
+      const tips = await this.tipsDatabaseService.findUnique({
+        where: { id: news.tipsId },
+      });
+      if (!tips) {
+        throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
+      }
+
       const data = {
         title: newsData.title,
-        status: news.status,
+        status: emailStatus,
       };
 
       const updatedNews = await this.newsDatabaseService.updateNews(id, data);
