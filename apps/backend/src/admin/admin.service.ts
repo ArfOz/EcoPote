@@ -27,7 +27,7 @@ import {
   ResponseTipsDetails,
   ResponseUpdateNews,
 } from '@shared/dtos';
-import { CreateAddNewsDto } from './dto';
+import { CreateAddNewsDto, UpdateNewsDto } from './dto';
 import { WinstonLoggerService } from '@logger-winston';
 
 @Injectable()
@@ -357,19 +357,16 @@ export class AdminService {
     }
   }
   async updateNews(
-    newsData: { title: string; status: string },
-    // file: Express.Multer.File,
-    id: number
+    id: number,
+    newsData: UpdateNewsDto,
+    file: Express.Multer.File
   ): Promise<ResponseUpdateNews> {
     try {
+      console.log('datalar', newsData, id);
       const news = await this.newsDatabaseService.findNewsById(id);
       if (!news) {
         throw new HttpException('News not found', HttpStatus.NOT_FOUND);
       }
-      if (newsData.status !== 'true' && newsData.status !== 'false') {
-        throw new HttpException('Invalid status', HttpStatus.BAD_REQUEST);
-      }
-      const emailStatus = newsData.status === 'true' ? true : false;
       const tips = await this.tipsDatabaseService.findUnique({
         where: { id: news.tipsId },
       });
@@ -377,10 +374,23 @@ export class AdminService {
         throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
       }
 
-      const data = {
-        title: newsData.title,
+      if (
+        newsData.status !== undefined &&
+        newsData.status !== 'true' &&
+        newsData.status !== 'false'
+      ) {
+        throw new HttpException('Invalid status', HttpStatus.BAD_REQUEST);
+      }
+
+      const emailStatus = newsData.status === 'true' ? true : false;
+
+      const data: Prisma.NewsUpdateInput = {
         status: emailStatus,
       };
+
+      if (newsData.title !== undefined) {
+        data.title = newsData.title;
+      }
 
       const updatedNews = await this.newsDatabaseService.updateNews(id, data);
       if (!updatedNews) {

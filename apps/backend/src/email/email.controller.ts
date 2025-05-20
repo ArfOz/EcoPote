@@ -66,7 +66,7 @@ export class EmailController {
     return await this.emailService.getEmailsOrder();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('allemails')
   async allEmails(
     @Query('page') page?: string,

@@ -12,8 +12,8 @@ export const Emails = () => {
   const [emails, setEmails] = useState<News[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editTitle, setEditTitle] = useState('');
-  const [editStatus, setEditStatus] = useState(false);
+  const [emailTitle, setEmailTitle] = useState('');
+  const [emailStatus, setEmailStatus] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -69,37 +69,43 @@ export const Emails = () => {
     const email = emails.find((e) => e.id === id);
     if (email) {
       setEditingId(id);
-      setEditTitle(email.title);
-      setEditStatus(email.status);
+      setEmailTitle(email.title);
+      setEmailStatus(email.status);
     }
   };
 
   const handleSave = async (id: number) => {
-    const token = localStorage.getItem('token');
     // Prepare FormData for file upload and other fields
     const formData = new FormData();
-    formData.append('title', editTitle);
-    formData.append('status', String(editStatus));
+    formData.append('title', emailTitle);
+
+    formData.append('status', String(emailStatus));
+    console.log('formdata', formData);
     if (file) {
-      formData.append('content', file);
+      formData.append('file', file);
     }
 
-    await fetchWithAuth(`admin/news/update/${id}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        // Note: Do not set 'Content-Type' header when using FormData; browser will set it automatically
+    console.log('FormData:', formData);
+
+    const res = await fetchWithAuth(
+      `admin/news/update/${id}`,
+      {
+        method: 'POST',
+        body: formData,
       },
-      body: formData,
-    });
+      true,
+      true
+    );
+
+    console.log('Response:', res);
 
     setEmails((prev) =>
       prev.map((email) =>
         email.id === id
           ? {
               ...email,
-              title: editTitle,
-              status: editStatus,
+              title: emailTitle,
+              status: emailStatus,
             }
           : email
       )
@@ -198,8 +204,8 @@ export const Emails = () => {
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                 {editingId === email.id ? (
                   <input
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
+                    value={emailTitle}
+                    onChange={(e) => setEmailTitle(e.target.value)}
                   />
                 ) : (
                   email.title
@@ -214,8 +220,10 @@ export const Emails = () => {
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                 {editingId === email.id ? (
                   <select
-                    value={editStatus ? 'active' : 'inactive'}
-                    onChange={(e) => setEditStatus(e.target.value === 'active')}
+                    value={emailStatus ? 'active' : 'inactive'}
+                    onChange={(e) =>
+                      setEmailStatus(e.target.value === 'active')
+                    }
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>

@@ -17,7 +17,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { Multer } from 'multer';
 import { JwtAuthGuard } from '@auth';
-import { CreateAddNewsDto, CreateAdminDto } from './dto';
+import { CreateAddNewsDto, CreateAdminDto, UpdateNewsDto } from './dto';
 import {
   CreateUserDto,
   ResponseCreateUser,
@@ -174,12 +174,14 @@ export class AdminController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file')) // <-- Add this line
   @Post('news/update/:id')
   async updateNews(
-    @Body() newsData: { title: string; content: string; status: string },
-    @Param('id') id: string
+    @Param('id') id: string,
+    @Body() newsData: UpdateNewsDto,
+    @UploadedFile() file: Express.Multer.File
   ): Promise<ResponseUpdateNews> {
-    return await this.adminService.updateNews(newsData, parseInt(id, 10));
+    return await this.adminService.updateNews(parseInt(id, 10), newsData, file);
   }
 
   @UseGuards(JwtAuthGuard)
