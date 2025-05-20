@@ -174,7 +174,15 @@ export class NewsController {
     @Body() newsData: UpdateNewsDto,
     @UploadedFile() file: Express.Multer.File
   ): Promise<ResponseUpdateNews> {
-    return await this.newsService.updateNews(parseInt(id, 10), newsData, file);
+    let htmlContent;
+    if (file) {
+      htmlContent = fs.readFileSync(file.path, 'utf8'); // Use file.path directly
+    }
+    return await this.newsService.updateNews(
+      parseInt(id, 10),
+      newsData,
+      htmlContent
+    );
   }
 
   @UseGuards(JwtAuthGuard)

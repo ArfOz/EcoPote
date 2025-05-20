@@ -7,7 +7,7 @@ import { News } from '@prisma/client';
 
 const NEWS_PER_PAGE = 20;
 
-export const AllEmails = () => {
+export const AllNews = () => {
   const router = useRouter();
   const [news, setNews] = useState<News[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,39 +16,36 @@ export const AllEmails = () => {
   const [newsStatus, setNewsStatus] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 
-  useEffect(() => {
+  // Fetch news from backend
+  const fetchNews = async () => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-    }
-
-    const fetchNews = async () => {
-      try {
-        const res: ResponseNewsAllDto = await fetchWithAuth('news/allnews', {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.success) {
-          throw new Error('Failed to fetch news');
-        }
-
-        setNews(res.data?.emails || []);
-      } catch (error) {
-        if (error instanceof Error) {
-          if (
-            error.message === 'Token is expired' ||
-            error.message === 'Unauthorized access' ||
-            error.message === 'No token found'
-          ) {
-            localStorage.removeItem('token');
-            router.push('/login');
-          }
-        }
+    try {
+      const res: ResponseNewsAllDto = await fetchWithAuth('news/allnews', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.success) {
+        throw new Error('Failed to fetch news');
       }
-    };
+      setNews(res.data?.emails || []);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        (error.message === 'Token is expired' ||
+          error.message === 'Unauthorized access' ||
+          error.message === 'No token found')
+      ) {
+        localStorage.removeItem('token');
+        router.push('/login');
+      }
+    }
+  };
+
+  useEffect(() => {
     fetchNews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   // Pagination logic
@@ -68,24 +65,20 @@ export const AllEmails = () => {
       setEditingId(id);
       setNewsTitle(email.title);
       setNewsStatus(email.status);
+      setFile(null);
     }
   };
 
   const handleSave = async (id: number) => {
-    // Prepare FormData for file upload and other fields
     const formData = new FormData();
     formData.append('title', newsTitle);
-
     formData.append('status', String(newsStatus));
-    console.log('formdata', formData);
     if (file) {
       formData.append('file', file);
     }
 
-    console.log('FormData:', formData);
-
-    const res = await fetchWithAuth(
-      `admin/news/update/${id}`,
+    await fetchWithAuth(
+      `news/news/update/${id}`,
       {
         method: 'POST',
         body: formData,
@@ -93,20 +86,9 @@ export const AllEmails = () => {
       true
     );
 
-    console.log('Response:', res);
-
-    setNews((prev) =>
-      prev.map((email) =>
-        email.id === id
-          ? {
-              ...email,
-              title: newsTitle,
-              status: newsStatus,
-            }
-          : email
-      )
-    );
     setEditingId(null);
+    setFile(null);
+    await fetchNews(); // Refresh data after update
   };
 
   const handleDelete = async (id: number) => {
@@ -122,8 +104,6 @@ export const AllEmails = () => {
 
   return (
     <div>
-      <h1>Emails</h1>
-      <p>Check the console for fetched emails.</p>
       <table
         style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}
       >
@@ -200,7 +180,7 @@ export const AllEmails = () => {
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                 {editingId === email.id ? (
                   <input
-                    value={email.title}
+                    value={newsTitle}
                     onChange={(e) => setNewsTitle(e.target.value)}
                   />
                 ) : (

@@ -1,11 +1,11 @@
 import React from 'react';
-import { AllEmails, Navbar } from '../components';
+import { AllNews, Navbar } from '../components';
 
 const EmailsPage: React.FC = () => {
   return (
     <div>
       <Navbar />
-      <AllEmails />
+      <AllNews />
     </div>
   );
 };

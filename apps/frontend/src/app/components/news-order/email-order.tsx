@@ -4,7 +4,7 @@ import { fetchWithAuth } from '@utils';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export const Emailorder = () => {
+export const Newsorder = () => {
   const [data, setData] = useState<ResponseNewsOrderDto['data'] | null>(null);
   const router = useRouter();
 
@@ -13,26 +13,26 @@ export const Emailorder = () => {
     if (!token) {
       router.push('/login');
     }
-    const fetchEmailOrder = async () => {
+    const fetchNewsOrder = async () => {
       try {
         const res: ResponseNewsOrderDto = await fetchWithAuth(
-          'email/emailsorder',
+          'news/newsorder',
           {},
           true
         );
         setData(res.data);
       } catch (error) {
-        console.error('Error fetching email order:', error);
+        console.error('Error fetching news order:', error);
       }
     };
 
-    fetchEmailOrder();
+    fetchNewsOrder();
   }, [router]);
 
   return (
     <>
       <div className="flex flex-col items-center justify-start min-h-screen bg-gray-100 py-10">
-        <h1 className="text-2xl font-bold mb-4">Email Order</h1>
+        <h1 className="text-2xl font-bold mb-4">News Order</h1>
         <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-blue-500 text-white">

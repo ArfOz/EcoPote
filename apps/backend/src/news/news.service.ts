@@ -254,7 +254,7 @@ export class NewsService {
   async updateNews(
     id: number,
     newsData: UpdateNewsDto,
-    file: Express.Multer.File
+    file: string
   ): Promise<ResponseUpdateNews> {
     try {
       console.log('datalar', newsData, id);
@@ -285,6 +285,9 @@ export class NewsService {
 
       if (newsData.title !== undefined) {
         data.title = newsData.title;
+      }
+      if (file) {
+        data.content = file;
       }
 
       const updatedNews = await this.newsDatabaseService.updateNews(id, data);

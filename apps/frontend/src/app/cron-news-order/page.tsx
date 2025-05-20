@@ -1,11 +1,11 @@
 import React from 'react';
-import { Emailorder, Navbar } from '../components';
+import { Newsorder, Navbar } from '../components';
 
 const CronEmailsOrder = () => {
   return (
     <>
       <Navbar />
-      <Emailorder />
+      <Newsorder />
     </>
   );
 };
