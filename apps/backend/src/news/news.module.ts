@@ -1,5 +1,5 @@
-import { EmailController } from './email.controller';
-import { EmailService } from './email.service';
+import { NewsController } from './news.controller';
+import { NewsService } from './news.service';
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 
@@ -26,7 +26,7 @@ import { AuthModule } from '@auth';
     AdminDatabaseModule,
     AuthModule,
   ],
-  controllers: [EmailController],
-  providers: [EmailService, UserDatabaseService, AdminDatabaseModule],
+  controllers: [NewsController],
+  providers: [NewsService, UserDatabaseService, AdminDatabaseModule],
 })
-export class EmailModule {}
+export class NewsModule {}

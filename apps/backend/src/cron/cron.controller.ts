@@ -16,7 +16,7 @@ import {
   ResponseCronUpdateDto,
   CronCreateDto,
   ResponseDeleteCron,
-  ResponseCronSendEmailDto,
+  ResponseCronSendNewsDto,
 } from '@shared/dtos';
 
 @Controller('cron')

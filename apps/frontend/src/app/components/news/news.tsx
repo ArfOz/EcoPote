@@ -2,18 +2,18 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
-import { ResponseEmailsAllDto } from '@shared/dtos';
+import { ResponseNewsAllDto } from '@shared/dtos';
 import { News } from '@prisma/client';
 
-const EMAILS_PER_PAGE = 20;
+const NEWS_PER_PAGE = 20;
 
-export const Emails = () => {
+export const AllEmails = () => {
   const router = useRouter();
-  const [emails, setEmails] = useState<News[]>([]);
+  const [news, setNews] = useState<News[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [emailTitle, setEmailTitle] = useState('');
-  const [emailStatus, setEmailStatus] = useState(false);
+  const [newsTitle, setNewsTitle] = useState('');
+  const [newsStatus, setNewsStatus] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -22,22 +22,19 @@ export const Emails = () => {
       router.push('/login');
     }
 
-    const fetchEmails = async () => {
+    const fetchNews = async () => {
       try {
-        const res: ResponseEmailsAllDto = await fetchWithAuth(
-          'email/allemails',
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res: ResponseNewsAllDto = await fetchWithAuth('news/allnews', {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!res.success) {
-          throw new Error('Failed to fetch emails');
+          throw new Error('Failed to fetch news');
         }
 
-        setEmails(res.data?.emails || []);
+        setNews(res.data?.emails || []);
       } catch (error) {
         if (error instanceof Error) {
           if (
@@ -51,14 +48,14 @@ export const Emails = () => {
         }
       }
     };
-    fetchEmails();
+    fetchNews();
   }, [router]);
 
   // Pagination logic
-  const totalPages = Math.ceil(emails.length / EMAILS_PER_PAGE);
-  const paginatedEmails = emails.slice(
-    (currentPage - 1) * EMAILS_PER_PAGE,
-    currentPage * EMAILS_PER_PAGE
+  const totalPages = Math.ceil(news.length / NEWS_PER_PAGE);
+  const paginatedNews = news.slice(
+    (currentPage - 1) * NEWS_PER_PAGE,
+    currentPage * NEWS_PER_PAGE
   );
 
   const handlePrevPage = () => setCurrentPage((p) => Math.max(1, p - 1));
@@ -66,20 +63,20 @@ export const Emails = () => {
     setCurrentPage((p) => Math.min(totalPages, p + 1));
 
   const handleUpdate = (id: number) => {
-    const email = emails.find((e) => e.id === id);
+    const email = news.find((e) => e.id === id);
     if (email) {
       setEditingId(id);
-      setEmailTitle(email.title);
-      setEmailStatus(email.status);
+      setNewsTitle(email.title);
+      setNewsStatus(email.status);
     }
   };
 
   const handleSave = async (id: number) => {
     // Prepare FormData for file upload and other fields
     const formData = new FormData();
-    formData.append('title', emailTitle);
+    formData.append('title', newsTitle);
 
-    formData.append('status', String(emailStatus));
+    formData.append('status', String(newsStatus));
     console.log('formdata', formData);
     if (file) {
       formData.append('file', file);
@@ -93,19 +90,18 @@ export const Emails = () => {
         method: 'POST',
         body: formData,
       },
-      true,
       true
     );
 
     console.log('Response:', res);
 
-    setEmails((prev) =>
+    setNews((prev) =>
       prev.map((email) =>
         email.id === id
           ? {
               ...email,
-              title: emailTitle,
-              status: emailStatus,
+              title: newsTitle,
+              status: newsStatus,
             }
           : email
       )
@@ -116,11 +112,11 @@ export const Emails = () => {
   const handleDelete = async (id: number) => {
     const token = localStorage.getItem('token');
     if (window.confirm('Are you sure you want to delete this email?')) {
-      await fetchWithAuth(`email/delete/${id}`, {
+      await fetchWithAuth(`news/delete/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-      setEmails((prev) => prev.filter((email) => email.id !== id));
+      setNews((prev) => prev.filter((email) => email.id !== id));
     }
   };
 
@@ -199,13 +195,13 @@ export const Emails = () => {
           </tr>
         </thead>
         <tbody>
-          {paginatedEmails.map((email) => (
+          {paginatedNews.map((email) => (
             <tr key={email.id}>
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                 {editingId === email.id ? (
                   <input
-                    value={emailTitle}
-                    onChange={(e) => setEmailTitle(e.target.value)}
+                    value={email.title}
+                    onChange={(e) => setNewsTitle(e.target.value)}
                   />
                 ) : (
                   email.title
@@ -220,10 +216,8 @@ export const Emails = () => {
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                 {editingId === email.id ? (
                   <select
-                    value={emailStatus ? 'active' : 'inactive'}
-                    onChange={(e) =>
-                      setEmailStatus(e.target.value === 'active')
-                    }
+                    value={newsStatus ? 'active' : 'inactive'}
+                    onChange={(e) => setNewsStatus(e.target.value === 'active')}
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>

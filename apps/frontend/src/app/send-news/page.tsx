@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
-import { ResponseMessageEmail } from '@shared/dtos';
+import { ResponseMessageNews } from '@shared/dtos';
 import { Navbar, ResponseStatus, Status } from '../components';
 
-const SendEmail = () => {
+const SendNews = () => {
   const [subject, setSubject] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null); // State for file name
@@ -30,8 +30,8 @@ const SendEmail = () => {
     }
 
     try {
-      const response: ResponseMessageEmail = (await fetchWithAuth(
-        'email/sendemail',
+      const response: ResponseMessageNews = (await fetchWithAuth(
+        'news/sendnews',
         {
           method: 'POST',
           body: formData,
@@ -40,13 +40,13 @@ const SendEmail = () => {
       )) as ResponseStatus;
 
       if (!response) {
-        throw new Error('Failed to send emails');
+        throw new Error('Failed to send news');
       }
       if (response.success) {
         setStatus({
           sentUsers: response.data.sentUsers ?? [],
           errorUsers: response.data.errorUsers ?? [],
-          message: 'Emails sent successfully',
+          message: 'News sent successfully',
         });
       }
       const fileInput = document.querySelector(
@@ -69,7 +69,7 @@ const SendEmail = () => {
           router.push('/login');
         }
       } else {
-        setStatus('An error occurred while sending emails.');
+        setStatus('An error occurred while sending news.');
       }
     }
   };
@@ -104,7 +104,7 @@ const SendEmail = () => {
       <Navbar />
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded shadow-md">
-          <h1 className="text-2xl font-bold text-center">Send Email</h1>
+          <h1 className="text-2xl font-bold text-center">Send News</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
@@ -146,7 +146,7 @@ const SendEmail = () => {
               type="submit"
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Send Emails
+              Send News
             </button>
           </form>
           {status && (
@@ -184,4 +184,4 @@ const SendEmail = () => {
   );
 };
 
-export default SendEmail;
+export default SendNews;

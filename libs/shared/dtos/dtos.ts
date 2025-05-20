@@ -29,7 +29,7 @@ export interface ResponseCreateUser {
   success: boolean;
 }
 
-export interface ResponseMessageEmail {
+export interface ResponseMessageNews {
   data: {
     sentUsers: string[];
     errorUsers: string[];
@@ -263,7 +263,7 @@ export interface ResponseDeleteCron {
   message: string;
   success: boolean;
 }
-export interface ResponseCronSendEmailDto {
+export interface ResponseCronSendNewsDto {
   message: string;
   success: boolean;
 }
@@ -272,7 +272,7 @@ export interface NewsOrder extends News {
   tips: { title: string };
 }
 
-export interface ResponseEmailOrderDto {
+export interface ResponseNewsOrderDto {
   data: NewsOrder[];
   success: boolean;
   message: string;
@@ -293,7 +293,7 @@ export interface ResponseUnregisterUserDto {
   };
 }
 
-export interface ResponseEmailsAllDto {
+export interface ResponseNewsAllDto {
   data: { emails: News[]; total: number };
   success: boolean;
   message: string;

@@ -21,10 +21,10 @@ export const Navbar = () => {
             Show All Users
           </button>
           <button
-            onClick={() => router.push('/send-email')}
+            onClick={() => router.push('/send-news')}
             className="text-white hover:text-gray-300"
           >
-            Send Email
+            Send News
           </button>
           <button
             onClick={() => router.push('/add-user')}
@@ -39,23 +39,23 @@ export const Navbar = () => {
             Tips
           </button>
           <button
-            onClick={() => router.push('/auto-email')}
+            onClick={() => router.push('/auto-news')}
             className="text-white hover:text-gray-300"
           >
-            Auto-Email
+            Auto-News
           </button>
           <button
-            onClick={() => router.push('/cron-email-order')}
+            onClick={() => router.push('/cron-news-order')}
             className="text-white hover:text-gray-300"
           >
-            Cron Emails Order
+            Cron News Order
           </button>
 
           <button
-            onClick={() => router.push('/emails')}
+            onClick={() => router.push('/news')}
             className="text-white hover:text-gray-300"
           >
-            All Emails
+            All News
           </button>
           <button
             onClick={handleLogout}
