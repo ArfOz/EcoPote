@@ -1,4 +1,6 @@
+import { LayoutWithSidebar } from './components';
 import './global.css';
+import { usePathname } from 'next/navigation';
 
 export const metadata = {
   title: 'Welcome to frontend',
@@ -10,9 +12,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // This hook only works in client components, so wrap the layout in a Client Component
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <LayoutWithSidebar>{children}</LayoutWithSidebar>
+      </body>
     </html>
   );
 }

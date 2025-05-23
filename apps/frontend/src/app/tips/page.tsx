@@ -8,7 +8,7 @@ import {
   ResponseTipsDetails,
   Tips,
 } from '@shared/dtos';
-import { TipsComponent, Navbar, SelectedTip } from '../components';
+import { TipsComponent, SelectedTip } from '../components';
 
 const TipsPage: React.FC = () => {
   const [tips, setTips] = React.useState<Tips[]>([]);
@@ -67,7 +67,6 @@ const TipsPage: React.FC = () => {
 
   return (
     <div>
-      <Navbar />
       <TipsComponent
         tips={tips}
         setSelectedTip={setSelectedTip}

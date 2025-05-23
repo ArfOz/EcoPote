@@ -1,6 +1,6 @@
 import { getCronExpression, TimeCalculator } from '@utils';
 import { Injectable, Logger } from '@nestjs/common';
-import { ScheduleEnum } from '@shared/dtos'; // Adjust the path based on your project structure
+import { ScheduleFrontEnum, CronTimeSetEnum } from '@shared/dtos'; // Adjust the path based on your project structure
 import {
   CronDatabaseService,
   NewsDatabaseService,
@@ -26,7 +26,7 @@ export class CronService {
   async createCronJob(
     name: string,
     startTime: Date,
-    schedule: ScheduleEnum,
+    schedule: keyof typeof CronTimeSetEnum,
     status: boolean
   ): Promise<ResponseCreateCron> {
     const dateNow = new Date();
@@ -84,7 +84,7 @@ export class CronService {
     id: number,
     cronName?: string,
     startTime?: Date,
-    schedule?: ScheduleEnum,
+    schedule?: keyof typeof CronTimeSetEnum,
     status?: boolean
   ): Promise<ResponseCronUpdateDto> {
     const dateNow = new Date();
@@ -108,6 +108,8 @@ export class CronService {
 
     let nextRun: Date | undefined = data.nextRun;
     if (startTime && schedule) {
+      // If schedule is an array, use the first element as the key
+      const scheduleKey = Array.isArray(schedule) ? schedule[0] : schedule;
       nextRun = TimeCalculator(schedule, startDateTime);
     }
 
@@ -120,14 +122,10 @@ export class CronService {
     };
 
     if (schedule) {
-      updatedCron.schedule = Object.keys(ScheduleEnum).find(
-        (x) => ScheduleEnum[x] === schedule
-      );
+      updatedCron.schedule = schedule;
     }
 
     const newCron = getCronExpression(schedule, startDateTime);
-    console.log('nextrun', nextRun);
-    console.log('newCron', newCron);
 
     const where: Prisma.CronWhereUniqueInput = { id };
 

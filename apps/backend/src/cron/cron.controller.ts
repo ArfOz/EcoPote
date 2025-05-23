@@ -17,7 +17,9 @@ import {
   CronCreateDto,
   ResponseDeleteCron,
   ResponseCronSendNewsDto,
+  CronTimeSetEnum,
 } from '@shared/dtos';
+import { ScheduleFrontEnum } from '@shared'; // Adjust the import path as needed
 
 @Controller('cron')
 export class CronController {
@@ -31,7 +33,7 @@ export class CronController {
       const res = await this.cronService.createCronJob(
         cronData.name,
         cronData.startTime,
-        cronData.schedule,
+        cronData.schedule as unknown as keyof typeof CronTimeSetEnum,
         cronData.status
       );
       return res;
@@ -67,7 +69,7 @@ export class CronController {
         cronData.id,
         cronData.name,
         cronData.startTime,
-        cronData.schedule,
+        cronData.schedule as unknown as keyof typeof CronTimeSetEnum,
         cronData.status
       );
       return response;

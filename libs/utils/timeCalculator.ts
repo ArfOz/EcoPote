@@ -1,5 +1,9 @@
-import { ScheduleEnum } from './../shared/dtos/dtos';
-export const TimeCalculator = (schedule: ScheduleEnum, startDateTime: Date) => {
+import { CronTimeSetEnum } from '@shared';
+
+export const TimeCalculator = (
+  schedule: keyof typeof CronTimeSetEnum,
+  startDateTime: Date
+) => {
   switch (schedule) {
     case 'every-5-minutes':
       return new Date(startDateTime.getTime() + 5 * 60 * 1000); // Add 5 minutes to the start time
@@ -32,7 +36,7 @@ export const TimeCalculator = (schedule: ScheduleEnum, startDateTime: Date) => {
  * For interval-based (every-5-minutes, etc.), uses the enum value directly.
  */
 export function getCronExpression(
-  schedule: ScheduleEnum,
+  schedule: keyof typeof CronTimeSetEnum,
   startTime: Date
 ): string {
   switch (schedule) {

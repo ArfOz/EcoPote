@@ -1,10 +1,9 @@
 import React from 'react';
-import { Newsorder, Navbar } from '../components';
+import { Newsorder } from '../components';
 
 const CronEmailsOrder = () => {
   return (
     <>
-      <Navbar />
       <Newsorder />
     </>
   );

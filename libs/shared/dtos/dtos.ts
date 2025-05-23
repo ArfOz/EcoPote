@@ -120,15 +120,15 @@ export interface ResponseTips {
   };
 }
 
-export enum ScheduleEnum {
-  EVERY_WEEK = 'every-week',
-  EVERY_MONTH = 'every-month',
-  EVERY_DAY = 'every-day',
-  EVERY_YEAR = 'every-year',
+export enum ScheduleFrontEnum {
+  'every-week' = 'Every Week',
+  'every-month' = 'Every Month',
+  'every-day' = 'Every Day',
+  'every-year' = 'Every Year',
   // For Testing
-  EVERY_5_MINUTES = 'every-5-minutes',
-  EVERY_10_MINUTES = 'every-10-minutes',
-  EVERY_MINUTE = 'every-minute',
+  'every-5-minutes' = 'Every 5 Minutes',
+  'every-10-minutes' = 'Every 10 Minutes',
+  'every-minute' = 'Every Minute',
 }
 
 export enum CronTimeSetEnum {
@@ -251,8 +251,8 @@ export class CronCreateDto {
   startTime!: Date;
 
   @IsNotEmpty()
-  @IsEnum(ScheduleEnum)
-  schedule!: ScheduleEnum;
+  @IsEnum(ScheduleFrontEnum)
+  schedule!: keyof typeof ScheduleFrontEnum;
 
   @IsBoolean()
   @IsNotEmpty()

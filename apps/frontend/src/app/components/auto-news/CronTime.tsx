@@ -68,7 +68,7 @@ export const CronTime = () => {
   }: {
     id: number;
     name?: string;
-    schedule?: string;
+    schedule?: keyof typeof ScheduleEnum;
     status?: boolean;
     startTime?: Date;
   }) => {
@@ -187,9 +187,9 @@ export const CronTime = () => {
                     }
                     className="px-1 border"
                   >
-                    {Object.values(ScheduleEnum).map((s) => (
-                      <option key={s} value={s}>
-                        {s}
+                    {Object.entries(ScheduleEnum).map(([key, value]) => (
+                      <option key={key} value={value}>
+                        {key}
                       </option>
                     ))}
                   </select>

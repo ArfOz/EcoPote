@@ -5,7 +5,6 @@ import React, { useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { CreateUserDto, ResponseCreateUser } from '@shared/dtos';
-import { Navbar } from '../components';
 
 const AddUser = () => {
   const [status, setStatus] = React.useState<string | null>(null);
@@ -79,7 +78,6 @@ const AddUser = () => {
 
   return (
     <>
-      <Navbar />
       <form
         onSubmit={handleSubmit}
         className="max-w-md mx-auto p-4 bg-white shadow-md rounded"

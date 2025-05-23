@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
@@ -15,24 +15,25 @@ const Login = () => {
     e.preventDefault();
 
     try {
-
-      const response :ResponseLogin = await fetchWithAuth('admin/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response: ResponseLogin = await fetchWithAuth(
+        'admin/login',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
         },
-        body: JSON.stringify({ email, password }),
-      }, false);
-
+        false
+      );
 
       if (response.success) {
-       
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
         } else {
           setError('Token is missing in the response.');
         }
-        router.push('/send-email');
+        router.push('/tips');
       } else {
         setError(`Error: ${response.message}`);
       }
@@ -47,7 +48,9 @@ const Login = () => {
         <h1 className="text-2xl font-bold text-center">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
               value={email}
@@ -57,7 +60,9 @@ const Login = () => {
             />
           </div>
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
