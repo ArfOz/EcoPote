@@ -11,6 +11,7 @@ import {
   ResponseTips,
   ResponseTipsDetails,
   ResponseUpdateNews,
+  CronTimeSetEnum,
 } from '@shared/dtos';
 import { sendEmailAzure, sendEmailsGmail } from '@shared/nodemailer';
 import {
@@ -20,6 +21,7 @@ import {
 } from '@database';
 import { LogsDatabaseService } from '@database/logs';
 import { CreateAddNewsDto, UpdateNewsDto } from './dtos';
+import { TimeCalculator } from '@utils';
 @Injectable()
 export class NewsService {
   constructor(
@@ -37,8 +39,13 @@ export class NewsService {
     logger.setServiceName('admin-service');
   }
 
-  async getStatus(): Promise<string> {
-    console.log('Email service is running!', new Date().toISOString());
+  async getStatus({ schedule }: { schedule: string }): Promise<string> {
+    console.log(
+      'Email service is running!',
+      new Date().toISOString(),
+      'schedule',
+      schedule
+    );
     return 'Email service is running!';
   }
 
@@ -81,7 +88,13 @@ export class NewsService {
     }
   }
 
-  async automatedNews() {
+  async automatedNews({
+    schedule,
+    startDate,
+  }: {
+    schedule: keyof typeof CronTimeSetEnum;
+    startDate: Date;
+  }) {
     const users: User[] = await this.userDatabaseService.findAll({
       where: { subscription: true },
     });
@@ -104,6 +117,8 @@ export class NewsService {
     //   email.title,
     //   email.content
     // );
+
+    const nextRun = TimeCalculator(schedule, startDate);
 
     const { sentUsers, errorUsers } = await sendEmailsGmail(
       users,

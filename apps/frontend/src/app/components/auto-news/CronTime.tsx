@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { fetchWithAuth } from '@utils';
 import { useRouter } from 'next/navigation';
 import {
+  CronTimeSetEnum,
   ResponseCron,
   ResponseCronUpdateDto,
-  ScheduleEnum,
+  ScheduleFrontEnum,
 } from '@shared/dtos';
 import { CronCreator } from '.';
 
@@ -68,11 +69,12 @@ export const CronTime = () => {
   }: {
     id: number;
     name?: string;
-    schedule?: keyof typeof ScheduleEnum;
+    schedule?: keyof typeof CronTimeSetEnum;
     status?: boolean;
     startTime?: Date;
   }) => {
     try {
+      console.log('schedule', schedule);
       const body = {
         id,
         ...(name !== undefined && { name }),
@@ -125,6 +127,11 @@ export const CronTime = () => {
 
   const handleSave = async () => {
     if (!tempCron.id) return;
+    // Prevent saving if startTime is before now
+    if (tempCron.startTime && tempCron.startTime.getTime() < Date.now()) {
+      alert('Start time cannot be before now.');
+      return;
+    }
     await handleChange(tempCron as any);
     setEditingCron(null);
     setTempCron({});
@@ -187,14 +194,16 @@ export const CronTime = () => {
                     }
                     className="px-1 border"
                   >
-                    {Object.entries(ScheduleEnum).map(([key, value]) => (
-                      <option key={key} value={value}>
-                        {key}
+                    {Object.entries(ScheduleFrontEnum).map(([key, label]) => (
+                      <option key={key} value={key}>
+                        {label}
                       </option>
                     ))}
                   </select>
                 ) : (
-                  cronJob.schedule
+                  ScheduleFrontEnum[
+                    cronJob.schedule as keyof typeof ScheduleFrontEnum
+                  ]
                 )}
               </td>
               <td className="py-2 px-2 border-b">
@@ -205,19 +214,36 @@ export const CronTime = () => {
               </td>
               <td className="py-2 px-2 border-b">
                 {editingCron === cronJob.id ? (
-                  <input
-                    type="datetime-local"
-                    value={new Date(tempCron.startTime!)
-                      .toISOString()
-                      .slice(0, 16)}
-                    onChange={(e) =>
-                      setTempCron({
-                        ...tempCron,
-                        startTime: new Date(e.target.value),
-                      })
-                    }
-                    className="px-1 border"
-                  />
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="datetime-local"
+                      value={
+                        tempCron.startTime
+                          ? new Date(
+                              new Date(tempCron.startTime).getTime() -
+                                new Date(
+                                  tempCron.startTime
+                                ).getTimezoneOffset() *
+                                  60000
+                            )
+                              .toISOString()
+                              .slice(0, 16)
+                          : ''
+                      }
+                      onChange={(e) =>
+                        setTempCron({
+                          ...tempCron,
+                          startTime: new Date(e.target.value),
+                        })
+                      }
+                      className="px-1 border"
+                      min={new Date(
+                        Date.now() - new Date().getTimezoneOffset() * 60000
+                      )
+                        .toISOString()
+                        .slice(0, 16)}
+                    />
+                  </div>
                 ) : (
                   new Date(cronJob.startTime).toLocaleString()
                 )}

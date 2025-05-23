@@ -25,7 +25,7 @@ export const CronCreator = ({
 
     const cronData: CronCreateDto = {
       name: formData.get('name') as string,
-      schedule: formData.get('schedule') as ScheduleFrontEnum,
+      schedule: formData.get('schedule') as keyof typeof ScheduleFrontEnum,
       startTime: new Date(event.currentTarget.startTime.value),
       status: status ? true : false,
     };
@@ -113,10 +113,9 @@ export const CronCreator = ({
                     name="schedule"
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
-                    {Object.values(ScheduleFrontEnum).map((schedule) => (
-                      <option key={schedule} value={schedule}>
-                        {schedule.charAt(0).toUpperCase() +
-                          schedule.slice(1).toLowerCase()}
+                    {Object.entries(ScheduleFrontEnum).map(([key, value]) => (
+                      <option key={key} value={value}>
+                        {value}
                       </option>
                     ))}
                   </select>

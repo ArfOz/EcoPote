@@ -26,6 +26,7 @@ import {
   ResponseTips,
   ResponseTipsDetails,
   ResponseUpdateNews,
+  CronTimeSetEnum,
 } from '@shared/dtos';
 import { CreateAddNewsDto, UpdateNewsDto } from './dtos';
 
@@ -35,9 +36,21 @@ export class NewsController {
 
   @AuthMode('static')
   @UseGuards(JwtAuthGuard)
-  @Get('status')
-  async getStatus(): Promise<string> {
-    return this.newsService.getStatus();
+  @Post('status')
+  async getStatus(@Body() body: { schedule: string }): Promise<string> {
+    return this.newsService.getStatus({ schedule: body.schedule });
+  }
+
+  @AuthMode('static')
+  @UseGuards(JwtAuthGuard)
+  @Post('automatednews')
+  async automatedNews(
+    @Body() body: { schedule: keyof typeof CronTimeSetEnum; startDate: Date }
+  ): Promise<ResponseMessageNews> {
+    return await this.newsService.automatedNews({
+      schedule: body.schedule,
+      startDate: body.startDate,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -57,13 +70,6 @@ export class NewsController {
       subject: body.subject,
       html: htmlContent,
     });
-  }
-
-  @AuthMode('static')
-  @UseGuards(JwtAuthGuard)
-  @Post('automatednews')
-  async automatedNews() {
-    return await this.newsService.automatedNews();
   }
 
   @UseGuards(JwtAuthGuard)
