@@ -55,16 +55,9 @@ export class CronService {
     // Convert the schedule (datetime string) to a Date object
     const nextRun = TimeCalculator(schedule, startDateTime);
 
-    // Convert schedule from kebab-case to snake_case if necessary
-    const normalizedSchedule = schedule.replace(
-      /-/g,
-      '_'
-    ) as keyof typeof CronTimeSetEnum;
-
     const savedCron: Prisma.CronCreateInput = {
       name,
-      schedule:
-        normalizedSchedule as unknown as Prisma.CronCreateInput['schedule'], // Ensure snake_case for Schedule type
+      schedule,
       startTime: startDateTime,
       createdAt: dateNow,
       updatedAt: dateNow,
