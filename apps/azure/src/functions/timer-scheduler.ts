@@ -9,7 +9,7 @@ import {
 import * as cronParser from 'cron-parser';
 
 let cronTime = '*/1 * * * *'; // Default cron time (every minute)
-let isActive = true; // Track if the cron is active
+let isActive = false; // Track if the cron is active
 
 // HTTP trigger to update the cron time or status
 export async function scheduleJob(

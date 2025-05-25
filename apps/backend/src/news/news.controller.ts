@@ -34,25 +34,6 @@ import { CreateAddNewsDto, UpdateNewsDto } from './dtos';
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
-  @AuthMode('static')
-  @UseGuards(JwtAuthGuard)
-  @Post('status')
-  async getStatus(@Body() body: { schedule: string }): Promise<string> {
-    return this.newsService.getStatus({ schedule: body.schedule });
-  }
-
-  @AuthMode('static')
-  @UseGuards(JwtAuthGuard)
-  @Post('automatednews')
-  async automatedNews(
-    @Body() body: { schedule: keyof typeof CronTimeSetEnum; startDate: Date }
-  ): Promise<ResponseMessageNews> {
-    return await this.newsService.automatedNews({
-      schedule: body.schedule,
-      startDate: body.startDate,
-    });
-  }
-
   @UseGuards(JwtAuthGuard)
   @Post('sendnews')
   @UseInterceptors(FileInterceptor('file'))

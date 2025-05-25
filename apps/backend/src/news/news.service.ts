@@ -39,16 +39,6 @@ export class NewsService {
     logger.setServiceName('admin-service');
   }
 
-  async getStatus({ schedule }: { schedule: string }): Promise<string> {
-    console.log(
-      'Email service is running!',
-      new Date().toISOString(),
-      'schedule',
-      schedule
-    );
-    return 'Email service is running!';
-  }
-
   async sendNews(emailData: {
     to: string;
     subject: string;
@@ -86,67 +76,6 @@ export class NewsService {
       // Handle error
       throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
     }
-  }
-
-  async automatedNews({
-    schedule,
-    startDate,
-  }: {
-    schedule: keyof typeof CronTimeSetEnum;
-    startDate: Date;
-  }) {
-    const users: User[] = await this.userDatabaseService.findAll({
-      where: { subscription: true },
-    });
-
-    if (users.length === 0) {
-      throw new HttpException(
-        'No users to send email to',
-        HttpStatus.NOT_FOUND
-      );
-    }
-
-    const email = await this.newsDatabaseService.findFirst({ status: true });
-
-    if (!email) {
-      throw new HttpException('No news to send email to', HttpStatus.NOT_FOUND);
-    }
-
-    // const { sentUsers, errorUsers } = await sendEmailAzure(
-    //   users,
-    //   email.title,
-    //   email.content
-    // );
-
-    const nextRun = TimeCalculator(schedule, startDate);
-
-    const { sentUsers, errorUsers } = await sendEmailsGmail(
-      users,
-      email.title,
-      email.content
-    );
-
-    const emailUpdate = await this.newsDatabaseService.updateNews(
-      email.id,
-      { status: false } // Update the status to false after sending
-    );
-    if (!emailUpdate) {
-      throw new HttpException(
-        'Failed to update email status',
-        HttpStatus.BAD_REQUEST
-      );
-    }
-    return {
-      data: { sentUsers, errorUsers },
-      success: true,
-      message: 'Email sent successfully',
-    };
-
-    // return { data: res, success: true, message: 'Email sent successfully' };
-  }
-  catch(error) {
-    // Handle error
-    throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
   }
 
   async getNewsOrder(): Promise<ResponseNewsOrderDto> {

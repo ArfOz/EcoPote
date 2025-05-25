@@ -43,7 +43,7 @@ model Cron {
   id        Int       @id @default(1)
   name      String
   startTime DateTime
-  schedule  String
+  schedule  Schedule @default(every_month)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   status    Boolean   @default(false)
@@ -75,3 +75,14 @@ model Log {
   @@index([timestamp])
   @@index([service])
 }
+
+enum Schedule {
+  every_week      
+  every_day       
+  every_month      
+  every_year      
+  every_5_minutes 
+  every_10_minutes 
+  every_minute    
+}
+

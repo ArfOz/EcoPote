@@ -121,25 +121,25 @@ export interface ResponseTips {
 }
 
 export enum ScheduleFrontEnum {
-  'every-week' = 'Every Week',
-  'every-month' = 'Every Month',
-  'every-day' = 'Every Day',
-  'every-year' = 'Every Year',
+  'every_week' = 'Every Week',
+  'every_month' = 'Every Month',
+  'every_day' = 'Every Day',
+  'every_year' = 'Every Year',
   // For Testing
-  'every-5-minutes' = 'Every 5 Minutes',
-  'every-10-minutes' = 'Every 10 Minutes',
-  'every-minute' = 'Every Minute',
+  'every_5_minutes' = 'Every 5 Minutes',
+  'every_10_minutes' = 'Every 10 Minutes',
+  'every_minute' = 'Every Minute',
 }
 
 export enum CronTimeSetEnum {
-  'every-week' = '0 0 * * 0',
-  'every-day' = '0 0 * * *',
-  'every-month' = '0 0 1 * *',
-  'every-year' = '0 0 1 1 *',
+  'every_week' = '0 0 * * 0',
+  'every_day' = '0 0 * * *',
+  'every_month' = '0 0 1 * *',
+  'every_year' = '0 0 1 1 *',
   // For Testing
-  'every-5-minutes' = '*/5 * * * *',
-  'every-10-minutes' = '*/10 * * * *',
-  'every-minute' = '*/1 * * * *',
+  'every_5_minutes' = '*/5 * * * *',
+  'every_10_minutes' = '*/10 * * * *',
+  'every_minute' = '*/1 * * * *',
 }
 
 export interface ResponseTipsDetails {

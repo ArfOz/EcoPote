@@ -1,18 +1,19 @@
 import { getCronExpression, TimeCalculator } from '@utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ScheduleFrontEnum, CronTimeSetEnum } from '@shared/dtos'; // Adjust the path based on your project structure
 import {
   CronDatabaseService,
   NewsDatabaseService,
   UserDatabaseService,
 } from '@database';
-import { sendEmailAzure } from '@shared/nodemailer';
+import { sendEmailAzure, sendEmailsGmail } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
 import {
   ResponseCreateCron,
   ResponseCronUpdateDto,
   ResponseDeleteCron,
 } from '@shared/dtos';
+import { start } from 'repl';
 
 @Injectable()
 export class CronService {
@@ -23,6 +24,15 @@ export class CronService {
     private readonly newsDatabaseService: NewsDatabaseService
   ) {}
 
+  async getStatus({ schedule }: { schedule: string }): Promise<string> {
+    console.log(
+      'Email service is running!',
+      new Date().toISOString(),
+      'schedule',
+      schedule
+    );
+    return 'Email service is running!';
+  }
   async createCronJob(
     name: string,
     startTime: Date,
@@ -45,9 +55,16 @@ export class CronService {
     // Convert the schedule (datetime string) to a Date object
     const nextRun = TimeCalculator(schedule, startDateTime);
 
+    // Convert schedule from kebab-case to snake_case if necessary
+    const normalizedSchedule = schedule.replace(
+      /-/g,
+      '_'
+    ) as keyof typeof CronTimeSetEnum;
+
     const savedCron: Prisma.CronCreateInput = {
       name,
-      schedule,
+      schedule:
+        normalizedSchedule as unknown as Prisma.CronCreateInput['schedule'], // Ensure snake_case for Schedule type
       startTime: startDateTime,
       createdAt: dateNow,
       updatedAt: dateNow,
@@ -77,6 +94,11 @@ export class CronService {
 
   async getCronJobs() {
     const cronJobs = await this.cronDatabaseService.findManyCron();
+    if (!cronJobs || cronJobs.length === 0) {
+      throw new HttpException('No cron jobs found', HttpStatus.NOT_FOUND);
+    }
+    // Map the cron jobs to the desired format
+
     return cronJobs;
   }
 
@@ -103,14 +125,16 @@ export class CronService {
     // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
     //   throw new Error(
     //     'Start time must be at least one hour after the current time.'
-    //   );
-    // }
-
     let nextRun: Date | undefined = data.nextRun;
+    let normalizedSchedule: keyof typeof CronTimeSetEnum | undefined = schedule;
     if (startTime && schedule) {
       // If schedule is an array, use the first element as the key
       const scheduleKey = Array.isArray(schedule) ? schedule[0] : schedule;
-      nextRun = TimeCalculator(schedule, startDateTime);
+      normalizedSchedule = scheduleKey.replace(
+        /-/g,
+        '_'
+      ) as keyof typeof CronTimeSetEnum;
+      nextRun = TimeCalculator(normalizedSchedule, startDateTime);
     }
 
     const updatedCron: Prisma.CronUpdateInput = {
@@ -121,9 +145,16 @@ export class CronService {
       nextRun,
     };
 
-    if (schedule) {
-      updatedCron.schedule = schedule;
+    if (normalizedSchedule) {
+      updatedCron.schedule = (normalizedSchedule as string).replace(
+        /-/g,
+        '_'
+      ) as any;
     }
+    // Remove the redundant assignment that could overwrite with kebab-case
+    // if (schedule) {
+    //   updatedCron.schedule = schedule;
+    // }
 
     const newCron = getCronExpression(schedule, startDateTime);
 
@@ -254,4 +285,90 @@ export class CronService {
   //     console.error('Failed to restart cron jobs', error);
   //   }
   // }
+
+  async automatedNews() {
+    const users: User[] = await this.userDatabaseService.findAll({
+      where: { subscription: true },
+    });
+
+    if (users.length === 0) {
+      throw new HttpException(
+        'No users to send email to',
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    const email = await this.newsDatabaseService.findFirst({ status: true });
+
+    if (!email) {
+      throw new HttpException('No news to send email to', HttpStatus.NOT_FOUND);
+    }
+
+    // const { sentUsers, errorUsers } = await sendEmailAzure(
+    //   users,
+    //   email.title,
+    //   email.content
+    // );
+
+    // const { sentUsers, errorUsers } = await sendEmailsGmail(
+    //   users,
+    //   email.title,
+    //   email.content
+    // );
+
+    const { sentUsers, errorUsers } = {
+      sentUsers: ['asds'],
+      errorUsers: [],
+    };
+
+    const emailUpdate = await this.newsDatabaseService.updateNews(
+      email.id,
+      { status: false } // Update the status to false after sending
+    );
+    if (!emailUpdate) {
+      throw new HttpException(
+        'Failed to update email status',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    const cronData = await this.cronDatabaseService.findUniqueCron({
+      id: 1,
+    });
+
+    let nextRun: Date | undefined;
+    const lastTime: Date | undefined = cronData.nextRun;
+    const schedule: keyof typeof CronTimeSetEnum | undefined =
+      'every_10_minutes';
+
+    console.log('cronData', lastTime, schedule);
+    if (lastTime && schedule) {
+      console.log('schedule', schedule, 'startTime', lastTime);
+      // If schedule is an array, use the first element as the key
+      nextRun = TimeCalculator('every_10_minutes', lastTime);
+    }
+
+    const updateCronDatabase: Prisma.CronUpdateInput = {
+      nextRun: cronData.nextRun,
+      lastRun: new Date(),
+    };
+    console.log('nextRun', nextRun);
+
+    await this.cronDatabaseService.updateCron({
+      where: { id: 1 },
+      data: updateCronDatabase,
+    });
+
+    return {
+      data: { sentUsers, errorUsers },
+      success: true,
+      message: 'Email sent successfully',
+    };
+
+    // return { data: res, success: true, message: 'Email sent successfully' };
+  }
+  catch(error) {
+    // Handle error
+    throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
+  }
 }

@@ -18,12 +18,21 @@ import {
   ResponseDeleteCron,
   ResponseCronSendNewsDto,
   CronTimeSetEnum,
+  ResponseMessageNews,
 } from '@shared/dtos';
 import { ScheduleFrontEnum } from '@shared'; // Adjust the import path as needed
+import { AuthMode, JwtAuthGuard } from '@auth';
 
 @Controller('cron')
 export class CronController {
   constructor(private readonly cronService: CronService) {}
+
+  @AuthMode('static')
+  @UseGuards(JwtAuthGuard)
+  @Post('status')
+  async getStatus(@Body() body: { schedule: string }): Promise<string> {
+    return this.cronService.getStatus({ schedule: body.schedule });
+  }
 
   @Post('create-job')
   async createCronJobs(
@@ -92,5 +101,12 @@ export class CronController {
         HttpStatus.BAD_REQUEST
       );
     }
+  }
+
+  @AuthMode('static')
+  @UseGuards(JwtAuthGuard)
+  @Get('automatednews')
+  async automatedNews(): Promise<ResponseMessageNews> {
+    return await this.cronService.automatedNews();
   }
 }

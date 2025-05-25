@@ -5,22 +5,22 @@ export const TimeCalculator = (
   startDateTime: Date
 ) => {
   switch (schedule) {
-    case 'every-5-minutes':
+    case 'every_5_minutes':
       return new Date(startDateTime.getTime() + 5 * 60 * 1000); // Add 5 minutes to the start time
-    case 'every-10-minutes':
+    case 'every_10_minutes':
       return new Date(startDateTime.getTime() + 10 * 60 * 1000); // Add 10 minutes to the start time
-    case 'every-minute':
+    case 'every_minute':
       return new Date(startDateTime.getTime() + 1 * 60 * 1000); // Add 1 minute to the start time
-    case 'every-day':
+    case 'every_day':
       return new Date(startDateTime.getTime() + 24 * 60 * 60 * 1000); // Add one day to the start time
-    case 'every-week':
+    case 'every_week':
       return new Date(startDateTime.getTime() + 7 * 24 * 60 * 60 * 1000); // Add one week to the start time
-    case 'every-month': {
+    case 'every_month': {
       const nextMonth = new Date(startDateTime);
       nextMonth.setMonth(nextMonth.getMonth() + 1); // Add one month to the start time
       return nextMonth;
     }
-    case 'every-year': {
+    case 'every_year': {
       const nextYear = new Date(startDateTime);
       nextYear.setFullYear(nextYear.getFullYear() + 1);
       return nextYear;
@@ -40,25 +40,25 @@ export function getCronExpression(
   startTime: Date
 ): string {
   switch (schedule) {
-    case 'every-day':
+    case 'every_day':
       // Run every day at the hour/minute of startTime
       return `${startTime.getMinutes()} ${startTime.getHours()} * * *`;
-    case 'every-week':
+    case 'every_week':
       // Run every week at the hour/minute/day of week of startTime
       return `${startTime.getMinutes()} ${startTime.getHours()} * * ${startTime.getDay()}`;
-    case 'every-month':
+    case 'every_month':
       // Run every month at the hour/minute/day of month of startTime
       return `${startTime.getMinutes()} ${startTime.getHours()} ${startTime.getDate()} * *`;
-    case 'every-year':
+    case 'every_year':
       // Run every year at the hour/minute/day/month of startTime
       return `${startTime.getMinutes()} ${startTime.getHours()} ${startTime.getDate()} ${
         startTime.getMonth() + 1
       } *`;
-    case 'every-5-minutes':
+    case 'every_5_minutes':
       return '*/5 * * * *'; // Adjust as needed for your cron library
-    case 'every-10-minutes':
+    case 'every_10_minutes':
       return '*/10 * * * *'; // Adjust as needed for your cron library
-    case 'every-minute':
+    case 'every_minute':
       return '*/1 * * * *'; // Adjust as needed for your cron library
 
     default:
