@@ -337,19 +337,17 @@ export class CronService {
     });
 
     let nextRun: Date | undefined;
-    const lastTime: Date | undefined = cronData.nextRun;
-    const schedule: keyof typeof CronTimeSetEnum | undefined =
-      'every_10_minutes';
 
-    console.log('cronData', lastTime, schedule);
-    if (lastTime && schedule) {
-      console.log('schedule', schedule, 'startTime', lastTime);
+    const schedule: keyof typeof CronTimeSetEnum | undefined =
+      cronData.schedule;
+
+    if (schedule) {
       // If schedule is an array, use the first element as the key
-      nextRun = TimeCalculator('every_10_minutes', lastTime);
+      nextRun = TimeCalculator(schedule, new Date());
     }
 
     const updateCronDatabase: Prisma.CronUpdateInput = {
-      nextRun: cronData.nextRun,
+      nextRun,
       lastRun: new Date(),
     };
     console.log('nextRun', nextRun);
