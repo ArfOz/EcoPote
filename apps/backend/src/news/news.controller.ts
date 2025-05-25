@@ -69,7 +69,6 @@ export class NewsController {
   ): Promise<ResponseNewsAllDto> {
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
-    console.log('status', status);
     return await this.newsService.allNews(
       pageNumber,
       limitNumber,

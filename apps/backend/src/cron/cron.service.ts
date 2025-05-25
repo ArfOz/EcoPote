@@ -111,31 +111,17 @@ export class CronService {
   ): Promise<ResponseCronUpdateDto> {
     const dateNow = new Date();
 
-    console.log('schedule', schedule);
-
     const data = await this.cronDatabaseService.findUniqueCron({ id });
 
     // Parse the startTime to a Date object
 
     const startDateTime = startTime ? new Date(startTime) : data.startTime;
 
-    console.log('startDateTime', startDateTime, 'now', dateNow);
-
     // const oneHourInMillis = 60 * 60 * 1000;
     // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
     //   throw new Error(
     //     'Start time must be at least one hour after the current time.'
-    let nextRun: Date | undefined = data.nextRun;
-    let normalizedSchedule: keyof typeof CronTimeSetEnum | undefined = schedule;
-    if (startTime && schedule) {
-      // If schedule is an array, use the first element as the key
-      const scheduleKey = Array.isArray(schedule) ? schedule[0] : schedule;
-      normalizedSchedule = scheduleKey.replace(
-        /-/g,
-        '_'
-      ) as keyof typeof CronTimeSetEnum;
-      nextRun = TimeCalculator(normalizedSchedule, startDateTime);
-    }
+    const nextRun: Date | undefined = data.nextRun;
 
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
@@ -145,12 +131,6 @@ export class CronService {
       nextRun,
     };
 
-    if (normalizedSchedule) {
-      updatedCron.schedule = (normalizedSchedule as string).replace(
-        /-/g,
-        '_'
-      ) as any;
-    }
     // Remove the redundant assignment that could overwrite with kebab-case
     // if (schedule) {
     //   updatedCron.schedule = schedule;
