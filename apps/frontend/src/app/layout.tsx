@@ -1,6 +1,6 @@
-import { LayoutWithSidebar } from './components';
 import './global.css';
-import { usePathname } from 'next/navigation';
+import { LayoutWithSidebar } from './components';
+import { AuthGuard } from './components/auth-guard/AuthGuard';
 
 export const metadata = {
   title: 'Welcome to frontend',
@@ -12,12 +12,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // This hook only works in client components, so wrap the layout in a Client Component
   return (
     <html lang="en">
       <body>
-        <LayoutWithSidebar>{children}</LayoutWithSidebar>
+        <AuthGuard>
+          <LayoutWithSidebar>{children}</LayoutWithSidebar>
+        </AuthGuard>
       </body>
     </html>
   );
 }
+
+// Move AuthGuard to a separate client component file!

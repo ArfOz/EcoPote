@@ -18,14 +18,14 @@ export const AllNews = () => {
 
   // Fetch news from backend
   const fetchNews = async () => {
-    const token = localStorage.getItem('token');
     try {
-      const res: ResponseNewsAllDto = await fetchWithAuth('news/allnews', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res: ResponseNewsAllDto = await fetchWithAuth(
+        'news/allnews',
+        {
+          method: 'GET',
         },
-      });
+        true
+      );
       if (!res.success) {
         throw new Error('Failed to fetch news');
       }
@@ -92,12 +92,14 @@ export const AllNews = () => {
   };
 
   const handleDelete = async (id: number) => {
-    const token = localStorage.getItem('token');
     if (window.confirm('Are you sure you want to delete this email?')) {
-      await fetchWithAuth(`news/delete/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await fetchWithAuth(
+        `news/delete/${id}`,
+        {
+          method: 'DELETE',
+        },
+        true
+      );
       setNews((prev) => prev.filter((email) => email.id !== id));
     }
   };

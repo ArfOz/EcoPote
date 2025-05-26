@@ -46,7 +46,8 @@ export const CronTime = () => {
           setError(error.message);
           if (
             error.message === 'Token is expired' ||
-            error.message === 'Unauthorized access'
+            error.message === 'Unauthorized access' ||
+            error.message === 'No token found'
           ) {
             localStorage.removeItem('token');
             router.push('/login');
@@ -102,9 +103,11 @@ export const CronTime = () => {
           prevData.map((job) => (job.id === id ? response.data : job))
         );
       } else {
+        setError(response.message || 'Failed to update cron job');
         console.error('Failed to update cron job', response.message);
       }
-    } catch (error) {
+    } catch (error: any) {
+      setError(error?.message || 'Failed to update cron job');
       console.error('Failed to update cron job', error);
     }
   };

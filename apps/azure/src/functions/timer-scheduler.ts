@@ -16,6 +16,26 @@ export async function scheduleJob(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
+  // --- AUTH CHECK START ---
+  const authHeader = request.headers.get('authorization');
+  const expectedToken = process.env.STATIC_TOKEN_CRON_TRIGGER;
+  if (
+    !authHeader ||
+    !authHeader.startsWith('Bearer ') ||
+    authHeader.split(' ')[1] !== expectedToken
+  ) {
+    return {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+      jsonBody: {
+        error: 'Unauthorized',
+        message:
+          'Invalid or missing authorization token. Please provide a valid Bearer token in the Authorization header.',
+        code: 'AUTH_ERROR',
+      },
+    };
+  }
+
   try {
     const { status, newCron } = (await request.json()) as {
       status?: boolean;

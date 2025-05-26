@@ -90,6 +90,7 @@ export class CronService {
     if (!cronJobs || cronJobs.length === 0) {
       throw new HttpException('No cron jobs found', HttpStatus.NOT_FOUND);
     }
+
     // Map the cron jobs to the desired format
 
     return cronJobs;
@@ -133,38 +134,58 @@ export class CronService {
 
     const where: Prisma.CronWhereUniqueInput = { id };
 
+    console.log('Calling Azure Function: scheduleJob with status:');
+    try {
+      await fetch('http://localhost:7071/api/scheduleJob', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status,
+          newCron,
+        }),
+      });
+    } catch (error) {
+      throw new HttpException(
+        error instanceof HttpException
+          ? error.message
+          : 'Failed to call Azure Function: scheduleJob',
+        error instanceof HttpException
+          ? error.getStatus()
+          : HttpStatus.BAD_GATEWAY
+      );
+    }
+
+    // Only skip update if only the name changed, otherwise proceed and trigger Azure Function
+
+    if (
+      cronName !== undefined &&
+      cronName !== data.name &&
+      startDateTime.getTime() === new Date(data.startTime).getTime() &&
+      schedule === data.schedule &&
+      status === data.status
+    ) {
+      // Only name changed, skip update and do not trigger Azure Function
+      return {
+        success: true,
+        message: 'No changes detected except name, cron job not updated',
+        data,
+      };
+    }
+
     const updatedData = await this.cronDatabaseService
       .updateCron({ where, data: updatedCron })
       .catch((error) => {
         console.error('Error updating database:', error);
-        return null;
+        throw new HttpException(
+          'Failed to update cron job in the database',
+          HttpStatus.BAD_REQUEST
+        );
       });
 
     if (!updatedData) {
       throw new Error('Failed to update cron job');
-    }
-
-    // add token to the body
-    let updateCronFunctions;
-    try {
-      updateCronFunctions = await fetch(
-        'http://localhost:7071/api/scheduleJob',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            status,
-            newCron,
-          }),
-        }
-      );
-    } catch (error) {
-      throw new HttpException(
-        'Failed to call Azure Function: scheduleJob',
-        HttpStatus.BAD_GATEWAY
-      );
     }
 
     return {

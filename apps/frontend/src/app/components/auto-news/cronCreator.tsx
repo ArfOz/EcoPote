@@ -38,7 +38,7 @@ export const CronCreator = ({
         },
         body: JSON.stringify(cronData),
       },
-      false
+      true
     );
 
     console.log('Cron job created:', res);

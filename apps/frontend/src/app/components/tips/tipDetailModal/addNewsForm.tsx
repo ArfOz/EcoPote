@@ -6,12 +6,15 @@ export const AddNewsForm = ({
   addNewsBackend,
   setFile,
   selectedTip,
+  setNewsStatus,
+  newsStatus,
 }: {
   newsTitle: string;
   setNewsTitle: (title: string) => void;
   addNewsBackend: (id: number) => Promise<void>;
   setFile: (file: File | null) => void;
-
+  setNewsStatus: (status: 'true' | 'false') => void;
+  newsStatus: 'true' | 'false';
   selectedTip: { id: number };
 }) => {
   return (
@@ -45,6 +48,8 @@ export const AddNewsForm = ({
           id="subscription"
           name="subscription"
           className="mr-2 leading-tight"
+          checked={newsStatus === 'true'}
+          onChange={(e) => setNewsStatus(e.target.checked ? 'true' : 'false')}
         />
         <span className="text-sm">Yes</span>
       </div>
