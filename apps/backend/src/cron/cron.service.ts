@@ -145,22 +145,26 @@ export class CronService {
     }
 
     // add token to the body
-    const updateCronFunctions = await fetch(
-      'http://localhost:7071/api/scheduleJob',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          status,
-          newCron,
-        }),
-      }
-    );
-
-    if (!updateCronFunctions || updateCronFunctions.status !== 200) {
-      throw new Error('Failed to trigger scheduleJob function');
+    let updateCronFunctions;
+    try {
+      updateCronFunctions = await fetch(
+        'http://localhost:7071/api/scheduleJob',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status,
+            newCron,
+          }),
+        }
+      );
+    } catch (error) {
+      throw new HttpException(
+        'Failed to call Azure Function: scheduleJob',
+        HttpStatus.BAD_GATEWAY
+      );
     }
 
     return {
