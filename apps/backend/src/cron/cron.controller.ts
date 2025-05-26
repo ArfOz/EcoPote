@@ -34,6 +34,7 @@ export class CronController {
     return this.cronService.getStatus({ schedule: body.schedule });
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('create-job')
   async createCronJobs(
     @Body() cronData: CronCreateDto
@@ -55,6 +56,7 @@ export class CronController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get-jobs')
   async getCronJobs(): Promise<ResponseCron> {
     try {
@@ -69,6 +71,7 @@ export class CronController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('update-job')
   async updateCronJob(
     @Body() cronData: CronUpdateDto
@@ -91,6 +94,7 @@ export class CronController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('delete-job/:id')
   async deleteCronJob(@Param('id') id: string): Promise<ResponseDeleteCron> {
     try {
