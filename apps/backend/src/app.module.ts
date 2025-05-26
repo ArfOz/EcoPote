@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
-import { EmailModule } from './email/email.module';
-import { AzureModule } from './azure/azure.module';
+import { NewsModule } from './news/news.module';
+// import { AzureModule } from './azure/azure.module';
 import { ConfigModule } from '@nestjs/config';
 import generalConfig from '@shared/config/general.config';
 import { UserModule } from './user/user.module';
@@ -11,6 +10,7 @@ import { AuthModule } from '@auth';
 import authConfig from '@auth/config/auth.config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronModule } from './cron/cron.module';
+// import { WinstonLoggerModule } from '@logger-winston';
 
 @Module({
   imports: [
@@ -25,8 +25,9 @@ import { CronModule } from './cron/cron.module';
     AuthModule,
     ScheduleModule.forRoot(),
     CronModule,
-    AzureModule,
-    EmailModule,
+    // AzureModule,
+    NewsModule,
+    // WinstonLoggerModule,
   ],
   controllers: [],
   providers: [],

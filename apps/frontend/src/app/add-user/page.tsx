@@ -2,7 +2,7 @@
 
 import { fetchWithAuth } from '@utils';
 import React, { useEffect } from 'react';
-import Navbar from '../components/navbar/Navbar';
+
 import { useRouter } from 'next/navigation';
 import { CreateUserDto, ResponseCreateUser } from '@shared/dtos';
 
@@ -78,7 +78,6 @@ const AddUser = () => {
 
   return (
     <>
-      <Navbar />
       <form
         onSubmit={handleSubmit}
         className="max-w-md mx-auto p-4 bg-white shadow-md rounded"

@@ -2,17 +2,17 @@ import { User } from '@prisma/client';
 import nodemailer, { TransportOptions } from 'nodemailer';
 
 const transporter = nodemailer.createTransport(<TransportOptions>{
-  host: process.env.MAIL_HOST, // Replace with your SMTP server
-  port: process.env.MAIL_PORT ? parseInt(process.env.MAIL_PORT) : 587,
+  host: process.env.MAIL_HOST_GMAIL, // Replace with your SMTP server
+  port: process.env.MAIL_PORT_GMAIL ? parseInt(process.env.MAIL_PORT) : 587,
   // secure: true,
 
   auth: {
-    user: process.env.MAIL_USER, // Replace with your email
-    pass: process.env.MAIL_PASSWORD, // Replace with your email password
+    user: process.env.MAIL_USER_GMAIL, // Replace with your email
+    pass: process.env.MAIL_PASSWORD_GMAIL, // Replace with your email password
   },
 });
 
-export const emailSender = async (
+export const sendEmail = async (
   user: User,
   subject: string,
   html: string,
@@ -21,7 +21,7 @@ export const emailSender = async (
 ) => {
   try {
     const info = await transporter.sendMail({
-      from: process.env.MAIL_USER, // Sender address
+      from: process.env.MAIL_USER_GMAIL, // Sender address
       to: user.email, // Recipient address
       subject: subject || 'Mon Eco pote', // Subject line
       html: html, // Plain html body
@@ -35,7 +35,7 @@ export const emailSender = async (
 };
 
 // Main function to send emails
-export const sendBulkEmails = async (
+export const sendEmailsGmail = async (
   users: User[],
   subject: string,
   html: string
@@ -46,7 +46,7 @@ export const sendBulkEmails = async (
 
   const sendEmailBatch = async (batch: User[]) => {
     const promises = batch.map((user) =>
-      emailSender(user, subject, html, sentUsers, errorUsers)
+      sendEmail(user, subject, html, sentUsers, errorUsers)
     );
     await Promise.all(promises);
   };

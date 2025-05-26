@@ -16,16 +16,25 @@ import {
   ResponseCronUpdateDto,
   CronCreateDto,
   ResponseDeleteCron,
-  ResponseCronSendEmailDto,
+  ResponseCronSendNewsDto,
+  CronTimeSetEnum,
+  ResponseMessageNews,
 } from '@shared/dtos';
-
-import { STATIC_TOKEN_REQUIRED, StaticTokenRequired } from '@shared';
+import { ScheduleFrontEnum } from '@shared'; // Adjust the import path as needed
 import { AuthMode, JwtAuthGuard } from '@auth';
 
 @Controller('cron')
 export class CronController {
   constructor(private readonly cronService: CronService) {}
 
+  @AuthMode('static')
+  @UseGuards(JwtAuthGuard)
+  @Post('status')
+  async getStatus(@Body() body: { schedule: string }): Promise<string> {
+    return this.cronService.getStatus({ schedule: body.schedule });
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('create-job')
   async createCronJobs(
     @Body() cronData: CronCreateDto
@@ -34,7 +43,7 @@ export class CronController {
       const res = await this.cronService.createCronJob(
         cronData.name,
         cronData.startTime,
-        cronData.schedule,
+        cronData.schedule as unknown as keyof typeof CronTimeSetEnum,
         cronData.status
       );
       return res;
@@ -47,6 +56,7 @@ export class CronController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get-jobs')
   async getCronJobs(): Promise<ResponseCron> {
     try {
@@ -61,6 +71,7 @@ export class CronController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('update-job')
   async updateCronJob(
     @Body() cronData: CronUpdateDto
@@ -70,7 +81,7 @@ export class CronController {
         cronData.id,
         cronData.name,
         cronData.startTime,
-        cronData.schedule,
+        cronData.schedule as unknown as keyof typeof CronTimeSetEnum,
         cronData.status
       );
       return response;
@@ -83,6 +94,7 @@ export class CronController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('delete-job/:id')
   async deleteCronJob(@Param('id') id: string): Promise<ResponseDeleteCron> {
     try {
@@ -94,65 +106,11 @@ export class CronController {
       );
     }
   }
-  @UseGuards(JwtAuthGuard)
+
   @AuthMode('static')
-  @Get('send-email')
-  async sendEmail() {
-    try {
-      console.log('Sending email...');
-      const response = await this.cronService.sendEmail();
-      if (!response) {
-        throw new HttpException(
-          'Failed to send email',
-          HttpStatus.INTERNAL_SERVER_ERROR
-        );
-      }
-      return response;
-    } catch (error) {
-      throw new HttpException(
-        error.message || 'Failed to send email',
-        HttpStatus.BAD_REQUEST
-      );
-    }
+  @UseGuards(JwtAuthGuard)
+  @Get('automatednews')
+  async automatedNews(): Promise<ResponseMessageNews> {
+    return await this.cronService.automatedNews();
   }
-
-  // @Get('restart')
-  // async restartCronJobs() {
-  //   try {
-  //     await this.cronService.restartCronJobs();
-  //     return { success: true, message: 'Cron jobs restarted successfully' };
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       'Failed to restart cron jobs',
-  //       HttpStatus.BAD_REQUEST
-  //     );
-  //   }
-  // }
-
-  // @Put('update-time')
-  // async updateCronTime(
-  //   @Body('cronName') cronName: string,
-  //   @Body('date') date: Date,
-  //   @Body('emailData') emailData: { subject: string; html: string }
-  // ) {
-  //   try {
-  //     await this.cronService.updateCronJob(cronName, date, emailData);
-  //     return { success: true, message: 'Cron time updated successfully' };
-  //   } catch (error) {
-  //     throw new HttpException(
-  //       'Failed to update cron time',
-  //       HttpStatus.BAD_REQUEST
-  //     );
-  //   }
-  // }
 }
-
-// *    *    *    *    *    *
-// ┬    ┬    ┬    ┬    ┬    ┬
-// │    │    │    │    │    │
-// │    │    │    │    │    └─ Day of the week (0 - 7) (Sunday is both 0 and 7)
-// │    │    │    │    └───── Month (1 - 12)
-// │    │    │    └────────── Day of the month (1 - 31)
-// │    │    └─────────────── Hour (0 - 23)
-// │    └──────────────────── Minute (0 - 59)
-// └───────────────────────── Second (0 - 59, optional)

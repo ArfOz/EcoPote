@@ -29,7 +29,7 @@ export interface ResponseCreateUser {
   success: boolean;
 }
 
-export interface ResponseMessageEmail {
+export interface ResponseMessageNews {
   data: {
     sentUsers: string[];
     errorUsers: string[];
@@ -120,18 +120,26 @@ export interface ResponseTips {
   };
 }
 
-export enum ScheduleEnum {
-  EVERY_WEEK = 'every-week',
-  EVERY_MONTH = 'every-month',
-  EVERY_DAY = 'every-day',
-  EVERY_YEAR = 'every-year',
+export enum ScheduleFrontEnum {
+  'every_week' = 'Every Week',
+  'every_month' = 'Every Month',
+  'every_day' = 'Every Day',
+  'every_year' = 'Every Year',
+  // For Testing
+  'every_5_minutes' = 'Every 5 Minutes',
+  'every_10_minutes' = 'Every 10 Minutes',
+  'every_minute' = 'Every Minute',
 }
 
 export enum CronTimeSetEnum {
-  EVERY_WEEK = '0 0 * * 0',
-  EVERY_DAY = '0 0 * * *',
-  EVERY_MONTH = '0 0 1 * *',
-  EVERY_YEAR = '0 0 1 1 *',
+  'every_week' = '0 0 * * 0',
+  'every_day' = '0 0 * * *',
+  'every_month' = '0 0 1 * *',
+  'every_year' = '0 0 1 1 *',
+  // For Testing
+  'every_5_minutes' = '*/5 * * * *',
+  'every_10_minutes' = '*/10 * * * *',
+  'every_minute' = '*/1 * * * *',
 }
 
 export interface ResponseTipsDetails {
@@ -151,6 +159,8 @@ export interface ResponseTipsDetails {
       createdAt: Date;
       updatedAt: Date;
       status: boolean;
+      sendStatus: boolean;
+      sendTime: Date | null;
     }[];
   };
 }
@@ -179,6 +189,7 @@ export interface ResponseTipNews {
       content: string;
       tipsId: number;
       status: boolean;
+      sendTime: Date | null;
     }[];
   };
 
@@ -226,6 +237,7 @@ export interface ResponseCreateCron {
     updatedAt: Date;
     status: boolean;
     lastRun: Date | null;
+    nextRun: Date | null;
   };
 }
 
@@ -239,8 +251,8 @@ export class CronCreateDto {
   startTime!: Date;
 
   @IsNotEmpty()
-  @IsEnum(ScheduleEnum)
-  schedule!: ScheduleEnum;
+  @IsEnum(ScheduleFrontEnum)
+  schedule!: keyof typeof ScheduleFrontEnum;
 
   @IsBoolean()
   @IsNotEmpty()
@@ -251,7 +263,7 @@ export interface ResponseDeleteCron {
   message: string;
   success: boolean;
 }
-export interface ResponseCronSendEmailDto {
+export interface ResponseCronSendNewsDto {
   message: string;
   success: boolean;
 }
@@ -260,8 +272,29 @@ export interface NewsOrder extends News {
   tips: { title: string };
 }
 
-export interface ResponseEmailOrderDto {
+export interface ResponseNewsOrderDto {
   data: NewsOrder[];
+  success: boolean;
+  message: string;
+}
+
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+
+export interface ResponseUnregisterUserDto {
+  message: string;
+  success: boolean;
+  data: {
+    id: number;
+    email: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+    subscription: boolean;
+  };
+}
+
+export interface ResponseNewsAllDto {
+  data: { emails: News[]; total: number };
   success: boolean;
   message: string;
 }

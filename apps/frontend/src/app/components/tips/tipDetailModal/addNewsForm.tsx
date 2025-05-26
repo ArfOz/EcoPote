@@ -11,6 +11,7 @@ export const AddNewsForm = ({
   setNewsTitle: (title: string) => void;
   addNewsBackend: (id: number) => Promise<void>;
   setFile: (file: File | null) => void;
+
   selectedTip: { id: number };
 }) => {
   return (
@@ -32,6 +33,21 @@ export const AddNewsForm = ({
         }}
         required
       />
+      <div className="mb-4">
+        <label
+          htmlFor="subscription"
+          className="block text-gray-700 font-bold mb-2"
+        >
+          Active:
+        </label>
+        <input
+          type="checkbox"
+          id="subscription"
+          name="subscription"
+          className="mr-2 leading-tight"
+        />
+        <span className="text-sm">Yes</span>
+      </div>
       <button
         className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700"
         onClick={() => addNewsBackend(selectedTip.id)}

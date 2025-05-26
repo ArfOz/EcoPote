@@ -1,6 +1,5 @@
 'use client';
 import React, { useEffect } from 'react';
-import Navbar from '../components/navbar/Navbar';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
 import {
@@ -9,8 +8,7 @@ import {
   ResponseTipsDetails,
   Tips,
 } from '@shared/dtos';
-import { TipsComponent } from '../components/tips';
-import { SelectedTip } from '../components/tips/tipDetailModal';
+import { TipsComponent, SelectedTip } from '../components';
 
 const TipsPage: React.FC = () => {
   const [tips, setTips] = React.useState<Tips[]>([]);
@@ -34,7 +32,7 @@ const TipsPage: React.FC = () => {
     }
     const fetchAllTips = async () => {
       try {
-        const res: ResponseTips = await fetchWithAuth(`admin/tips`, {}, true); // Fetch all users
+        const res: ResponseTips = await fetchWithAuth(`news/tips`, {}, true); // Fetch all users
 
         const data = res.data;
         if (data && Array.isArray(data.tips)) {
@@ -69,7 +67,6 @@ const TipsPage: React.FC = () => {
 
   return (
     <div>
-      <Navbar />
       <TipsComponent
         tips={tips}
         setSelectedTip={setSelectedTip}

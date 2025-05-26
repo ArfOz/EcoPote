@@ -1,31 +1,42 @@
-import { TimeCalculator } from '@utils';
-import { Injectable } from '@nestjs/common';
-import { ScheduleEnum } from '@shared/dtos'; // Adjust the path based on your project structure
+import { getCronExpression, TimeCalculator } from '@utils';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { ScheduleFrontEnum, CronTimeSetEnum } from '@shared/dtos'; // Adjust the path based on your project structure
 import {
   CronDatabaseService,
   NewsDatabaseService,
   UserDatabaseService,
 } from '@database';
-import { sendEmailAzure } from '@shared/nodemailer';
+import { sendEmailAzure, sendEmailsGmail } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
 import {
   ResponseCreateCron,
   ResponseCronUpdateDto,
   ResponseDeleteCron,
 } from '@shared/dtos';
+import { start } from 'repl';
 
 @Injectable()
 export class CronService {
+  // private readonly logger = new Logger(CronService.name);
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
     private readonly userDatabaseService: UserDatabaseService,
     private readonly newsDatabaseService: NewsDatabaseService
   ) {}
 
+  async getStatus({ schedule }: { schedule: string }): Promise<string> {
+    console.log(
+      'Email service is running!',
+      new Date().toISOString(),
+      'schedule',
+      schedule
+    );
+    return 'Email service is running!';
+  }
   async createCronJob(
     name: string,
     startTime: Date,
-    schedule: ScheduleEnum,
+    schedule: keyof typeof CronTimeSetEnum,
     status: boolean
   ): Promise<ResponseCreateCron> {
     const dateNow = new Date();
@@ -33,13 +44,13 @@ export class CronService {
     // Parse the startTime to a Date object
     const startDateTime = startTime ? new Date(startTime) : undefined;
 
-    // Check if startTime is at least one hour after dateNow
-    const oneHourInMillis = 60 * 60 * 1000;
-    if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
-      throw new Error(
-        'Start time must be at least one hour after the current time.'
-      );
-    }
+    // // Check if startTime is at least one hour after dateNow
+    // const oneHourInMillis = 60 * 60 * 1000;
+    // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
+    //   throw new Error(
+    //     'Start time must be at least one hour after the current time.'
+    //   );
+    // }
 
     // Convert the schedule (datetime string) to a Date object
     const nextRun = TimeCalculator(schedule, startDateTime);
@@ -65,6 +76,8 @@ export class CronService {
       throw new Error('Failed to save cron job to the database.');
     }
 
+    // this.logger.log(`Successfully created cron job with ID: ${res.id}`);
+
     return {
       success: true,
       message: 'Cron job started successfully',
@@ -74,6 +87,11 @@ export class CronService {
 
   async getCronJobs() {
     const cronJobs = await this.cronDatabaseService.findManyCron();
+    if (!cronJobs || cronJobs.length === 0) {
+      throw new HttpException('No cron jobs found', HttpStatus.NOT_FOUND);
+    }
+    // Map the cron jobs to the desired format
+
     return cronJobs;
   }
 
@@ -81,7 +99,7 @@ export class CronService {
     id: number,
     cronName?: string,
     startTime?: Date,
-    schedule?: ScheduleEnum,
+    schedule?: keyof typeof CronTimeSetEnum,
     status?: boolean
   ): Promise<ResponseCronUpdateDto> {
     const dateNow = new Date();
@@ -92,26 +110,26 @@ export class CronService {
 
     const startDateTime = startTime ? new Date(startTime) : data.startTime;
 
-    const oneHourInMillis = 60 * 60 * 1000;
-    if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
-      throw new Error(
-        'Start time must be at least one hour after the current time.'
-      );
-    }
-
-    let nextRun: Date | undefined = data.nextRun;
-    if (startTime && schedule) {
-      nextRun = TimeCalculator(schedule, startDateTime);
-    }
+    // const oneHourInMillis = 60 * 60 * 1000;
+    // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
+    //   throw new Error(
+    //     'Start time must be at least one hour after the current time.'
+    const nextRun: Date | undefined = data.nextRun;
 
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
-      schedule,
       startTime: startDateTime,
       updatedAt: dateNow,
       status,
       nextRun,
     };
+
+    // Remove the redundant assignment that could overwrite with kebab-case
+    // if (schedule) {
+    //   updatedCron.schedule = schedule;
+    // }
+
+    const newCron = getCronExpression(schedule, startDateTime);
 
     const where: Prisma.CronWhereUniqueInput = { id };
 
@@ -124,6 +142,29 @@ export class CronService {
 
     if (!updatedData) {
       throw new Error('Failed to update cron job');
+    }
+
+    // add token to the body
+    let updateCronFunctions;
+    try {
+      updateCronFunctions = await fetch(
+        'http://localhost:7071/api/scheduleJob',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status,
+            newCron,
+          }),
+        }
+      );
+    } catch (error) {
+      throw new HttpException(
+        'Failed to call Azure Function: scheduleJob',
+        HttpStatus.BAD_GATEWAY
+      );
     }
 
     return {
@@ -221,4 +262,88 @@ export class CronService {
   //     console.error('Failed to restart cron jobs', error);
   //   }
   // }
+
+  async automatedNews() {
+    const users: User[] = await this.userDatabaseService.findAll({
+      where: { subscription: true },
+    });
+
+    if (users.length === 0) {
+      throw new HttpException(
+        'No users to send email to',
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    const email = await this.newsDatabaseService.findFirst({ status: true });
+
+    if (!email) {
+      throw new HttpException('No news to send email to', HttpStatus.NOT_FOUND);
+    }
+
+    // const { sentUsers, errorUsers } = await sendEmailAzure(
+    //   users,
+    //   email.title,
+    //   email.content
+    // );
+
+    // const { sentUsers, errorUsers } = await sendEmailsGmail(
+    //   users,
+    //   email.title,
+    //   email.content
+    // );
+
+    const { sentUsers, errorUsers } = {
+      sentUsers: ['asds'],
+      errorUsers: [],
+    };
+
+    const emailUpdate = await this.newsDatabaseService.updateNews(
+      email.id,
+      { status: false } // Update the status to false after sending
+    );
+    if (!emailUpdate) {
+      throw new HttpException(
+        'Failed to update email status',
+        HttpStatus.BAD_REQUEST
+      );
+    }
+
+    const cronData = await this.cronDatabaseService.findUniqueCron({
+      id: 1,
+    });
+
+    let nextRun: Date | undefined;
+
+    const schedule: keyof typeof CronTimeSetEnum | undefined =
+      cronData.schedule;
+
+    if (schedule) {
+      // If schedule is an array, use the first element as the key
+      nextRun = TimeCalculator(schedule, new Date());
+    }
+
+    const updateCronDatabase: Prisma.CronUpdateInput = {
+      nextRun,
+      lastRun: new Date(),
+    };
+    console.log('nextRun', nextRun);
+
+    await this.cronDatabaseService.updateCron({
+      where: { id: 1 },
+      data: updateCronDatabase,
+    });
+
+    return {
+      data: { sentUsers, errorUsers },
+      success: true,
+      message: 'Email sent successfully',
+    };
+
+    // return { data: res, success: true, message: 'Email sent successfully' };
+  }
+  catch(error) {
+    // Handle error
+    throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
+  }
 }

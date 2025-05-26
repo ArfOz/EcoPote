@@ -22,12 +22,12 @@ import {
   ResponseGetAllusers,
   ResponseLogin,
   ResponseLogout,
-  ResponseMessageEmail,
+  ResponseMessageNews,
   ResponseTips,
   ResponseTipsDetails,
   ResponseUpdateNews,
 } from '@shared/dtos';
-import { CreateAddNewsDto } from './dto';
+import { WinstonLoggerService } from '@logger-winston';
 
 @Injectable()
 export class AdminService {
@@ -38,10 +38,10 @@ export class AdminService {
     @Inject(authConfig.KEY)
     private readonly authCfg: ConfigType<typeof authConfig>,
     private readonly userDatabaseService: UserDatabaseService,
-    private readonly authService: AuthService,
-    private readonly newsDatabaseService: NewsDatabaseService,
-    private readonly tipsDatabaseService: TipsDatabaseService
-  ) {}
+    private readonly authService: AuthService // private readonly logger: WinstonLoggerService
+  ) {
+    // this.logger.serviceName('admin-service');
+  }
 
   async addAdmin(adminData: {
     email: string;
@@ -230,238 +230,6 @@ export class AdminService {
         'Failed to toggle subscription',
         HttpStatus.BAD_REQUEST
       );
-    }
-  }
-
-  async addTips(
-    tipsData: { title: string; description: string },
-    html?: string
-  ): Promise<{ message: string; success: boolean }> {
-    try {
-      const tips = await this.tipsDatabaseService.findMany({
-        where: { title: tipsData.title },
-      });
-
-      if (tips.length > 0) {
-        // Tips already exist
-        throw new HttpException('Tips already exists', HttpStatus.CONFLICT);
-      }
-
-      const data: Prisma.TipsCreateInput = {
-        title: tipsData.title,
-        description: tipsData.description,
-      };
-      console.log('html', html);
-      if (html) {
-        data.news = {
-          create: {
-            title: tipsData.title,
-            content: html,
-          },
-        };
-      }
-
-      const response = await this.tipsDatabaseService.createTips(data);
-
-      if (!response) {
-        throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
-      }
-
-      return { message: 'Tips added successfully', success: true };
-    } catch (error) {
-      if (error) {
-        throw new HttpException(error.response, error.status);
-      }
-      // Handle error
-      throw new HttpException('Failed to add tips', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async getTips(): Promise<ResponseTips> {
-    try {
-      const tips = await this.tipsDatabaseService.findMany({});
-      return {
-        data: {
-          tips: tips,
-          total: tips.length,
-        },
-        message: 'Tips fetched successfully',
-        success: true,
-      };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to fetch tips', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async addNews(newsData: CreateAddNewsDto, html: string) {
-    try {
-      const tips = await this.tipsDatabaseService.findUnique({
-        where: { id: parseInt(newsData.tipsId) },
-      });
-      if (!tips) {
-        throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
-      }
-
-      const data = await this.newsDatabaseService.createNews({
-        title: newsData.title,
-        content: html,
-        tips: {
-          connect: {
-            id: parseInt(newsData.tipsId),
-          },
-        },
-      });
-
-      return { message: 'News added successfully', success: true, data };
-    } catch (error) {
-      // Handle error
-      console.error('Error adding news:', error);
-      throw new HttpException('Failed to add news', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async getNews(id: number, page?: number, limit?: number) {
-    try {
-      const news = await this.newsDatabaseService.findMany({
-        where: { tipsId: id },
-        take: limit,
-        skip: (page - 1) * limit,
-      });
-      const total = await this.newsDatabaseService.count({ tipsId: id });
-      return {
-        data: { news, total },
-        message: 'News fetched successfully',
-        success: true,
-      };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to fetch news', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async getNewsById(id: number) {
-    try {
-      const news = await this.newsDatabaseService.findNewsById(id);
-      return {
-        data: news,
-        message: 'News fetched successfully',
-        success: true,
-      };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to fetch news', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async updateNews(
-    newsData: { title: string },
-    id: number
-  ): Promise<ResponseUpdateNews> {
-    try {
-      const news = await this.newsDatabaseService.findNewsById(id);
-      if (!news) {
-        throw new HttpException('News not found', HttpStatus.NOT_FOUND);
-      }
-      const data = {
-        title: newsData.title,
-        status: news.status,
-      };
-
-      const updatedNews = await this.newsDatabaseService.updateNews(id, data);
-      if (!updatedNews) {
-        throw new HttpException(
-          'Failed to update news',
-          HttpStatus.BAD_REQUEST
-        );
-      }
-
-      return {
-        message: 'News updated successfully',
-        success: true,
-        data: updatedNews,
-      };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to update news', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async deleteNews(id: number) {
-    try {
-      const news = await this.newsDatabaseService.deleteNews(id);
-      return {
-        data: news,
-        message: 'News deleted successfully',
-        success: true,
-      };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to delete news', HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  async getTipsById(
-    id: number,
-    page?: number,
-    limit?: number
-  ): Promise<ResponseTipsDetails> {
-    const select: Prisma.TipsSelect = {
-      id: true,
-      title: true,
-      description: true,
-      createdAt: true,
-      updatedAt: true,
-      news: {
-        select: {
-          id: true,
-          title: true,
-          content: true,
-          createdAt: true,
-          updatedAt: true,
-          status: true,
-        },
-      },
-    };
-    try {
-      if (!page || !limit) {
-        const tips = await this.tipsDatabaseService.findMany({
-          where: {
-            id: id,
-          },
-          select,
-        });
-
-        const total = await this.newsDatabaseService.count({ tipsId: id });
-        return { success: true, message: '', data: { ...tips[0], total } };
-      }
-
-      if (page || limit) {
-        const skip: number = (page - 1) * limit;
-        const take: number = limit;
-        select.news = {
-          take,
-          skip,
-        };
-      }
-      const tip = await this.tipsDatabaseService.findMany({
-        where: {
-          id: id,
-        },
-        select,
-      });
-
-      if (!tip) {
-        throw new HttpException('Tips not found', HttpStatus.NOT_FOUND);
-      }
-
-      console.log('tip', tip);
-
-      const total = await this.newsDatabaseService.count({ tipsId: id });
-      return {
-        data: { ...(Array.isArray(tip) ? tip[0] : tip), total },
-        message: 'Tips fetched successfully',
-        success: true,
-      };
-    } catch (error) {
-      // Handle error
-      throw new HttpException('Failed to fetch tips', HttpStatus.BAD_REQUEST);
     }
   }
 }

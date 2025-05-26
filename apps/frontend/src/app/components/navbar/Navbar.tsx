@@ -1,65 +1,72 @@
+// Client Component for conditional sidebar
 'use client';
-import { useRouter } from 'next/navigation';
+import React from 'react';
+import { usePathname } from 'next/navigation';
 
-const Navbar = () => {
-  const router = useRouter();
+export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const hideSidebar = pathname === '/login' || pathname === '/unregister';
+
+  if (hideSidebar) {
+    return <>{children}</>;
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   return (
-    <nav className="bg-gray-800 p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="text-white font-bold">Admin Panel</div>
-        <div className="flex space-x-4">
-          <button
-            onClick={() => router.push('/users')}
-            className="text-white hover:text-gray-300"
-          >
-            Show All Users
-          </button>
-          <button
-            onClick={() => router.push('/send-email')}
-            className="text-white hover:text-gray-300"
-          >
-            Send Email
-          </button>
-          <button
-            onClick={() => router.push('/add-user')}
-            className="text-white hover:text-gray-300"
-          >
-            Add User
-          </button>
-          <button
-            onClick={() => router.push('/tips')}
-            className="text-white hover:text-gray-300"
-          >
-            Tips
-          </button>
-          <button
-            onClick={() => router.push('/auto-email')}
-            className="text-white hover:text-gray-300"
-          >
-            Auto-Email
-          </button>
-          <button
-            onClick={() => router.push('/cron-email-order')}
-            className="text-white hover:text-gray-300"
-          >
-            Cron Emails Order
-          </button>
-          <button
-            onClick={handleLogout}
-            className="text-white hover:text-gray-300"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
-    </nav>
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
+      {/* Side Navbar */}
+      <nav
+        style={{
+          width: '220px',
+          background: '#222',
+          color: '#fff',
+          padding: '2rem 1rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem',
+        }}
+      >
+        <a
+          href="/"
+          style={{ color: '#fff', textDecoration: 'none', fontWeight: 'bold' }}
+        >
+          Home
+        </a>
+        <a href="/users" style={{ color: '#fff', textDecoration: 'none' }}>
+          Users
+        </a>
+        <a href="/add-user" style={{ color: '#fff', textDecoration: 'none' }}>
+          Add User
+        </a>
+        <a href="/news" style={{ color: '#fff', textDecoration: 'none' }}>
+          All News
+        </a>
+        <a href="/send-news" style={{ color: '#fff', textDecoration: 'none' }}>
+          Send News
+        </a>
+        <a href="/tips" style={{ color: '#fff', textDecoration: 'none' }}>
+          Tips
+        </a>
+        <a
+          href="/cron-news-order"
+          style={{ color: '#fff', textDecoration: 'none' }}
+        >
+          Automated News Order
+        </a>
+        <a href="/auto-news" style={{ color: '#fff', textDecoration: 'none' }}>
+          Automated News Planner
+        </a>
+        <a href="/tips" style={{ color: '#fff', textDecoration: 'none' }}>
+          <button onClick={() => handleLogout()}>Logout</button>
+        </a>
+        {/* Add more links as needed */}
+      </nav>
+      {/* Main Content */}
+      <main style={{ flex: 1, padding: '2rem' }}>{children}</main>
+    </div>
   );
-};
-
-export default Navbar;
+}

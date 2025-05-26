@@ -28,21 +28,22 @@ model Admin {
 }
 
 model News {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   title     String
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   tipsId    Int
-  tips      Tips     @relation(fields: [tipsId], references: [id], onDelete: Cascade)
-  status    Boolean  @default(false)
+  tips      Tips      @relation(fields: [tipsId], references: [id], onDelete: Cascade)
+  status    Boolean   @default(false)
+  sendTime  DateTime?
 }
 
 model Cron {
-  id        Int       @id @default(autoincrement())
+  id        Int       @id @default(1)
   name      String
   startTime DateTime
-  schedule  String
+  schedule  Schedule @default(every_month)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   status    Boolean   @default(false)
@@ -58,3 +59,30 @@ model Tips {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  level     String // INFO, WARN, ERROR, etc.
+  message   String
+  context   String? // Service or class name
+  timestamp DateTime @default(now())
+  metadata  Json? // Additional structured data
+  service   String // Service name (e.g., "cron-service")
+  userId    String? // Optional user context
+  traceId   String? // For distributed tracing
+
+  @@index([level])
+  @@index([timestamp])
+  @@index([service])
+}
+
+enum Schedule {
+  every_week      
+  every_day       
+  every_month      
+  every_year      
+  every_5_minutes 
+  every_10_minutes 
+  every_minute    
+}
+

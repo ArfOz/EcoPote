@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateAdminDto {
   @IsNotEmpty()
@@ -40,14 +46,4 @@ export class SendEmailDto {
 
   @IsNotEmpty()
   html: string;
-}
-
-export class CreateAddNewsDto {
-  @IsNotEmpty()
-  @IsString()
-  title: string;
-
-  @IsNotEmpty()
-  @IsString()
-  tipsId: string;
 }

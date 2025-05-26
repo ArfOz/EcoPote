@@ -5,7 +5,7 @@ import { CronController } from './cron.controller';
 // import { TaskService } from './task.service';
 
 @Module({
-  imports: [ScheduleModule.forRoot()],
+  imports: [],
   controllers: [CronController],
   providers: [CronService],
 })

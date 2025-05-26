@@ -1,4 +1,4 @@
-import { ScheduleEnum } from '@shared/dtos';
+import { CronTimeSetEnum, ScheduleFrontEnum } from '@shared/dtos';
 import {
   IsEmail,
   IsNotEmpty,
@@ -27,8 +27,8 @@ export class CronUpdateDto {
   startTime?: Date;
 
   @IsOptional()
-  @IsEnum(ScheduleEnum)
-  schedule?: ScheduleEnum;
+  @IsString()
+  schedule?: typeof CronTimeSetEnum;
 
   @IsOptional()
   @IsBoolean()
