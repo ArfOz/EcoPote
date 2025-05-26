@@ -55,7 +55,7 @@ export const SelectedTip = ({
 
         try {
           const tipNews: ResponseTipNews = await fetchWithAuth(
-            `admin/tips/news/${selectedTip.id}?page=${page}&limit=${limit}`,
+            `news/tips/${selectedTip.id}?page=${page}&limit=${limit}`,
             {},
             true
           );
@@ -212,6 +212,7 @@ export const SelectedTip = ({
                 addNewsBackend={addNewsBackend}
                 selectedTip={selectedTip}
                 setNewsStatus={setNewsStatus}
+                newsStatus={newsStatus}
               />
             )}
           </div>

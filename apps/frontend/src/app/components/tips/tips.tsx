@@ -15,7 +15,7 @@ export const TipsComponent = ({
   const handleTipClick = async (id: number) => {
     try {
       const tipData: ResponseTipsDetails = await fetchWithAuth(
-        `admin/tips/${id}`,
+        `news/tips/${id}`,
         {},
         true
       );

@@ -26,10 +26,6 @@ const TipsPage: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/login');
-    }
     const fetchAllTips = async () => {
       try {
         const res: ResponseTips = await fetchWithAuth(`news/tips`, {}, true); // Fetch all users
