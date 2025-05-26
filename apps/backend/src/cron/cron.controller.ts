@@ -27,8 +27,8 @@ import { AuthMode, JwtAuthGuard } from '@auth';
 export class CronController {
   constructor(private readonly cronService: CronService) {}
 
-  @AuthMode('static')
   @UseGuards(JwtAuthGuard)
+  @AuthMode('static')
   @Post('status')
   async getStatus(@Body() body: { schedule: string }): Promise<string> {
     return this.cronService.getStatus({ schedule: body.schedule });

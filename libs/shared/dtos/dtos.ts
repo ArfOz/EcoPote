@@ -92,7 +92,6 @@ export interface ResponseCronUpdateDto {
   data: {
     name: string;
     id: number;
-    cronTime: string;
     startTime: Date;
     schedule: string;
     createdAt: Date;

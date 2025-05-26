@@ -49,7 +49,6 @@ export async function fetchWithAuth(
     }
 
     const data = await response.json();
-
     if (!response.ok) {
       throw new Error(data.message || 'An error occurred');
     }
