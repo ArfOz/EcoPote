@@ -1,6 +1,6 @@
 import './global.css';
 import { LayoutWithSidebar } from './components';
-import { AuthGuard } from './AuthGuard';
+import { AuthGuard } from './components/auth-guard/AuthGuard';
 
 export const metadata = {
   title: 'Welcome to frontend',
