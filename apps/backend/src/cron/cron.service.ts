@@ -1,5 +1,11 @@
 import { getCronExpression, TimeCalculator } from '@utils';
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { ScheduleFrontEnum, CronTimeSetEnum } from '@shared/dtos'; // Adjust the path based on your project structure
 import {
   CronDatabaseService,
@@ -14,6 +20,8 @@ import {
   ResponseDeleteCron,
 } from '@shared/dtos';
 import { start } from 'repl';
+import authConfig from '@auth/config/auth.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class CronService {
@@ -21,7 +29,9 @@ export class CronService {
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
     private readonly userDatabaseService: UserDatabaseService,
-    private readonly newsDatabaseService: NewsDatabaseService
+    private readonly newsDatabaseService: NewsDatabaseService,
+    @Inject(authConfig.KEY)
+    private readonly authCfg: ConfigType<typeof authConfig>
   ) {}
 
   async getStatus({ schedule }: { schedule: string }): Promise<string> {
@@ -134,12 +144,13 @@ export class CronService {
 
     const where: Prisma.CronWhereUniqueInput = { id };
 
-    console.log('Calling Azure Function: scheduleJob with status:');
+    console.log('Calling Azure Function: scheduleJob with status:', status);
     try {
       await fetch('http://localhost:7071/api/scheduleJob', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCfg.static_token_cron_trigger}`,
         },
         body: JSON.stringify({
           status,

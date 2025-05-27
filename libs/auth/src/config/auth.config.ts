@@ -12,4 +12,5 @@ export default registerAs('auth', () => ({
   differentIpTemplateName: process.env['DIFFERENT_IP_TEMPLATE_NAME'] as string,
   baseTemplateUrl: process.env['BASE_TEMPLATE_URL'] as string,
   admin_email: process.env['ADMIN_EMAIL'] as string,
+  static_token_cron_trigger: process.env['STATIC_TOKEN_CRON_TRIGGER'] as string,
 }));

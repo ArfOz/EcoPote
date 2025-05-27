@@ -33,7 +33,7 @@ const Login = () => {
         } else {
           setError('Token is missing in the response.');
         }
-        router.push('/tips');
+        router.push('/');
       } else {
         setError(`Error: ${response.message}`);
       }

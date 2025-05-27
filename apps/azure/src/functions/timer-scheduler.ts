@@ -42,6 +42,10 @@ export async function scheduleJob(
       newCron?: string;
     };
 
+    context.log(
+      `Received request to update cron job. Status: ${status}, New Cron: ${newCron}`
+    );
+
     if (typeof status === 'boolean') {
       isActive = status;
       context.log(
