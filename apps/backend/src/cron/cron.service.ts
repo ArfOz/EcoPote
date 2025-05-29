@@ -171,6 +171,7 @@ export class CronService {
         body: JSON.stringify({
           status,
           newCron,
+          startTime,
         }),
       });
     } catch (error) {
