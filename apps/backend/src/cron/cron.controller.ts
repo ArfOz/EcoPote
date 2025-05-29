@@ -29,7 +29,7 @@ export class CronController {
 
   @UseGuards(JwtAuthGuard)
   @AuthMode('static')
-  @Post('status')
+  @Get('status')
   async getStatus(@Body() body: { schedule: string }): Promise<string> {
     return this.cronService.getStatus({ schedule: body.schedule });
   }

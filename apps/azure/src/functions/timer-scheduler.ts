@@ -101,14 +101,11 @@ export async function timerTrigger(
         );
       }
       await fetch(url, {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          schedule: cronTime,
-        }),
       });
       context.log(`Successfully triggered ${url}`);
     } else {
