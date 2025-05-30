@@ -45,7 +45,7 @@ model Cron {
   startTime DateTime
   schedule  Schedule @default(every_month)
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  updatedAt DateTime  
   status    Boolean   @default(false)
   lastRun   DateTime?
   nextRun   DateTime?

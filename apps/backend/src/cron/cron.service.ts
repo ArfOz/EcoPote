@@ -6,7 +6,7 @@ import {
   NewsDatabaseService,
   UserDatabaseService,
 } from '@database';
-import { sendEmailAzure } from '@shared/nodemailer';
+import { sendEmailAzure, sendEmailsGmail } from '@shared/nodemailer';
 import { Prisma, User } from '@prisma/client';
 import {
   ResponseCreateCron,
@@ -350,7 +350,9 @@ export class CronService {
 
     if (schedule) {
       // If schedule is an array, use the first element as the key
-      nextRun = TimeCalculator(schedule, new Date());
+      const now = new Date();
+      now.setSeconds(0, 0); // Set seconds and milliseconds to zero
+      nextRun = TimeCalculator(schedule, now);
     }
 
     const updateCronDatabase: Prisma.CronUpdateInput = {
@@ -369,8 +371,6 @@ export class CronService {
       success: true,
       message: 'Email sent successfully',
     };
-
-    // return { data: res, success: true, message: 'Email sent successfully' };
   }
   catch(error) {
     // Handle error
