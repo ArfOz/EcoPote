@@ -15,7 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import { Multer } from 'multer';
 import { AuthMode, JwtAuthGuard } from '@auth';
-import { NewsService } from './news.service';
+import { TipsService } from './tips.service';
 import {
   ResponseAddNews,
   ResponseDeleteNews,
@@ -31,8 +31,8 @@ import {
 import { CreateAddNewsDto, UpdateNewsDto } from './dtos';
 
 @Controller('tips')
-export class NewsController {
-  constructor(private readonly newsService: NewsService) {}
+export class TipsController {
+  constructor(private readonly newsService: TipsService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('sendnews')

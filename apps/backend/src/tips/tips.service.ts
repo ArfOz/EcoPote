@@ -21,9 +21,9 @@ import {
 } from '@database';
 import { LogsDatabaseService } from '@database/logs';
 import { CreateAddNewsDto, UpdateNewsDto } from './dtos';
-import { TimeCalculator } from '@utils';
+
 @Injectable()
-export class NewsService {
+export class TipsService {
   constructor(
     private userDatabaseService: UserDatabaseService,
     private newsDatabaseService: NewsDatabaseService,
