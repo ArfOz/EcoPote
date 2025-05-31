@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { NewsModule } from './news/news.module';
-// import { AzureModule } from './azure/azure.module';
 import { ConfigModule } from '@nestjs/config';
 import generalConfig from '@shared/config/general.config';
 import { UserModule } from './user/user.module';
@@ -25,7 +24,6 @@ import { CronModule } from './cron/cron.module';
     AuthModule,
     ScheduleModule.forRoot(),
     CronModule,
-    // AzureModule,
     NewsModule,
     // WinstonLoggerModule,
   ],

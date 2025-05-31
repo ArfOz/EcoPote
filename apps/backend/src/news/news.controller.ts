@@ -30,7 +30,7 @@ import {
 } from '@shared/dtos';
 import { CreateAddNewsDto, UpdateNewsDto } from './dtos';
 
-@Controller('news')
+@Controller('tips')
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
@@ -78,7 +78,7 @@ export class NewsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('tips-add')
+  @Post('tip-add')
   @UseInterceptors(FileInterceptor('file'))
   async addTips(
     @Body() tipsData: { title: string; description: string },
@@ -92,13 +92,13 @@ export class NewsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('tips')
+  @Get('alltips')
   async getTips(): Promise<ResponseTips> {
     return await this.newsService.getTips();
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('tips/:id')
+  @Get('tip/:id')
   async getTipsById(
     @Param('id') id: string,
     @Query('page') page?: string,
@@ -131,7 +131,7 @@ export class NewsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('tips/news/:id')
+  @Get('tip/news/:id')
   async getNews(
     @Param('id') id: string,
     @Query('page') page?: string,

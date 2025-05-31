@@ -55,7 +55,7 @@ export const SelectedTip = ({
 
         try {
           const tipNews: ResponseTipNews = await fetchWithAuth(
-            `news/tips/${selectedTip.id}?page=${page}&limit=${limit}`,
+            `tips/tip/${selectedTip.id}?page=${page}&limit=${limit}`,
             {},
             true
           );
@@ -91,7 +91,7 @@ export const SelectedTip = ({
       }
 
       const res: ResponseAddNews = await fetchWithAuth(
-        'admin/news/add',
+        'tips/news/add',
         {
           method: 'POST',
           body: formData,
@@ -145,7 +145,7 @@ export const SelectedTip = ({
   const handleDeleteNews = async (newsId: number) => {
     try {
       const res: ResponseDeleteNews = await fetchWithAuth(
-        `news/news/${newsId}`,
+        `tips/news/${newsId}`,
         {
           method: 'DELETE',
         },
@@ -168,7 +168,7 @@ export const SelectedTip = ({
         const fetchUpdatedNews = async () => {
           try {
             const tipNews: ResponseTipNews = await fetchWithAuth(
-              `news/tips/news/${selectedTip?.id}?page=${page}&limit=${limit}`,
+              `tips/tip/news/${selectedTip?.id}?page=${page}&limit=${limit}`,
               {},
               true
             );

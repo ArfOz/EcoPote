@@ -12,7 +12,7 @@ export const Newsorder = () => {
     const fetchNewsOrder = async () => {
       try {
         const res: ResponseNewsOrderDto = await fetchWithAuth(
-          'news/newsorder',
+          'tips/newsorder',
           {},
           true
         );
