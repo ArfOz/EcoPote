@@ -28,7 +28,7 @@ export class CronUpdateDto {
 
   @IsOptional()
   @IsString()
-  schedule?: typeof CronTimeSetEnum;
+  schedule?: keyof typeof CronTimeSetEnum;
 
   @IsOptional()
   @IsBoolean()

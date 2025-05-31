@@ -77,12 +77,13 @@ export class CronController {
     @Body() cronData: CronUpdateDto
   ): Promise<ResponseCronUpdateDto> {
     try {
+      console.log('Updating cron job with data:', cronData);
       const response = await this.cronService.updateCronJob(
         cronData.id,
-        cronData.name,
-        cronData.startTime,
-        cronData.schedule as unknown as keyof typeof CronTimeSetEnum,
-        cronData.status
+        cronData?.name,
+        cronData?.startTime,
+        cronData?.schedule,
+        cronData?.status
       );
       return response;
     } catch (error) {
