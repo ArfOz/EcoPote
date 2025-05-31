@@ -28,7 +28,7 @@ const TipsPage: React.FC = () => {
   useEffect(() => {
     const fetchAllTips = async () => {
       try {
-        const res: ResponseTips = await fetchWithAuth(`news/tips`, {}, true); // Fetch all users
+        const res: ResponseTips = await fetchWithAuth(`tips/alltips`, {}, true); // Fetch all users
 
         const data = res.data;
         if (data && Array.isArray(data.tips)) {

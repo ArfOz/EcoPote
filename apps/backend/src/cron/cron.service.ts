@@ -1,6 +1,6 @@
 import { getCronExpression, TimeCalculator } from '@utils';
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { ScheduleFrontEnum, CronTimeSetEnum } from '@shared/dtos'; // Adjust the path based on your project structure
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { CronTimeSetEnum } from '@shared/dtos'; // Adjust the path based on your project structure
 import {
   CronDatabaseService,
   NewsDatabaseService,
@@ -13,6 +13,8 @@ import {
   ResponseCronUpdateDto,
   ResponseDeleteCron,
 } from '@shared/dtos';
+import authConfig from '@auth/config/auth.config';
+import { ConfigType } from '@nestjs/config';
 import { start } from 'repl';
 
 @Injectable()
@@ -21,7 +23,9 @@ export class CronService {
   constructor(
     private readonly cronDatabaseService: CronDatabaseService,
     private readonly userDatabaseService: UserDatabaseService,
-    private readonly newsDatabaseService: NewsDatabaseService
+    private readonly newsDatabaseService: NewsDatabaseService,
+    @Inject(authConfig.KEY)
+    private readonly authCfg: ConfigType<typeof authConfig>
   ) {}
 
   async getStatus({ schedule }: { schedule: string }): Promise<string> {
@@ -105,17 +109,63 @@ export class CronService {
   ): Promise<ResponseCronUpdateDto> {
     const dateNow = new Date();
 
+    console.log(
+      'Updating cron job with ID:',
+      id,
+      'cronName:',
+      cronName,
+      'startTime:',
+      startTime,
+      'schedule:',
+      schedule,
+      'status:',
+      status
+    );
+
     const data = await this.cronDatabaseService.findUniqueCron({ id });
 
-    // Parse the startTime to a Date object
+    // Fallback to existing schedule if not provided
+    schedule = schedule || data.schedule;
 
+    // Parse the startTime to a Date object
     const startDateTime = startTime ? new Date(startTime) : data.startTime;
 
-    // const oneHourInMillis = 60 * 60 * 1000;
-    // if (startDateTime.getTime() - dateNow.getTime() < oneHourInMillis) {
-    //   throw new Error(
-    //     'Start time must be at least one hour after the current time.'
-    const nextRun: Date | undefined = data.nextRun;
+    // Only skip update if only the name changed, otherwise proceed and trigger Azure Function.
+    if (
+      cronName !== undefined &&
+      cronName !== data.name &&
+      startDateTime.getTime() === new Date(data.startTime).getTime() &&
+      schedule === data?.schedule &&
+      status === data?.status
+    ) {
+      const data = await this.cronDatabaseService.updateCron({
+        where: { id },
+        data: { name: cronName, updatedAt: dateNow },
+      });
+      return {
+        success: true,
+        message: 'No changes detected except name, cron job not updated',
+        data,
+      };
+    }
+
+    let nextRun: Date | undefined;
+    if (schedule) {
+      nextRun = TimeCalculator(schedule, startDateTime);
+    }
+
+    console.log(
+      'Next run calculated as:',
+      nextRun,
+      'Start time:',
+      startDateTime
+    );
+
+    if (startDateTime < nextRun) {
+      nextRun = startDateTime;
+    }
+
+    const newCron = getCronExpression(schedule, startDateTime);
 
     const updatedCron: Prisma.CronUpdateInput = {
       name: cronName,
@@ -123,27 +173,20 @@ export class CronService {
       updatedAt: dateNow,
       status,
       nextRun,
+      schedule,
     };
 
-    // Remove the redundant assignment that could overwrite with kebab-case
-    // if (schedule) {
-    //   updatedCron.schedule = schedule;
-    // }
-
-    const newCron = getCronExpression(schedule, startDateTime);
-
-    const where: Prisma.CronWhereUniqueInput = { id };
-
-    console.log('Calling Azure Function: scheduleJob with status:');
     try {
       await fetch('http://localhost:7071/api/scheduleJob', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCfg.static_token_cron_trigger}`,
         },
         body: JSON.stringify({
           status,
           newCron,
+          startTime,
         }),
       });
     } catch (error) {
@@ -156,26 +199,8 @@ export class CronService {
           : HttpStatus.BAD_GATEWAY
       );
     }
-
-    // Only skip update if only the name changed, otherwise proceed and trigger Azure Function
-
-    if (
-      cronName !== undefined &&
-      cronName !== data.name &&
-      startDateTime.getTime() === new Date(data.startTime).getTime() &&
-      schedule === data.schedule &&
-      status === data.status
-    ) {
-      // Only name changed, skip update and do not trigger Azure Function
-      return {
-        success: true,
-        message: 'No changes detected except name, cron job not updated',
-        data,
-      };
-    }
-
     const updatedData = await this.cronDatabaseService
-      .updateCron({ where, data: updatedCron })
+      .updateCron({ where: { id }, data: updatedCron })
       .catch((error) => {
         console.error('Error updating database:', error);
         throw new HttpException(
@@ -183,7 +208,6 @@ export class CronService {
           HttpStatus.BAD_REQUEST
         );
       });
-
     if (!updatedData) {
       throw new Error('Failed to update cron job');
     }
@@ -308,20 +332,24 @@ export class CronService {
     //   email.content
     // );
 
-    // const { sentUsers, errorUsers } = await sendEmailsGmail(
-    //   users,
-    //   email.title,
-    //   email.content
-    // );
+    const { sentUsers, errorUsers } = await sendEmailsGmail(
+      users,
+      email.title,
+      email.content
+    );
 
-    const { sentUsers, errorUsers } = {
-      sentUsers: ['asds'],
-      errorUsers: [],
-    };
+    // const { sentUsers, errorUsers } = {
+    //   sentUsers: ['asds'],
+    //   errorUsers: [],
+    // };
+
+    // Remove seconds and milliseconds from sendTime
+    const sendTime = new Date();
+    sendTime.setSeconds(0, 0);
 
     const emailUpdate = await this.newsDatabaseService.updateNews(
       email.id,
-      { status: false } // Update the status to false after sending
+      { status: false, sendTime } // Update the status to false after sending
     );
     if (!emailUpdate) {
       throw new HttpException(
@@ -341,7 +369,9 @@ export class CronService {
 
     if (schedule) {
       // If schedule is an array, use the first element as the key
-      nextRun = TimeCalculator(schedule, new Date());
+      const now = new Date();
+      now.setSeconds(0, 0); // Set seconds and milliseconds to zero
+      nextRun = TimeCalculator(schedule, now);
     }
 
     const updateCronDatabase: Prisma.CronUpdateInput = {
@@ -360,11 +390,10 @@ export class CronService {
       success: true,
       message: 'Email sent successfully',
     };
-
-    // return { data: res, success: true, message: 'Email sent successfully' };
   }
   catch(error) {
     // Handle error
+    console.error('Error sending email:', error);
     throw new HttpException('Failed to send email', HttpStatus.BAD_REQUEST);
   }
 }

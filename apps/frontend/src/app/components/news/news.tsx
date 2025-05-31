@@ -20,7 +20,7 @@ export const AllNews = () => {
   const fetchNews = async () => {
     try {
       const res: ResponseNewsAllDto = await fetchWithAuth(
-        'news/allnews',
+        'tips/allnews',
         {
           method: 'GET',
         },
@@ -78,7 +78,7 @@ export const AllNews = () => {
     }
 
     await fetchWithAuth(
-      `news/news/update/${id}`,
+      `tips/news/update/${id}`,
       {
         method: 'POST',
         body: formData,
@@ -94,7 +94,7 @@ export const AllNews = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this email?')) {
       await fetchWithAuth(
-        `news/delete/${id}`,
+        `tips/news/${id}`,
         {
           method: 'DELETE',
         },

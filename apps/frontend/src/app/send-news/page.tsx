@@ -24,7 +24,7 @@ const SendNews = () => {
 
     try {
       const response: ResponseMessageNews = (await fetchWithAuth(
-        'news/sendnews',
+        'tips/sendnews',
         {
           method: 'POST',
           body: formData,

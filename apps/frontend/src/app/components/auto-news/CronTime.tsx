@@ -130,12 +130,67 @@ export const CronTime = () => {
 
   const handleSave = async () => {
     if (!tempCron.id) return;
-    // Prevent saving if startTime is before now
-    if (tempCron.startTime && tempCron.startTime.getTime() < Date.now()) {
-      alert('Start time cannot be before now.');
+
+    // Only send changed fields
+    const original = data.find((job) => job.id === editingCron);
+    if (!original) return;
+
+    const changedFields: any = { id: tempCron.id };
+
+    if (tempCron.name !== undefined && tempCron.name !== original.name) {
+      changedFields.name = tempCron.name;
+    }
+    if (
+      tempCron.schedule !== undefined &&
+      tempCron.schedule !== original.schedule
+    ) {
+      changedFields.schedule = tempCron.schedule;
+    }
+    if (tempCron.status !== undefined && tempCron.status !== original.status) {
+      changedFields.status = tempCron.status;
+    }
+    if (
+      tempCron.startTime !== undefined &&
+      new Date(tempCron.startTime).getTime() !==
+        new Date(original.startTime).getTime()
+    ) {
+      if (new Date(tempCron.startTime).getTime() < Date.now()) {
+        alert('Start time cannot be before now.');
+        return;
+      }
+      changedFields.startTime = tempCron.startTime;
+    }
+
+    // If schedule is changed, also check startTime is not in the past
+    if (
+      tempCron.schedule !== undefined &&
+      tempCron.schedule !== original.schedule
+    ) {
+      if (
+        tempCron.startTime !== undefined &&
+        new Date(tempCron.startTime).getTime() < Date.now()
+      ) {
+        alert('Start time cannot be before now.');
+        return;
+      }
+      // If startTime is not being changed, check the original startTime
+      if (
+        tempCron.startTime === undefined &&
+        new Date(original.startTime).getTime() < Date.now()
+      ) {
+        alert('Start time cannot be before now.');
+        return;
+      }
+    }
+
+    // If no changes, do nothing
+    if (Object.keys(changedFields).length === 1) {
+      setEditingCron(null);
+      setTempCron({});
       return;
     }
-    await handleChange(tempCron as any);
+
+    await handleChange(changedFields);
     setEditingCron(null);
     setTempCron({});
   };

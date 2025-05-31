@@ -10,8 +10,9 @@ import * as cronParser from 'cron-parser';
 
 let cronTime = '*/1 * * * *'; // Default cron time (every minute)
 let isActive = false; // Track if the cron is active
+let defaultStartTime: Date | null = null; // Track when to start running jobs
 
-// HTTP trigger to update the cron time or status
+// HTTP trigger to update the cron time, status, or startTime
 export async function scheduleJob(
   request: HttpRequest,
   context: InvocationContext
@@ -37,10 +38,15 @@ export async function scheduleJob(
   }
 
   try {
-    const { status, newCron } = (await request.json()) as {
+    const { status, newCron, startTime } = (await request.json()) as {
       status?: boolean;
       newCron?: string;
+      startTime?: string; // ISO string
     };
+
+    context.log(
+      `Received request to update cron job. Status: ${status}, New Cron: ${newCron}, New StartTime: ${startTime}`
+    );
 
     if (typeof status === 'boolean') {
       isActive = status;
@@ -54,12 +60,19 @@ export async function scheduleJob(
       context.log(`Cron time updated to "${cronTime}"`);
     }
 
+    if (startTime) {
+      defaultStartTime = new Date(startTime);
+      context.log(`Start time updated to "${defaultStartTime.toISOString()}"`);
+    }
+
     return {
       status: 200,
       jsonBody: {
         message: `Cron job ${
           isActive ? 'started' : 'stopped'
-        }. Cron time: ${cronTime}`,
+        }. Cron time: ${cronTime}. Start time: ${
+          defaultStartTime?.toISOString() ?? 'not set'
+        }`,
       },
     };
   } catch (error) {
@@ -68,7 +81,7 @@ export async function scheduleJob(
   }
 }
 
-// Timer trigger runs on a fixed schedule, but checks cronTime and isActive
+// Timer trigger runs on a fixed schedule, but checks cronTime, isActive, and startTime
 export async function timerTrigger(
   myTimer: Timer,
   context: InvocationContext
@@ -79,6 +92,15 @@ export async function timerTrigger(
   }
 
   const now = new Date();
+
+  // Check if startTime is set and now is before startTime
+  if (defaultStartTime && now < defaultStartTime) {
+    context.log(
+      `Current time (${now.toISOString()}) is before startTime (${defaultStartTime.toISOString()}). Skipping execution.`
+    );
+    return;
+  }
+
   const token = process.env.STATIC_TOKEN;
   const url: string = process.env.EMAIL_BACKEND_URL!;
 
@@ -97,14 +119,11 @@ export async function timerTrigger(
         );
       }
       await fetch(url, {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          schedule: cronTime,
-        }),
       });
       context.log(`Successfully triggered ${url}`);
     } else {
