@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
 import { ResponseNewsAllDto } from '@shared/dtos';
 import { News } from '@prisma/client';
+import { handleAuthError } from '../error';
 
 const NEWS_PER_PAGE = 20;
 
@@ -15,6 +16,7 @@ export const AllNews = () => {
   const [newsTitle, setNewsTitle] = useState('');
   const [newsStatus, setNewsStatus] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch news from backend
   const fetchNews = async () => {
@@ -30,16 +32,10 @@ export const AllNews = () => {
         throw new Error('Failed to fetch news');
       }
       setNews(res.data?.emails || []);
+      handleAuthError(error, setError, router);
     } catch (error) {
-      if (
-        error instanceof Error &&
-        (error.message === 'Token is expired' ||
-          error.message === 'Unauthorized access' ||
-          error.message === 'No token found')
-      ) {
-        localStorage.removeItem('token');
-        router.push('/login');
-      }
+      handleAuthError(error, setError, router);
+      console.error('Error fetching news:', error);
     }
   };
 

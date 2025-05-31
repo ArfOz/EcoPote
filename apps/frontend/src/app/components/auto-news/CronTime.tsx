@@ -9,6 +9,7 @@ import {
   ScheduleFrontEnum,
 } from '@shared/dtos';
 import { CronCreator } from '.';
+import { handleAuthError } from '../error';
 
 export const CronTime = () => {
   const [data, setData] = useState<ResponseCron['data']>([]);
@@ -39,22 +40,9 @@ export const CronTime = () => {
           true
         );
         setData(res.data);
-
         console.log('Cron jobs fetched:', res.data);
       } catch (error) {
-        if (error instanceof Error) {
-          setError(error.message);
-          if (
-            error.message === 'Token is expired' ||
-            error.message === 'Unauthorized access' ||
-            error.message === 'No token found'
-          ) {
-            localStorage.removeItem('token');
-            router.push('/login');
-          }
-        } else {
-          setError('An unknown error occurred');
-        }
+        handleAuthError(error, setError, router);
       }
     };
 
@@ -107,7 +95,7 @@ export const CronTime = () => {
         console.error('Failed to update cron job', response.message);
       }
     } catch (error: any) {
-      setError(error?.message || 'Failed to update cron job');
+      handleAuthError(error, setError, router);
       console.error('Failed to update cron job', error);
     }
   };

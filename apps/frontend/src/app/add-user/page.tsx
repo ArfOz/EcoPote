@@ -5,6 +5,7 @@ import React, { useEffect } from 'react';
 
 import { useRouter } from 'next/navigation';
 import { CreateUserDto, ResponseCreateUser } from '@shared/dtos';
+import { handleAuthError } from '../components';
 
 const AddUser = () => {
   const [status, setStatus] = React.useState<string | null>(null);
@@ -47,25 +48,9 @@ const AddUser = () => {
         setStatus('User added successfully');
       }
       // Clear form fields
-
       (event.target as HTMLFormElement).reset();
     } catch (error) {
-      console.error('Error adding user:', error);
-      if (error instanceof Error) {
-        if (error.message === 'Unauthorized') {
-          router.push('/login');
-        }
-        if (error.message === 'Token expired') {
-          router.push('/login');
-        }
-
-        setError(error.message);
-        setTimeout(() => {
-          setError(null);
-        }, 5000);
-      } else {
-        setError('An unknown error occurred');
-      }
+      handleAuthError(error, setError, router);
     }
   };
 

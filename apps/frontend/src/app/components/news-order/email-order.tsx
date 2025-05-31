@@ -3,9 +3,11 @@ import { ResponseNewsOrderDto } from '@shared/dtos';
 import { fetchWithAuth } from '@utils';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { handleAuthError } from '../error'; // Adjust the import path if needed
 
 export const Newsorder = () => {
   const [data, setData] = useState<ResponseNewsOrderDto['data'] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -18,6 +20,7 @@ export const Newsorder = () => {
         );
         setData(res.data);
       } catch (error) {
+        handleAuthError(error, setError, router);
         console.error('Error fetching news order:', error);
       }
     };
@@ -29,6 +32,7 @@ export const Newsorder = () => {
     <>
       <div className="flex flex-col items-center justify-start min-h-screen bg-gray-100 py-10">
         <h1 className="text-2xl font-bold mb-4">News Order</h1>
+        {error && <div className="text-red-600 mb-4">{error}</div>}
         <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-blue-500 text-white">

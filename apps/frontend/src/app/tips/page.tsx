@@ -8,7 +8,7 @@ import {
   ResponseTipsDetails,
   Tips,
 } from '@shared/dtos';
-import { TipsComponent, SelectedTip } from '../components';
+import { TipsComponent, SelectedTip, handleAuthError } from '../components';
 
 const TipsPage: React.FC = () => {
   const [tips, setTips] = React.useState<Tips[]>([]);
@@ -40,13 +40,7 @@ const TipsPage: React.FC = () => {
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message);
-          if (
-            error.message === 'Token is expired' ||
-            error.message === 'Unauthorized access'
-          ) {
-            localStorage.removeItem('token');
-            router.push('/login');
-          }
+          handleAuthError(error, setError, router);
         } else {
           setError('An unknown error occurred');
         }

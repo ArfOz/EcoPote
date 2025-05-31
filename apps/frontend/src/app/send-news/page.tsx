@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
 import { ResponseMessageNews } from '@shared/dtos';
-import { ResponseStatus, Status } from '../components';
+import { handleAuthError, ResponseStatus, Status } from '../components';
 
 const SendNews = () => {
   const [subject, setSubject] = useState<string>('');
@@ -54,13 +54,7 @@ const SendNews = () => {
     } catch (error) {
       if (error instanceof Error) {
         setStatus(`Error: ${error.message}`);
-        if (
-          error.message === 'Token is expired' ||
-          error.message === 'Unauthorized access'
-        ) {
-          localStorage.removeItem('token');
-          router.push('/login');
-        }
+        handleAuthError(error, setStatus, router);
       } else {
         setStatus('An error occurred while sending news.');
       }
