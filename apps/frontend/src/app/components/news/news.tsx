@@ -94,7 +94,7 @@ export const AllNews = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this email?')) {
       await fetchWithAuth(
-        `news/delete/${id}`,
+        `news/news/${id}`,
         {
           method: 'DELETE',
         },

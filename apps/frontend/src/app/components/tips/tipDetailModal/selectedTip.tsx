@@ -145,7 +145,7 @@ export const SelectedTip = ({
   const handleDeleteNews = async (newsId: number) => {
     try {
       const res: ResponseDeleteNews = await fetchWithAuth(
-        `admin/news/${newsId}`,
+        `news/news/${newsId}`,
         {
           method: 'DELETE',
         },
@@ -168,7 +168,7 @@ export const SelectedTip = ({
         const fetchUpdatedNews = async () => {
           try {
             const tipNews: ResponseTipNews = await fetchWithAuth(
-              `admin/tips/news/${selectedTip?.id}?page=${page}&limit=${limit}`,
+              `news/tips/news/${selectedTip?.id}?page=${page}&limit=${limit}`,
               {},
               true
             );

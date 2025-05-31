@@ -332,16 +332,16 @@ export class CronService {
     //   email.content
     // );
 
-    // const { sentUsers, errorUsers } = await sendEmailsGmail(
-    //   users,
-    //   email.title,
-    //   email.content
-    // );
+    const { sentUsers, errorUsers } = await sendEmailsGmail(
+      users,
+      email.title,
+      email.content
+    );
 
-    const { sentUsers, errorUsers } = {
-      sentUsers: ['asds'],
-      errorUsers: [],
-    };
+    // const { sentUsers, errorUsers } = {
+    //   sentUsers: ['asds'],
+    //   errorUsers: [],
+    // };
 
     // Remove seconds and milliseconds from sendTime
     const sendTime = new Date();
