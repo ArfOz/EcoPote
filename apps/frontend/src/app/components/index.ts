@@ -1,5 +1,6 @@
 export * from './auth-guard';
 export * from './auto-news';
+export * from './datafetch';
 export * from './dtos';
 export * from './error';
 export * from './navbar';

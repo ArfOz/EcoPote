@@ -6,6 +6,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -29,6 +30,31 @@ export interface ResponseCreateUser {
   success: boolean;
 }
 
+export class CronUpdateDto {
+  @IsNumber()
+  @IsNotEmpty()
+  id!: number;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsString()
+  @IsOptional()
+  cronTime?: string;
+
+  @IsString()
+  @IsOptional()
+  startTime?: Date;
+
+  @IsOptional()
+  @IsString()
+  schedule?: keyof typeof CronTimeSetEnum;
+
+  @IsOptional()
+  @IsBoolean()
+  status?: boolean;
+}
 export interface ResponseMessageNews {
   data: {
     sentUsers: string[];
@@ -84,6 +110,7 @@ export interface ResponseCron {
     nextRun: Date | null;
   }[];
   success: boolean;
+  message: string;
 }
 
 export interface ResponseCronUpdateDto {
@@ -229,7 +256,6 @@ export interface ResponseCreateCron {
   data: {
     name: string;
     id: number;
-    cronTime: string;
     startTime: Date;
     schedule: string;
     createdAt: Date;

@@ -10,10 +10,9 @@ import {
 } from '@shared/dtos';
 import { CronCreator } from '.';
 import { handleAuthError } from '../error';
+import { useFetchData } from '../datafetch';
 
 export const CronTime = () => {
-  const [data, setData] = useState<ResponseCron['data']>([]);
-  const [error, setError] = useState<string | null>(null);
   const [editingCron, setEditingCron] = useState<number | null>(null);
   const [tempCron, setTempCron] = useState<
     Partial<{
@@ -30,24 +29,12 @@ export const CronTime = () => {
   >({});
 
   const router = useRouter();
-
-  useEffect(() => {
-    const fetchCronJobs = async () => {
-      try {
-        const res: ResponseCron = await fetchWithAuth(
-          'cron/get-jobs',
-          {},
-          true
-        );
-        setData(res.data);
-        console.log('Cron jobs fetched:', res.data);
-      } catch (error) {
-        handleAuthError(error, setError, router);
-      }
-    };
-
-    fetchCronJobs();
-  }, [router]);
+  const {
+    data = [],
+    error,
+    setData,
+    setError,
+  } = useFetchData<ResponseCron['data']>('cron/get-jobs', [router], true);
 
   const handleChange = async ({
     id,
@@ -88,7 +75,14 @@ export const CronTime = () => {
 
       if (response.success) {
         setData((prevData) =>
-          prevData.map((job) => (job.id === id ? response.data : job))
+          (prevData ?? []).map((job) =>
+            job.id === id
+              ? {
+                  ...job,
+                  ...response.data,
+                }
+              : job
+          )
         );
       } else {
         setError(response.message || 'Failed to update cron job');
@@ -107,7 +101,7 @@ export const CronTime = () => {
       });
 
       if (response.success) {
-        setData((prevData) => prevData.filter((job) => job.id !== id));
+        setData((prevData) => (prevData ?? []).filter((job) => job.id !== id));
       } else {
         console.error('Failed to delete cron job', response.message);
       }
@@ -120,7 +114,7 @@ export const CronTime = () => {
     if (!tempCron.id) return;
 
     // Only send changed fields
-    const original = data.find((job) => job.id === editingCron);
+    const original = data?.find((job) => job.id === editingCron);
     if (!original) return;
 
     const changedFields: any = { id: tempCron.id };
@@ -185,11 +179,13 @@ export const CronTime = () => {
 
   const handleCancel = () => {
     setData((prev) =>
-      prev.map((job) =>
-        job.id === editingCron
-          ? ((orig) => ({ ...orig }))(prev.find((j) => j.id === editingCron)!)
-          : job
-      )
+      (prev ?? []).map((job) => {
+        if (job.id === editingCron) {
+          const orig = prev?.find((j) => j.id === editingCron);
+          return orig ? { ...orig } : job;
+        }
+        return job;
+      })
     );
     setEditingCron(null);
     setTempCron({});
@@ -215,7 +211,7 @@ export const CronTime = () => {
           </tr>
         </thead>
         <tbody>
-          {data.map((cronJob) => (
+          {data?.map((cronJob) => (
             <tr key={cronJob.id}>
               <td className="py-2 px-2 border-b">{cronJob.id}</td>
               <td className="py-2 px-2 border-b">
@@ -369,7 +365,9 @@ export const CronTime = () => {
           ))}
         </tbody>
       </table>
-      {data.length === 0 && <CronCreator setData={setData} />}
+      {Array.isArray(data) && data.length === 0 && (
+        <CronCreator setData={setData} />
+      )}
     </div>
   );
 };
