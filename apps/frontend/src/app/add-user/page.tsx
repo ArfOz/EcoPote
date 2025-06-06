@@ -1,7 +1,7 @@
 'use client';
 
 import { fetchWithAuth } from '@utils';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useRouter } from 'next/navigation';
 import { CreateUserDto, ResponseCreateUser } from '@shared/dtos';

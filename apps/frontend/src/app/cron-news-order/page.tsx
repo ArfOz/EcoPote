@@ -1,4 +1,3 @@
-import React from 'react';
 import { Newsorder } from '../components';
 
 const CronEmailsOrder = () => {

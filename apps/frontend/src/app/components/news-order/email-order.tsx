@@ -1,33 +1,22 @@
 'use client';
 import { ResponseNewsOrderDto } from '@shared/dtos';
-import { fetchWithAuth } from '@utils';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
-import { handleAuthError } from '../error'; // Adjust the import path if needed
+import { useFetchData } from '../datafetch';
 
 export const Newsorder = () => {
-  const [data, setData] = useState<ResponseNewsOrderDto['data'] | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchNewsOrder = async () => {
-      try {
-        const res: ResponseNewsOrderDto = await fetchWithAuth(
-          'tips/newsorder',
-          {},
-          true
-        );
-        setData(res.data);
-      } catch (error) {
-        handleAuthError(error, setError, router);
-        console.error('Error fetching news order:', error);
-      }
-    };
-
-    fetchNewsOrder();
-  }, [router]);
-
+  const {
+    data = [],
+    error,
+    setData,
+    setError,
+  } = useFetchData<ResponseNewsOrderDto['data']>(
+    'tips/newsorder',
+    [router],
+    true
+  );
   return (
     <>
       <div className="flex flex-col items-center justify-start min-h-screen bg-gray-100 py-10">

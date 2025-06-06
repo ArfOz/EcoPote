@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { fetchWithAuth } from '@utils';
 import { useRouter } from 'next/navigation';
 import {
@@ -365,8 +365,16 @@ export const CronTime = () => {
           ))}
         </tbody>
       </table>
-      {Array.isArray(data) && data.length === 0 && (
-        <CronCreator setData={setData} />
+      {data?.length === 0 && (
+        <CronCreator
+          setData={(newData) =>
+            setData(
+              typeof newData === 'function'
+                ? (prev) => newData(prev ?? [])
+                : newData
+            )
+          }
+        />
       )}
     </div>
   );
