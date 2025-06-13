@@ -1,56 +1,28 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchWithAuth } from '@utils';
 import { ResponseNewsAllDto } from '@shared/dtos';
 import { News } from '@prisma/client';
+import { useFetchData } from '../datafetch';
 
 const NEWS_PER_PAGE = 20;
 
 export const AllNews = () => {
   const router = useRouter();
-  const [news, setNews] = useState<News[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [newsTitle, setNewsTitle] = useState('');
   const [newsStatus, setNewsStatus] = useState(false);
   const [file, setFile] = useState<File | null>(null);
 
-  // Fetch news from backend
-  const fetchNews = async () => {
-    try {
-      const res: ResponseNewsAllDto = await fetchWithAuth(
-        'tips/allnews',
-        {
-          method: 'GET',
-        },
-        true
-      );
-      if (!res.success) {
-        throw new Error('Failed to fetch news');
-      }
-      setNews(res.data?.emails || []);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        (error.message === 'Token is expired' ||
-          error.message === 'Unauthorized access' ||
-          error.message === 'No token found')
-      ) {
-        localStorage.removeItem('token');
-        router.push('/login');
-      }
-    }
-  };
-
-  useEffect(() => {
-    fetchNews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  const { data, error, setData, setError } = useFetchData<
+    ResponseNewsAllDto['data']
+  >('tips/allnews', [router], true);
 
   // Pagination logic
-  const totalPages = Math.ceil(news.length / NEWS_PER_PAGE);
-  const paginatedNews = news.slice(
+  const totalPages = Math.ceil((data?.emails?.length || 0) / NEWS_PER_PAGE);
+  const paginatedNews = data?.emails?.slice(
     (currentPage - 1) * NEWS_PER_PAGE,
     currentPage * NEWS_PER_PAGE
   );
@@ -60,7 +32,7 @@ export const AllNews = () => {
     setCurrentPage((p) => Math.min(totalPages, p + 1));
 
   const handleUpdate = (id: number) => {
-    const email = news.find((e) => e.id === id);
+    const email = data?.emails?.find((e) => e.id === id);
     if (email) {
       setEditingId(id);
       setNewsTitle(email.title);
@@ -85,10 +57,14 @@ export const AllNews = () => {
       },
       true
     );
-
     setEditingId(null);
     setFile(null);
-    await fetchNews(); // Refresh data after update
+
+    // Re-fetch and update table
+    const response = await fetchWithAuth('tips/allnews', {}, true);
+    if (response && response.data) {
+      setData(response.data);
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -100,7 +76,11 @@ export const AllNews = () => {
         },
         true
       );
-      setNews((prev) => prev.filter((email) => email.id !== id));
+      // Re-fetch and update table
+      const response = await fetchWithAuth('tips/allnews', {}, true);
+      if (response && response.data) {
+        setData(response.data);
+      }
     }
   };
 
@@ -177,7 +157,7 @@ export const AllNews = () => {
           </tr>
         </thead>
         <tbody>
-          {paginatedNews.map((email) => (
+          {paginatedNews?.map((email) => (
             <tr key={email.id}>
               <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                 {editingId === email.id ? (
@@ -305,3 +285,6 @@ export const AllNews = () => {
     </div>
   );
 };
+function setNews(arg0: (prev: any) => any) {
+  throw new Error('Function not implemented.');
+}

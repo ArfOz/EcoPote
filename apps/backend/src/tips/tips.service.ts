@@ -56,17 +56,17 @@ export class TipsService {
         );
       }
 
-      // const { sentUsers, errorUsers } = await sendEmailAzure(
-      //   users,
-      //   emailData.subject,
-      //   emailData.html
-      // );
-
-      const { sentUsers, errorUsers } = await sendEmailsGmail(
+      const { sentUsers, errorUsers } = await sendEmailAzure(
         users,
         emailData.subject,
         emailData.html
       );
+
+      // const { sentUsers, errorUsers } = await sendEmailsGmail(
+      //   users,
+      //   emailData.subject,
+      //   emailData.html
+      // );
       return {
         data: { sentUsers, errorUsers },
         success: true,

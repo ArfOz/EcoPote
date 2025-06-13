@@ -34,7 +34,7 @@ import { CreateAddNewsDto, UpdateNewsDto } from './dtos';
 export class TipsController {
   constructor(private readonly newsService: TipsService) {}
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('sendnews')
   @UseInterceptors(FileInterceptor('file'))
   async sendNews(

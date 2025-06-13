@@ -60,8 +60,8 @@ export class CronController {
   @Get('get-jobs')
   async getCronJobs(): Promise<ResponseCron> {
     try {
-      const jobs = await this.cronService.getCronJobs();
-      return { success: true, data: jobs };
+      const data = await this.cronService.getCronJobs();
+      return { success: true, data, message: 'Cron jobs fetched successfully' };
     } catch (error) {
       console.error('Error fetching cron jobs:', error);
       throw new HttpException(

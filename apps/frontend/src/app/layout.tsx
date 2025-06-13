@@ -22,5 +22,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-// Move AuthGuard to a separate client component file!

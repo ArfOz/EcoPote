@@ -12,7 +12,13 @@
     "all:sequential": "npx nx run-many --targets=backend:serve,frontend:dev --parallel=false",
     "build:app": "nest build",
     "start:prod": "node dist/main.js",
-    "build:azure": "npx nx run functions:build --prod"
+    "build:azure": "npx nx run functions:build --prod",
+    "start": "node dist/apps/backend/main.js",
+    "start:backend": "node dist/apps/backend/main.js",
+    "start:frontend": "npx nx run frontend:dev",
+    "dev": "npx nx run backend:serve",
+    "build:backend": "nx build backend",
+    "deploy:azure:backend": "npm run build:backend && az webapp deploy --resource-group mail-sender --name ecopotebackend --src-path dist/apps/backend"
   },
   "private": true,
   "dependencies": {

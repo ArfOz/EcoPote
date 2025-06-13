@@ -13,7 +13,6 @@ export const CronCreator = ({
 }: {
   setData: React.Dispatch<React.SetStateAction<ResponseCron['data']>>;
 }) => {
-  const [cronJobs, setCronJobs] = React.useState<ResponseCron[]>([]);
   const [status, setStatus] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);

@@ -1,34 +1,27 @@
 'use client';
 import { ResponseNewsOrderDto } from '@shared/dtos';
-import { fetchWithAuth } from '@utils';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
+import { useFetchData } from '../datafetch';
 
 export const Newsorder = () => {
-  const [data, setData] = useState<ResponseNewsOrderDto['data'] | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchNewsOrder = async () => {
-      try {
-        const res: ResponseNewsOrderDto = await fetchWithAuth(
-          'tips/newsorder',
-          {},
-          true
-        );
-        setData(res.data);
-      } catch (error) {
-        console.error('Error fetching news order:', error);
-      }
-    };
-
-    fetchNewsOrder();
-  }, [router]);
-
+  const {
+    data = [],
+    error,
+    setData,
+    setError,
+  } = useFetchData<ResponseNewsOrderDto['data']>(
+    'tips/newsorder',
+    [router],
+    true
+  );
   return (
     <>
       <div className="flex flex-col items-center justify-start min-h-screen bg-gray-100 py-10">
         <h1 className="text-2xl font-bold mb-4">News Order</h1>
+        {error && <div className="text-red-600 mb-4">{error}</div>}
         <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg overflow-hidden">
           <thead>
             <tr className="bg-blue-500 text-white">
