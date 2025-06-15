@@ -1,5 +1,14 @@
-import { getJestProjectsAsync } from '@nx/jest';
+import type { Config } from 'jest';
 
-export default async () => ({
-  projects: await getJestProjectsAsync(),
-});
+const config: Config = {
+  displayName: 'backend',
+  preset: '../../jest.preset.js',
+  testEnvironment: 'node',
+  transform: {
+    '^.+\\.[tj]s$': 'ts-jest',
+  },
+  moduleFileExtensions: ['ts', 'js', 'html'],
+  coverageDirectory: '../../coverage/apps/backend',
+};
+
+export default config;
