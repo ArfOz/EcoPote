@@ -20,6 +20,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Generate database
+        run: npm run database:generate
+
       - name: Build backend
         run: npx nx build backend
 
