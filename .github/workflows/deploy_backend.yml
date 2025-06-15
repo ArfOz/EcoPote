@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x' # or '20.x' for better Azure compatibility
+          node-version: '20.x' # or '20.x' for better Azure compatibility
 
       - name: Install dependencies
         run: npm install
@@ -26,15 +26,10 @@ jobs:
       - name: Build backend
         run: npx nx build backend
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          allow-no-subscriptions: true
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'backendecopote'
           slot-name: 'Production'
           package: dist/apps/backend
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
