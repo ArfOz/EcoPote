@@ -32,4 +32,4 @@ jobs:
           app-name: 'backendecopote'
           slot-name: 'Production'
           package: dist/apps/backend
-          publish-profile: ${{ secrets.__publishingprofilesecretname__ }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
