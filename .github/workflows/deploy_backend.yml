@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x'
+          node-version: '18.x' # or '20.x' for better Azure compatibility
 
       - name: Install dependencies
         run: npm install
@@ -28,5 +28,5 @@ jobs:
         with:
           app-name: 'backendecopote'
           slot-name: 'Production'
-          package: .
+          package: dist/apps/backend
           publish-profile: ${{ secrets.__publishingprofilesecretname__ }}
