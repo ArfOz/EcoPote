@@ -26,10 +26,14 @@ jobs:
       - name: Build backend
         run: npx nx build backend
 
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'backendecopote'
           slot-name: 'Production'
           package: dist/apps/backend
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
