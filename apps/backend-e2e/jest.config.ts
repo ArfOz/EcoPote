@@ -1,18 +1,14 @@
-export default {
-  displayName: 'backend-e2e',
+import type { Config } from 'jest';
+
+const config: Config = {
+  displayName: 'backend',
   preset: '../../jest.preset.js',
-  globalSetup: '<rootDir>/src/support/global-setup.ts',
-  globalTeardown: '<rootDir>/src/support/global-teardown.ts',
-  setupFiles: ['<rootDir>/src/support/test-setup.ts'],
   testEnvironment: 'node',
   transform: {
-    '^.+\\.[tj]s$': [
-      'ts-jest',
-      {
-        tsconfig: '<rootDir>/tsconfig.spec.json',
-      },
-    ],
+    '^.+\\.[tj]s$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/backend-e2e',
+  coverageDirectory: '../../coverage/apps/backend',
 };
+
+export default config;
